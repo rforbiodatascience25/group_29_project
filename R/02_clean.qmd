@@ -3,3 +3,29 @@ title: "Cleaning data"
 format: html
 editor: visual
 ---
+
+# Loading packages
+
+```{r}
+
+library("tidyverse")
+```
+
+# Loading data files
+
+```{r}
+
+blood <- read_csv(file = "data/blood_load.csv")
+
+tonsil <- read_csv(file = "data/tonsil_load.csv")
+
+thymus <- read_csv(file = "data/thymus_load.csv")
+```
+
+# Cleaning blood data
+
+# Cleaning tonsil data
+
+# Cleaning thymus data
+
+# Writing data files

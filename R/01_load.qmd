@@ -26,7 +26,7 @@ thymus <- read_csv(file = "data/_raw/thymus.csv")
 
 ```
 
-# Writing files
+# Writing data files
 
 ```{r}
 
