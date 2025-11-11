@@ -25,3 +25,18 @@ tonsil <- read_csv(file = "data/_raw/tonsil.csv")
 thymus <- read_csv(file = "data/_raw/thymus.csv")
 
 ```
+
+# Writing files
+
+```{r}
+
+write_csv(x = blood,
+          file = "data/blood_load.csv")
+
+write_csv(x = tonsil,
+          file = "data/tonsil_load.csv")
+
+write_csv(x = thymus,
+          file = "data/thymus_load.csv")
+
+```
