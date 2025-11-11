@@ -11,6 +11,8 @@ editor_options:
 ```{r}
 
 library("tidyverse")
+
+source(file = "R/99_proj_func.R")
 ```
 
 # Loading data files
@@ -30,14 +32,27 @@ thymus <- read_csv(file = "data/thymus_load.csv")
 
 selected_measures <- c("CVQb", "MedQb", "count", "PEpos")
 
-blood_clean <- blood |>
-  select(CD, ends_with(selected_measures)) |>
-  pivot_longer(cols = ends_with(selected_measures),
-               names_to = c("Cell_type", ".value"),
-               names_pattern = "(.*)_(.*)",
-               values_drop_na = TRUE) |>
-  mutate(Tissue = "blood")
+blood_clean <- blood |> 
+  pivot_selected_variables(ID_col = "CD",
+                           variables = selected_measures,
+                           tissue = "blood")
 
+tonsil_clean <- tonsil |> 
+  pivot_selected_variables(ID_col = "CD",
+                           variables = selected_measures,
+                           tissue = "tonsil")
+
+thymus_clean <- thymus |> 
+  pivot_selected_variables(ID_col = "CD",
+                           variables = selected_measures,
+                           tissue = "thymus")
+
+# I have saved this for later use. Just let it be here.
+#   mutate(hierarchy_level = case_when(cell_type == "Lymphs" ~ 1,
+                                     #cell_type %in% c("T", "B") ~ 2,
+                                     #cell_type %in% c("Tgd", "TCD8", "TCD4") ~ 3,
+                                     #.default = 4),
+         #.after = cell_type)
 ```
 
 # Cleaning tonsil data
