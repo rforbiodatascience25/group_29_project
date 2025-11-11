@@ -2,6 +2,8 @@
 title: "Cleaning data"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Loading packages
