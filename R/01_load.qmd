@@ -2,4 +2,26 @@
 title: "Loading data"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
+
+# Loading packages
+
+```{r}
+
+library("tidyverse")
+
+```
+
+# Loading data files
+
+```{r}
+
+blood <- read_csv(file = "data/_raw/blood.csv")
+
+tonsil <- read_csv(file = "data/_raw/tonsil.csv")
+
+thymus <- read_csv(file = "data/_raw/thymus.csv")
+
+```
