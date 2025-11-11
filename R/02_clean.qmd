@@ -35,7 +35,8 @@ blood_clean <- blood |>
   pivot_longer(cols = ends_with(selected_measures),
                names_to = c("Cell_type", ".value"),
                names_pattern = "(.*)_(.*)",
-               values_drop_na = TRUE)
+               values_drop_na = TRUE) |>
+  mutate(Tissue = "blood")
 
 ```
 
