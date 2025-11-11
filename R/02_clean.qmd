@@ -26,6 +26,15 @@ thymus <- read_csv(file = "data/thymus_load.csv")
 
 # Cleaning blood data
 
+```{r}
+
+selected_measures <- c("CVQb", "MedQB", "count", "PEpos")
+
+blood <- blood |>
+  select(CD, ends_with(selected_measures))
+
+```
+
 # Cleaning tonsil data
 
 # Cleaning thymus data
