@@ -28,7 +28,7 @@ thymus <- read_csv(file = "data/thymus_load.csv")
 
 ```{r}
 
-selected_measures <- c("CVQb", "MedQB", "count", "PEpos")
+selected_measures <- c("CVQb", "MedQb", "count", "PEpos")
 
 blood <- blood |>
   select(CD, ends_with(selected_measures))
