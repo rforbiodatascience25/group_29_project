@@ -30,8 +30,12 @@ thymus <- read_csv(file = "data/thymus_load.csv")
 
 selected_measures <- c("CVQb", "MedQb", "count", "PEpos")
 
-blood <- blood |>
-  select(CD, ends_with(selected_measures))
+blood_clean <- blood |>
+  select(CD, ends_with(selected_measures)) |>
+  pivot_longer(cols = ends_with(selected_measures),
+               names_to = c("Cell_type", ".value"),
+               names_pattern = "(.*)_(.*)",
+               values_drop_na = TRUE)
 
 ```
 
