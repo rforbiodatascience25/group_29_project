@@ -69,4 +69,14 @@ thymus_clean <- thymus |>
 
 # Cleaning thymus data
 
+# Merge the three cleaned datasets
+
+```{r}
+merged_data <- bind_rows(
+blood_clean,
+tonsil_clean,
+thymus_clean
+)
+```
+
 # Writing data files
