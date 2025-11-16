@@ -26,7 +26,7 @@ tonsil <- read_csv(file = "data/tonsil_load.csv")
 thymus <- read_csv(file = "data/thymus_load.csv")
 ```
 
-# Cleaning blood data
+# Cleaning each data set
 
 ```{r}
 
@@ -65,21 +65,17 @@ thymus_clean <- thymus |>
          #.before = cell_type)
 ```
 
-# Cleaning tonsil data
-
-# Cleaning thymus data
-
-# Merge the three cleaned datasets
+# Merge the three cleaned data sets
 
 ```{r}
 
 level_3 <- c("Tgd", "TCD8", "TCD4", "Bnaive", "BnatEff", "BIgM", "BswMem","Bdn", "B27high", "BnaiveTo", "CC", "CB", "UnswtMem", "SwtMem", "PC")
 
-data <- bind_rows(blood_clean,
-                  tonsil_clean,
-                  thymus_clean)
+data_merged <- bind_rows(blood_clean,
+                         tonsil_clean,
+                         thymus_clean)
 
-data_clean <- data |>
+data_clean <- data_merged |>
   filter(CD != "FMO") |>
   mutate(hierarchy_level = case_when(cell_type == "Lymphs" ~ 1,
                                      cell_type %in% c("T", "B") ~ 2,
@@ -93,15 +89,41 @@ data_clean <- data |>
                             .default = "B cells"),
          .before = cell_type)
 
-list_cols <- grep("^MedQb_", names(df), value = TRUE)
+```
+
+# Preparing data set for PCA
+
+```{r}
 
 
-data_PCA <- data |>
+PCA_nested <- data |>
   pivot_wider(id_cols = c("tissue", "cell_type"),
               names_from = "CD",
               values_from = c("MedQb", "PEpos"),
               values_fn = list)
 
+max_len <- PCA_nested |>
+  select(starts_with(c("MedQb", "PEpos"))) |> 
+  map(lengths) |>
+  unlist() |>
+  max()
+
+PCA_clean <- PCA_nested |>
+  mutate(across(
+    starts_with(c("MedQb","PEpos")),
+    ~ map(.x, ~ c(.x, rep(NA, max_len - length(.x)))))) |>
+  unnest() |>
+  filter(!if_all(-c(tissue, cell_type), is.na))
+  
 ```
 
 # Writing data files
+
+```{r}
+
+write_csv(x = data_clean,
+          file = "data/data_clean.csv")
+
+write_csv(x = PCA_clean,
+          file = "data/PCA_clean.csv")
+```
