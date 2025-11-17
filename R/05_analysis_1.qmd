@@ -62,7 +62,7 @@ data_clean |>
   cell_type_order() |>
   filter(lineage == "B cells",
          hierarchy_level == 3,
-         CD %in% c("CD23","CD44"))|>
+         CD %in% c("CD27","CD95"))|>
   ggplot(aes(x = cell_type,
              y = MedQb,
              fill = tissue)) +
@@ -77,9 +77,9 @@ data_clean |>
 
 data_clean |>
   cell_type_order() |>
-  filter(lineage == "CD8 T cells",
-         hierarchy_level == 4,
-         tissue == "thymus") |>
+  filter(lineage == "B cells",
+         hierarchy_level == 3,
+         tissue == "blood") |>
   ggplot(aes(x = fct_reorder(CD, MedQb),
              y = MedQb)) +
   geom_boxplot(fill = "hotpink", alpha = 0.7) +
