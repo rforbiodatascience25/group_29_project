@@ -44,7 +44,7 @@ data_clean |>
   cell_type_order() |>
   filter(lineage %in% c("CD8 T cells", "T cells"),
          hierarchy_level == 4,
-         CD %in% c("CD10","CD51"))|>
+         CD %in% c("CD10","CD1a"))|>
   ggplot(aes(x = cell_type,
              y = MedQb,
              fill = tissue)) +
@@ -62,7 +62,7 @@ data_clean |>
   cell_type_order() |>
   filter(lineage == "B cells",
          hierarchy_level == 3,
-         CD %in% c("CD10","CD51"))|>
+         CD %in% c("CD23","CD44"))|>
   ggplot(aes(x = cell_type,
              y = MedQb,
              fill = tissue)) +
@@ -71,4 +71,20 @@ data_clean |>
   theme_bw() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   facet_wrap(~ CD, ncol = 1)
+```
+
+```{r}
+
+data_clean |>
+  cell_type_order() |>
+  filter(lineage == "CD8 T cells",
+         hierarchy_level == 4,
+         tissue == "thymus") |>
+  ggplot(aes(x = fct_reorder(CD, MedQb),
+             y = MedQb)) +
+  geom_boxplot(fill = "hotpink", alpha = 0.7) +
+  scale_y_log10() +
+  #facet_wrap(~ cell_type, ncol = 1) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
