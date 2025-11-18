@@ -2,4 +2,36 @@
 title: "Adding new variables"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
+
+# Loading packages
+
+```{r}
+
+library("tidyverse")
+
+source(file = "R/99_proj_func.R")
+```
+
+# Loading data files
+
+```{r}
+
+data_clean <- read_csv(file = "data/data_clean.csv")
+```
+
+# CD4 vs CD8
+
+```{r}
+
+CD4_vs_CD8_aug <- data_clean |>
+  filter(lineage %in% c("CD4 T cells", "CD8 T cells"),
+         cell_type != "CD4ISP",
+         cell_type != "TCD8RAdim",
+         hierarchy_level == 4)
+  
+  
+
+```
