@@ -2,4 +2,42 @@
 title: "Analysis 2"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
+
+### Creating auxiliary data frame
+
+```{r}
+aux_data <- data_clean %>%
+  distinct(cell_type, tissue) %>%
+  mutate(y = "Tissue")  # dummy y-position above your markers
+```
+
+### Making the heat dot plot
+
+```{r}
+#| fig-height: 1000
+#| fig-width: 400
+
+ggplot(data = data_clean, aes(x = cell_type, y = CD)) +
+  geom_point(aes(size = PEpos, color = log10(MedQb))) +
+  geom_tile(data = aux_data, aes(x = cell_type, y = y, fill = tissue), height = 2) +
+  scale_size_continuous(range = c(0.5, 2)) +
+  scale_color_gradient2(low = "lightblue", mid = "orange", high = "darkred", midpoint = 3) +
+  scale_fill_manual(values = c("blood" = "#93aa9b", "tonsil" = "#c8b145", "thymus" = "#bb6e36")) +
+  scale_x_discrete(position = "top") +
+  coord_cartesian(clip = "off") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0, hjust = 0, size = 5), 
+        axis.text.y = element_text(size = 5), 
+        panel.grid = element_blank()) +
+  scale_x_discrete(position = "top") +
+  labs(
+    x = "Cell Type",
+    y = "Marker",
+    size = "Frequency of Positive Cells (%)",
+    color = "Fluorescence [log10(Median ABC)]"
+  )
+
+```
