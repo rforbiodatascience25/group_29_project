@@ -96,13 +96,12 @@ CD4_vs_CD8_aug |>
 data_sub <- data_clean |>
   cell_type_order() |>
   filter(lineage %in% c("CD8 T cells", "T cells"),
-         hierarchy_level == 4,
-         CD %in% c("CD10","CD1a"))
+         hierarchy_level == 4,)
 
 # Fit linear models
 
 cd_models <- data_sub |>
-  group_by(CD) |>  # Group by CD marker
+  group_by(tissue, CD) |>  # Group by CD marker
   nest() |>        # Nest data for each CD marker
   mutate(
     model_object = map(.x = data,
@@ -114,18 +113,17 @@ cd_models <- data_sub |>
 
 # Clean and select columns
 
-columns <- c("CD", "cell_type_compared", "p.value", "estimate", "conf.low", "conf.high")
+columns <- c("CD", "tissue", "cell_type_compared", "p.value", "estimate", "conf.low", "conf.high")
 
 cd_results <- cd_models |>
   unnest(model_object_tidy) |>             # Expand nested results
   filter(term != "(Intercept)") |>         # Remove intercept
   mutate(cell_type_compared = str_remove(term, "cell_type")) |>  # Rename column
-  select(CD, cell_type_compared, estimate, conf.low, conf.high, p.value) |>
+  select(columns) |>
   ungroup() |>
-  mutate(
-    q.value = p.adjust(p.value),                   # Adjust p-values for multiple testing
-    is_significant = case_when(q.value < 0.05 ~ "yes",
-                               q.value >= 0.05 ~ "no")  # Mark significant differences
+  mutate(                   # Adjust p-values for multiple testing
+    is_significant = case_when(p.value < 0.05 ~ "yes",
+                               p.value >= 0.05 ~ "no")  # Mark significant differences
   )
 
 # Create plots
