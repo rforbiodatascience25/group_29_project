@@ -2,4 +2,49 @@
 title: "Describing data"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
+
+# Loading packages
+
+```{r}
+
+library("tidyverse")
+
+source(file = "R/99_proj_func.R")
+```
+
+# Loading data files
+
+```{r}
+
+data_clean <- read_csv(file = "data/data_clean.csv")
+
+```
+
+# Description of the clean data set
+
+```{r}
+
+nrow(data_clean)   
+ncol(data_clean) 
+
+
+data_clean |>
+  mutate(tissue = factor(tissue,
+                         levels = c("thymus", "tonsil", "blood"),
+                         labels = c("Thymus", "Tonsil", "Blood"))) |>
+  cell_type_order() |>
+  table1(~ MedQb + PEpos + cell_type + CD | tissue,
+         data = _)
+
+
+
+```
+
+The data consists of immunological measurements from blood, tonsil and thymus. The dataset consists of observations and 9 variables containing CD markers for the cell types in the specific tissue. An overview of the quantitative markers is given below using a table1 summary of data_clean. **The data is structured in long format,** meaning that each combination of tissue, cell type and CD marker appears as one row. This structure makes the dataset suitable for visualization and statistical analysis
+
+The dataset contains measurements from three tissue types: blood (N = 18,463), thymus (N = 4,482), and tonsil (N = 5,453). This distribution shows that the majority of observations originate from blood, while there are fewer measurements from thymus and tonsil.
+
+If you look at the cell types, they are distributed very differently between the tissues. Blood is dominated by mature B and T cell subtypes, thymus by early T cell development stages, while tonsils primarily contain B cell maturation stages and plasma cells.
