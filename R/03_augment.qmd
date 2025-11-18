@@ -11,6 +11,8 @@ editor_options:
 ```{r}
 
 library("tidyverse")
+library(broom)
+library(ggrepel)
 
 source(file = "R/99_proj_func.R")
 ```
@@ -37,3 +39,75 @@ CD4_vs_CD8_aug <- data_clean |>
 ```
 
 # T cells maturation
+
+```{r}
+
+data_sub <- data_clean |>
+  cell_type_order() |>
+  filter(lineage %in% c("CD8 T cells", "T cells"),
+         hierarchy_level == 4,
+         CD %in% c("CD10","CD1a"))
+
+# Fit linear models
+
+cd_models <- data_sub |>
+  group_by(CD) |>  # Group by CD marker
+  nest() |>        # Nest data for each CD marker
+  mutate(
+    model_object = map(.x = data,
+                       .f = ~ lm(MedQb ~ cell_type, data = .x)),  # Compare each cell_type to first
+    model_object_tidy = map(.x = model_object,
+                             .f = ~ tidy(.x, conf.int = TRUE, conf.level = 0.95))  
+                                                                  # Get coefficients + CI
+    )
+
+# Clean and select columns
+
+columns <- c("CD", "cell_type_compared", "p.value", "estimate", "conf.low", "conf.high")
+
+cd_results <- cd_models |>
+  unnest(model_object_tidy) |>             # Expand nested results
+  filter(term != "(Intercept)") |>         # Remove intercept
+  mutate(cell_type_compared = str_remove(term, "cell_type")) |>  # Rename column
+  select(CD, cell_type_compared, estimate, conf.low, conf.high, p.value) |>
+  ungroup() |>
+  mutate(
+    q.value = p.adjust(p.value),                   # Adjust p-values for multiple testing
+    is_significant = case_when(q.value < 0.05 ~ "yes",
+                               q.value >= 0.05 ~ "no")  # Mark significant differences
+  )
+
+# Create plots
+
+# Keep only significant comparisons
+cd_results_sig <- cd_results |> 
+  filter(is_significant == "yes")
+
+forest_plot <- cd_results_sig |>
+  ggplot(aes(x = estimate, y = fct_reorder(cell_type_compared, estimate))) +
+  geom_point(size = 3, color = "blue") +  # points for estimates
+  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height = 0.2, color = "blue") +  # CIs
+  geom_vline(xintercept = 0, linetype = "dashed") +  # baseline
+  facet_wrap(~ CD, scales = "free_y") +  # one y-axis per CD marker
+  labs(
+    x = "Difference in MedQb vs first cell type",
+    y = " ",
+    title = "Significant Differences of CD markers by Cell Type",
+    caption = "Data from CD Maps"
+  ) +
+  theme_minimal() 
+  
+print(forest_plot)
+
+
+#Other plots
+cd_results |>
+  ggplot(aes(x = estimate, y = fct_reorder(cell_type_compared, estimate), color = is_significant)) +
+  geom_segment(aes(x = 0, xend = estimate, y = cell_type_compared, yend = cell_type_compared), size = 0.5, color = "gray") +
+  geom_point(size = 3) +
+  facet_wrap(~ CD, scales = "free_y") +
+  scale_color_manual(values = c("no"="gray", "yes"="blue")) +
+  labs(title = "Lollipop plot of CD marker differences",
+       x = "Difference vs first cell type", y = "Cell Type", color = "Significant") +
+  theme_minimal()
+```
