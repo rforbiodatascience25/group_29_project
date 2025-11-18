@@ -91,25 +91,24 @@ data_clean <- data_merged |>
 # Preparing data set for PCA
 
 ```{r}
-
 PCA_nested <- data_merged |>
   pivot_wider(id_cols = c("tissue", "cell_type"),
               names_from = "CD",
               values_from = c("MedQb", "PEpos"),
-              values_fn = list)
+              values_fn = mean)
 
-max_len <- PCA_nested |>
-  select(starts_with(c("MedQb", "PEpos"))) |> 
-  map(lengths) |>
-  unlist() |>
-  max()
+#max_len <- PCA_nested |>
+  #select(starts_with(c("MedQb", "PEpos"))) |> 
+  #map(lengths) |>
+  #unlist() |>
+  #max()
 
-PCA_clean <- PCA_nested |>
-  mutate(across(
-    starts_with(c("MedQb","PEpos")),
-    ~ map(.x, ~ c(.x, rep(NA, max_len - length(.x)))))) |>
-  unnest() |>
-  filter(!if_all(-c(tissue, cell_type), is.na))
+#PCA_clean <- PCA_nested |>
+  #mutate(across(
+    #starts_with(c("MedQb","PEpos")),
+    #~ map(.x, ~ c(.x, rep(NA, max_len - length(.x)))))) |>
+  #unnest() |>
+  #filter(!if_all(-c(tissue, cell_type), is.na))
   
 ```
 
