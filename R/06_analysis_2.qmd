@@ -2,4 +2,30 @@
 title: "Analysis 2"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
+
+### Preparing data_clean for analysis
+
+```{r}
+  
+```
+
+### Making the heat dot plot
+
+```{r}
+ggplot(data = data_clean, aes(x = cell_type, y = CD)) +
+  geom_point(aes(size = PEpos, color = log10(MedQb))) +
+  scale_size_continuous(range = c(0.1, 1)) +
+  scale_color_gradient2(low = "lightblue", mid = "orange", high = "darkred", midpoint = 3) +
+  theme_minimal() |>
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1), 
+        axis.text.y = element_text(size = 5))
+  labs(
+    x = "Cell Type",
+    y = "Marker",
+    size = "Frequency of Positive Cells (%)",
+    color = "log10(Median ABC)"
+  )
+```
