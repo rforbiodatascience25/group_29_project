@@ -1,6 +1,6 @@
 pivot_selected_variables <- function(data, ID_col, variables, tissue){
   data |>
-    select(ID_col, ends_with(variables)) |>
+    select(ID_col, all_of(ends_with(variables))) |>
     pivot_longer(cols = ends_with(variables),
                  names_to = c("cell_type", ".value"),
                  names_pattern = "(.*)_(.*)",
@@ -50,4 +50,36 @@ cell_type_order <- function(data){
                                          "BswMem",
                                          "Bdn",
                                          "B27high")))
+}
+
+asc_CDs_boxplot <- function(data, lineage, hierarchy_level, tissue, measure){
+  measure <- enquo(measure)
+  
+  data|>
+    cell_type_order() |>
+    filter(lineage == !!lineage,
+           hierarchy_level == !!hierarchy_level,
+           tissue == !!tissue) |>
+    drop_na(!!measure) |>
+    group_by(CD) |>
+    mutate(measure_grp = median(!!measure)) |>
+    ungroup() |>
+    ggplot(aes(x = fct_reorder(CD, measure_grp),
+               y = !!measure,
+               fill = log10(measure_grp))) +
+    geom_boxplot() +
+    scale_y_log10(labels = trans_format("log10", 
+                                        math_format(10^.x))) +
+    scale_fill_gradient2(low = "lightblue", 
+                         mid = "orange", 
+                         high = "darkred", 
+                         midpoint = 3) +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, 
+                                     vjust = 0.5, 
+                                     hjust = 1)) +
+    labs(x = "CD",
+         y = measure,
+         fill = paste0("log10(", quo_name(measure), ")"),
+         title = paste("Fluorescence of", lineage, "from the", tissue))
 }

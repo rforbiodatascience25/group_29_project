@@ -80,10 +80,11 @@ data_clean <- data_merged |>
                                      cell_type %in% level_3 ~ 3,
                                      .default = 4),
          .after = cell_type) |>
-  mutate(lineage = case_when(str_detect(cell_type, "CD4") ~ "CD4 T cells",
+  mutate(lineage = case_when(tissue == "thymus" ~ "thymocytes",
+                             str_detect(cell_type, "CD4") ~ "CD4 T cells",
                              str_detect(cell_type, "CD8") ~ "CD8 T cells",
                              str_starts(cell_type, "T") ~ "T cells",
-                             str_starts(cell_type, "D") ~ "T cells",
+                             #str_starts(cell_type, "D") ~ "T cells",
                              .default = "B cells"),
          .before = cell_type)
 ```

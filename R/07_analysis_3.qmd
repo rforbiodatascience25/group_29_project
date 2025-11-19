@@ -1,0 +1,46 @@
+---
+title: "Analysis 3"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# Loading packages
+
+```{r}
+
+library("tidyverse")
+library("scales")
+library("patchwork")
+
+source(file = "R/99_proj_func.R")
+
+```
+
+# Loading data files
+
+```{r}
+
+data_clean <- read_csv("data/data_clean.csv")
+
+```
+
+# Creating the plots
+
+```{r}
+
+p1 <- data_clean |>
+  asc_CDs_boxplot(lineage = "B cells",
+                  hierarchy_level = 3,
+                  tissue = "blood",
+                  measure = MedQb)
+
+p2 <- data_clean |>
+  asc_CDs_boxplot(lineage = "B cells",
+                  hierarchy_level = 3,
+                  tissue = "blood",
+                  measure = CVQb)
+
+p1 / p2
+```
