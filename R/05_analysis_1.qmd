@@ -80,11 +80,32 @@ data_clean |>
   filter(lineage == "B cells",
          hierarchy_level == 3,
          tissue == "blood") |>
-  ggplot(aes(x = fct_reorder(CD, MedQb),
-             y = MedQb)) +
-  geom_boxplot(fill = "hotpink", alpha = 0.7) +
-  scale_y_log10() +
-  #facet_wrap(~ cell_type, ncol = 1) +
+  drop_na(MedQb) |>
+  group_by(CD) |>
+  mutate(MedQb_grp = median(MedQb)) |>
+  ungroup() |>
+  ggplot(aes(x = fct_reorder(CD, MedQb_grp),
+             y = MedQb,
+             fill = log10(MedQb_grp))) +
+  geom_boxplot() +
+  scale_y_log10(labels = trans_format("log10", 
+                                      math_format(10^.x))) +
+  scale_fill_gradient2(low = "lightblue", 
+                        mid = "orange", 
+                        high = "darkred", 
+                        midpoint = 3) +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1)) +
+  labs(x = "CD",
+       y = "Flourescence [Median ABC]",
+       fill = "log10(Median ABC)",
+       title = paste("Fluorescence of", lineage, "in", tissue))
+
+data_clean |>
+  asc_CDs_boxplot(lineage = "B cells",
+                  hierarchy_level = 4,
+                  tissue = "blood",
+                  measure = MedQb)
 ```
