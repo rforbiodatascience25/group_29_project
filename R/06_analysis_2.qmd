@@ -26,8 +26,8 @@ tube_bar <- data_clean |>
 ## Making the heat dot plot
 
 ```{r}
-#| fig-height: 10000
-#| fig-width: 200
+#| fig-height: 15
+#| fig-width: 8
 
 ggplot(data = data_clean_analysis2, 
        aes(x = cell_type, 
