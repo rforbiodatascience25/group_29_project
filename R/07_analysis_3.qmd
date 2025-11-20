@@ -133,7 +133,7 @@ The following combinations are used in the analysis view:
 
 -   T cells (instead of *Thymocytes*) from thymus at hierarchy level 4
 
-These figures are arranged in a two part layout (MedQb \| CVQb) for each lineage, so that both median values ​​and variation within the individual cell type-tissue combinations can be compared, and the visualizations can provide an overall overview of the quality of the CD marker measurements for the four selected immune populations.
+The plots show the MedQb values for each lineage, so that both median values ​​and variation within the individual cell type-tissue combinations can be compared, and the visualizations can provide an overall overview of the quality of the CD marker measurements for the four selected immune populations.
 
 As the tonsil contains multiple stages of B cell maturation, it is expected that B cells (tonsil) show a wide spread in CD marker levels.
 
