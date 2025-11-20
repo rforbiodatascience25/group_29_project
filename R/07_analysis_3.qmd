@@ -1,17 +1,17 @@
 ---
 title: "Analysis 3"
-format: html
+format:
+  html:
+    embed-resources: true
 editor: visual
-editor_options: 
-  chunk_output_type: console
-project:
-  type: default
-  output-dir: results
 ---
 
 # Loading packages
 
 ```{r}
+#| label: load_packages
+#| message: false
+#| warning: false
 
 library(tidyverse)
 library(scales)
@@ -23,6 +23,9 @@ source(here::here("R", "99_proj_func.R"))
 # Loading data files
 
 ```{r}
+#| label: load_data
+#| message: false
+#| warning: false
 
 data_clean <- read_csv(here::here("data", "data_clean.csv"))
 
@@ -31,6 +34,11 @@ data_clean <- read_csv(here::here("data", "data_clean.csv"))
 # Flourescence of B cells
 
 ```{r}
+#| label: B_cells_blood
+#| message: false
+#| warning: false
+#| fig-height: 10
+#| fig-width: 9
 
 p1 <- data_clean |>
   asc_CDs_boxplot(lineage = "B cells",
@@ -48,6 +56,11 @@ p1 / p2
 ```
 
 ```{r}
+#| label: B_cells_tonsil
+#| message: false
+#| warning: false
+#| fig-height: 10
+#| fig-width: 9
 
 p1 <- data_clean |>
   asc_CDs_boxplot(lineage = "B cells",
@@ -67,6 +80,11 @@ p1 / p2
 # Flourescence of T cells
 
 ```{r}
+#| label: CD4_T_cells
+#| message: false
+#| warning: false
+#| fig-height: 12
+#| fig-width: 9
 
 p1 <- data_clean |>
   asc_CDs_boxplot(lineage = "CD4 T cells",
@@ -83,6 +101,11 @@ p1 / p2
 ```
 
 ```{r}
+#| label: CD8_T_cells
+#| message: false
+#| warning: false
+#| fig-height: 10
+#| fig-width: 9
 
 p1 <- data_clean |>
   asc_CDs_boxplot(lineage = "CD8 T cells",
@@ -100,6 +123,11 @@ p1 / p2
 ```
 
 ```{r}
+#| label: Thymocytes
+#| message: false
+#| warning: false
+#| fig-height: 10
+#| fig-width: 9
 
 p1 <- data_clean |>
   asc_CDs_boxplot(lineage = "thymocytes",
