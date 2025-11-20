@@ -30,7 +30,7 @@ pca_data <- PCA_filled|>
 
 ```{r}
 pca_data |> 
-  augment(data = PCA_filled) |>     # NOT pca_data, unless you want only numeric columns
+  augment(data = PCA_filled) |>
   ggplot(aes(.fittedPC1, 
              .fittedPC2,
              shape = tissue,
@@ -42,10 +42,10 @@ pca_data |>
        y = "PC2",
        color = "cell type") +
   theme(
-  legend.key.size = unit(0.4, "lines"),   # height of each legend row
-  legend.text = element_text(size = 7),   # smaller text
-  legend.spacing.y = unit(0.1, "lines"),  # vertical space between rows
-  legend.spacing.x = unit(0.2, "lines")   # horizontal spacing
+  legend.key.size = unit(0.4, "lines"),   #height of each legend row
+  legend.text = element_text(size = 7),   #smaller text
+  legend.spacing.y = unit(0.1, "lines"),  #vertical space between rows
+  legend.spacing.x = unit(0.2, "lines")   #horizontal spacing
 )
 
 ```
