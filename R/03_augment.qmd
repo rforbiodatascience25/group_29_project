@@ -222,7 +222,7 @@ data_aug <- data_clean |>
   mutate(
     intercept = estimate[term == "(Intercept)"],
     estimate = case_when(
-      term == "(Intercept)" ~ intercept,
+      term == "(Intercept)" ~ estimate,
       term != "(Intercept)" ~ estimate + intercept),
     conf.low = case_when(
       term == "(Intercept)" ~ conf.low,
