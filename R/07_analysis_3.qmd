@@ -44,3 +44,112 @@ p2 <- data_clean |>
 
 p1 / p2
 ```
+
+```{r}
+
+p1 <- data_clean |>
+  asc_CDs_boxplot(
+    lineage         = "B cells",
+    hierarchy_level = 3,
+    tissue          = "tonsil",
+    measure         = MedQb
+  )
+
+p2 <- data_clean |>
+  asc_CDs_boxplot(
+    lineage         = "B cells",
+    hierarchy_level = 3,
+    tissue          = "tonsil",
+    measure         = CVQb
+  )
+
+## 2) CD4 T cells – blood – level 4
+p3 <- data_clean |>
+  asc_CDs_boxplot(
+    lineage         = "CD4 T cells",
+    hierarchy_level = 4,
+    tissue          = "blood",
+    measure         = MedQb
+  )
+
+p4 <- data_clean |>
+  asc_CDs_boxplot(
+    lineage         = "CD4 T cells",
+    hierarchy_level = 4,
+    tissue          = "blood",
+    measure         = CVQb
+  )
+
+
+p5 <- data_clean |>
+  asc_CDs_boxplot(
+    lineage         = "CD8 T cells",
+    hierarchy_level = 4,
+    tissue          = "blood",
+    measure         = MedQb
+  )
+
+p6 <- data_clean |>
+  asc_CDs_boxplot(
+    lineage         = "CD8 T cells",
+    hierarchy_level = 4,
+    tissue          = "blood",
+    measure         = CVQb
+  )
+
+
+p7 <- data_clean |>
+  asc_CDs_boxplot(
+    lineage         = "T cells",
+    hierarchy_level = 4,
+    tissue          = "thymus",
+    measure         = MedQb
+  )
+
+p8 <- data_clean |>
+  asc_CDs_boxplot(
+    lineage         = "T cells",
+    hierarchy_level = 4,
+    tissue          = "thymus",
+    measure         = CVQb
+  )
+
+
+(p1 | p2) /
+(p3 | p4) /
+(p5 | p6) /
+(p7 | p8)
+
+
+```
+
+To look at the variation in ASC-related CD markers, a boxplot was generated for four selected immune cell types in their different relevant tissues. For each cell type, both MedQb and CVQb were visualized side by side to provide an overall overview of signal strength and internal variation.
+
+The following combinations are used in the analysis view:
+
+-   B cells from tonsil at hierarchy level 3
+
+-   CD4 T cells from blood at hierarchy level 4
+
+-   CD8 T cells from blood at hierarchy level 4
+
+-   T cells (instead of *Thymocytes*) from thymus at hierarchy level 4
+
+These figures are arranged in a two part layout (MedQb \| CVQb) for each lineage, so that both median values ​​and variation within the individual cell type-tissue combinations can be compared, and the visualizations can provide an overall overview of the quality of the CD marker measurements for the four selected immune populations.(p1 \| p2)
+
+```{p1 <- p1 + theme(axis.text.x = element_text(angle = 90))}
+p2 <- p2 + theme(axis.text.x = element_text(angle = 90))
+p3 <- p3 + theme(axis.text.x = element_text(angle = 90))
+p4 <- p4 + theme(axis.text.x = element_text(angle = 90))
+p5 <- p5 + theme(axis.text.x = element_text(angle = 90))
+p6 <- p6 + theme(axis.text.x = element_text(angle = 90))
+p7 <- p7 + theme(axis.text.x = element_text(angle = 90))
+p8 <- p8 + theme(axis.text.x = element_text(angle = 90))
+
+```
+
+As the tonsil contains multiple stages of B cell maturation, it is expected that B cells (tonsil) show a wide spread in CD marker levels.
+
+Blood, which consists of CD4 and CD8 T-cells, has more aggregated signals, reflecting mature and stable T cell populations.
+
+If we look at T cells (thymus) again, a greater variation in signal strength is seen, which is consistent with the fact that early developmental stages of T cells are found in the thymus
