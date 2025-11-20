@@ -2,3 +2,50 @@
 title: "05_PCA"
 format: html
 ---
+
+# Loading libs
+
+```{r}
+library(broom)
+```
+
+# Filling PCA_nested data set with median in empty cells
+
+```{r}
+PCA_filled <- PCA_nested |>
+  mutate(across(
+    where(is.numeric),
+    ~ if_else(is.na(.x), median(.x, na.rm = TRUE), .x)
+  ))
+```
+
+# Make the PCA set
+
+```{r}
+pca_data <- PCA_filled|> 
+  select(where(is.numeric)) |>
+  prcomp(scale = TRUE)
+
+```
+
+```{r}
+pca_data |> 
+  augment(data = PCA_filled) |>     # NOT pca_data, unless you want only numeric columns
+  ggplot(aes(.fittedPC1, 
+             .fittedPC2,
+             shape = tissue,
+             color = cell_type)) +
+  geom_point(size = 1.5,
+             alpha = 0.4) +
+  labs(title = "PCA plot",
+       x = "PC1",
+       y = "PC2",
+       color = "cell type") +
+  theme(
+  legend.key.size = unit(0.4, "lines"),   # height of each legend row
+  legend.text = element_text(size = 7),   # smaller text
+  legend.spacing.y = unit(0.1, "lines"),  # vertical space between rows
+  legend.spacing.x = unit(0.2, "lines")   # horizontal spacing
+)
+
+```
