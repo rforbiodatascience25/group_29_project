@@ -3,7 +3,7 @@ title: "05_PCA"
 format: html
 ---
 
-# Loading libs
+# Loading libraries
 
 ```{r}
 library(broom)
