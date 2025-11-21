@@ -60,6 +60,10 @@ data_clean <- bind_rows(blood_clean,
 
 # Preparing data set for PCA
 
+### Populating all cells in dataset
+
+When you make a PCA plot you need all numeric rows and columns to be filled with data. So firstly we needed to fill the empty cells with data. These were empty due to the different cell types and CD's. Unpopulated cells was populated with the median for the column. We avoided using the mean due to outliers potentially skewing the data.
+
 ```{r}
 PCA_clean <- data_clean |>
   pivot_wider(id_cols = c("tissue", "cell_type"),
