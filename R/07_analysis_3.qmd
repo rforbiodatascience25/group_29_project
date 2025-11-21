@@ -157,4 +157,3 @@ The following combinations are used in the analysis view:
 -   CD8 T cells from blood at hierarchy level 4
 
 -   Thymocytes from thymus at hierarchy level 4
-
