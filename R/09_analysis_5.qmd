@@ -2,6 +2,8 @@
 title: "Analysis 5"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Loading packages
@@ -38,7 +40,7 @@ columns <- c("tissue",
              "is_significant",
              "any_significant")
 
-CD4_vs_CD8_aug  <- data_aug |>
+CD4_vs_CD8  <- data_aug |>
   filter(lineage %in% c("CD4 T cells", "CD8 T cells"),
          cell_type != "CD4ISP",
          cell_type != "TCD8RAdim",
@@ -88,18 +90,114 @@ CD4_vs_CD8_aug  <- data_aug |>
                              .default = "CD8 T cells"),
          .before = cell_type)
 
-CD4_vs_CD8_aug |>
+```
+
+```{r}
+
+p1 <- CD4_vs_CD8 |>
+  filter(pair == "naive") |>
   ggplot(aes(x = CD,
              y = estimate,
              color = lineage)) +
-  geom_point() +
+  geom_point(size = 2) +
   geom_errorbar(aes(ymin = conf.low,
-                    ymax = conf.high)) +
+                    ymax = conf.high),
+                width = 0.4) +
   theme_bw() +
   theme(axis.text.x = element_text(angle = 90, 
                                    vjust = 0.5, 
                                    hjust = 1)) +
-  facet_wrap(~ pair) +
-  theme(legend.position = "bottom")
+  theme(legend.position = "none") +
+  scale_color_manual(values = c("CD4 T cells" = "navy",
+                                "CD8 T cells" = "hotpink")) +
+  labs(title = "CD4naive vs CD8naive",
+       x = "Significant CDs",
+       y = "Estimate of log(MedQb)",
+       color = "Lineage")
 
+p2 <- CD4_vs_CD8 |>
+  filter(pair == "CM") |>
+  ggplot(aes(x = CD,
+             y = estimate,
+             color = lineage)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = conf.low,
+                    ymax = conf.high),
+                width = 0.4) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1)) +
+  theme(legend.position = "none") +
+  scale_color_manual(values = c("CD4 T cells" = "navy",
+                                "CD8 T cells" = "hotpink")) +
+  labs(title = "CD4CM vs CD8CM",
+       x = "Significant CDs",
+       y = "Estimate of log(MedQb)",
+       color = "Lineage")
+
+p3 <- CD4_vs_CD8 |>
+  filter(pair == "EM") |>
+  ggplot(aes(x = CD,
+             y = estimate,
+             color = lineage)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = conf.low,
+                    ymax = conf.high),
+                width = 0.4) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1)) +
+  theme(legend.position = "none") +
+  scale_color_manual(values = c("CD4 T cells" = "navy",
+                                "CD8 T cells" = "hotpink")) +
+  labs(title = "CD4EM vs CD8EM",
+       x = "Significant CDs",
+       y = "Estimate of log(MedQb)",
+       color = "Lineage")
+
+p4 <- CD4_vs_CD8 |>
+  filter(pair == "TEMRA") |>
+  ggplot(aes(x = CD,
+             y = estimate,
+             color = lineage)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = conf.low,
+                    ymax = conf.high),
+                width = 0.4) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1)) +
+  theme(legend.position = "bottom") +
+  scale_color_manual(values = c("CD4 T cells" = "navy",
+                                "CD8 T cells" = "hotpink")) +
+  labs(title = "CD4TEMRA vs CD8TEMRA",
+       x = "Significant CDs",
+       y = "Estimate of log(MedQb)",
+       color = "Lineage")
+
+(p1 + p2) / (p3 + p4)
+```
+
+```{r}
+
+p1 <- CD4_vs_CD8 |>
+  plot_CD4vsCD8(pair = "naive",
+                legend_position = "none")
+
+p2 <- CD4_vs_CD8 |>
+  plot_CD4vsCD8(pair = "CM",
+                legend_position = "none")
+
+p3 <- CD4_vs_CD8 |>
+  plot_CD4vsCD8(pair = "EM",
+                legend_position = "none")
+
+p4 <- CD4_vs_CD8 |>
+  plot_CD4vsCD8(pair = "TEMRA",
+                legend_position = "none")
+
+(p1 + p2) / (p3 + p4)
 ```

@@ -87,3 +87,78 @@ asc_CDs_boxplot <- function(data, lineage, hierarchy_level, tissue, measure){
          fill = paste0("log10(", quo_name(measure), ")"),
          title = paste("Fluorescence of", lineage, "from the", tissue))
 }
+
+plot_cd_expression <- function(data, lineage_filter, cds, cell_type_exclude = NULL,
+                               title = "Expression of Selected Markers") {
+  
+  df <- data |>
+    filter(lineage %in% lineage_filter,
+           CD %in% cds)
+  
+  if (!is.null(cell_type_exclude)) {
+    df <- df |> filter(!str_detect(cell_type, 
+                                   cell_type_exclude))
+  }
+  
+  df |>
+    cell_type_order() |>
+    ggplot(aes(x = cell_type,
+               y = estimate,
+               color = factor(is_significant, 
+                              levels = c("reference", 
+                                         "yes", 
+                                         "no")),
+               shape = tissue)) +
+    geom_point(size = 2) +
+    geom_errorbar(aes(ymin = conf.low, 
+                      ymax = conf.high), 
+                  width = 0.4) +
+    facet_wrap(~ CD, ncol = 2, 
+               scales = "free_y") +
+    scale_color_manual(
+      name = "Significance",
+      values = c(
+        "reference" = "black",
+        "yes"       = "#29cf8f",
+        "no"        = "#fa2840"
+      )
+    ) +
+    scale_shape_discrete(name = "Tissue") +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 90, 
+                                 vjust = 0.5, 
+                                 hjust = 1),
+      strip.text = element_text(size = 14, 
+                                face = "bold"),
+      axis.line = element_line(color = "black")
+    ) +
+    labs(
+      title = title,
+      x = "Cell Type",
+      y = "Estimate"
+    )
+}
+
+plot_CD4vsCD8 <- function(data, pair, legend_position) {
+  data |>
+    filter(pair == !!pair) |>
+    ggplot(aes(x = CD,
+               y = estimate,
+               color = lineage)) +
+    geom_point(size = 2) +
+    geom_errorbar(aes(ymin = conf.low,
+                      ymax = conf.high),
+                  width = 0.4) +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, 
+                                     vjust = 0.5, 
+                                     hjust = 1),
+          legend.position = legend_position) +
+    scale_color_manual(values = c("CD4 T cells" = "navy",
+                                  "CD8 T cells" = "hotpink")) +
+    labs(title = paste0("CD4", pair, " vs CD8", pair),
+         x = "Significant CDs",
+         y = "Estimate of log(MedQb)",
+         color = "Lineage")
+}
