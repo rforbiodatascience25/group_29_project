@@ -62,9 +62,10 @@ asc_CDs_boxplot <- function(data, lineage, hierarchy_level, tissue, measure){
            tissue == !!tissue) |>
     drop_na(!!measure) |>
     group_by(CD) |>
-    mutate(measure_grp = median(!!measure)) |>
+    mutate(MedQb_grp = median(MedQb),
+           measure_grp = median(!!measure)) |>
     ungroup() |>
-    ggplot(aes(x = fct_reorder(CD, measure_grp),
+    ggplot(aes(x = fct_reorder(CD, MedQb_grp),
                y = !!measure,
                fill = log10(measure_grp))) +
     geom_boxplot() +
@@ -75,9 +76,12 @@ asc_CDs_boxplot <- function(data, lineage, hierarchy_level, tissue, measure){
                          high = "darkred", 
                          midpoint = 3) +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 90, 
+    theme(axis.text.x = element_text(size = 6,
+                                     angle = 90, 
                                      vjust = 0.5, 
-                                     hjust = 1)) +
+                                     hjust = 1),
+          axis.text.y = element_text(size = 8),
+          legend.position = "bottom") +
     labs(x = "CD",
          y = measure,
          fill = paste0("log10(", quo_name(measure), ")"),

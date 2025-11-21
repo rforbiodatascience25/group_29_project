@@ -1,34 +1,44 @@
 ---
 title: "Analysis 3"
-format: html
+format:
+  html:
+    embed-resources: true
 editor: visual
-editor_options: 
-  chunk_output_type: console
 ---
 
 # Loading packages
 
 ```{r}
+#| label: load_packages
+#| message: false
+#| warning: false
 
-library("tidyverse")
-library("scales")
-library("patchwork")
+library(tidyverse)
+library(scales)
+library(patchwork)
 
-source(file = "R/99_proj_func.R")
-
+source(here::here("R", "99_proj_func.R"))
 ```
 
 # Loading data files
 
 ```{r}
+#| label: load_data
+#| message: false
+#| warning: false
 
-data_clean <- read_csv("data/data_clean.csv")
+data_clean <- read_csv(here::here("data", "data_clean.csv"))
 
 ```
 
-# Creating the plots
+# Flourescence of B cells
 
 ```{r}
+#| label: B_cells_blood
+#| message: false
+#| warning: false
+#| fig-height: 10
+#| fig-width: 9
 
 p1 <- data_clean |>
   asc_CDs_boxplot(lineage = "B cells",
@@ -46,84 +56,99 @@ p1 / p2
 ```
 
 ```{r}
+#| label: B_cells_tonsil
+#| message: false
+#| warning: false
+#| fig-height: 10
+#| fig-width: 9
 
 p1 <- data_clean |>
-  asc_CDs_boxplot(
-    lineage         = "B cells",
-    hierarchy_level = 3,
-    tissue          = "tonsil",
-    measure         = MedQb
-  )
+  asc_CDs_boxplot(lineage = "B cells",
+                  hierarchy_level = 3,
+                  tissue = "tonsil",
+                  measure = MedQb)
 
 p2 <- data_clean |>
-  asc_CDs_boxplot(
-    lineage         = "B cells",
-    hierarchy_level = 3,
-    tissue          = "tonsil",
-    measure         = CVQb
-  )
+  asc_CDs_boxplot(lineage = "B cells",
+                  hierarchy_level = 3,
+                  tissue = "tonsil",
+                  measure = CVQb)
 
-## 2) CD4 T cells – blood – level 4
-p3 <- data_clean |>
-  asc_CDs_boxplot(
-    lineage         = "CD4 T cells",
-    hierarchy_level = 4,
-    tissue          = "blood",
-    measure         = MedQb
-  )
+p1 / p2
+```
 
-p4 <- data_clean |>
-  asc_CDs_boxplot(
-    lineage         = "CD4 T cells",
-    hierarchy_level = 4,
-    tissue          = "blood",
-    measure         = CVQb
-  )
+# Flourescence of T cells
 
+```{r}
+#| label: CD4_T_cells
+#| message: false
+#| warning: false
+#| fig-height: 12
+#| fig-width: 9
 
-p5 <- data_clean |>
-  asc_CDs_boxplot(
-    lineage         = "CD8 T cells",
-    hierarchy_level = 4,
-    tissue          = "blood",
-    measure         = MedQb
-  )
+p1 <- data_clean |>
+  asc_CDs_boxplot(lineage = "CD4 T cells",
+                  hierarchy_level = 4,
+                  tissue = "blood",
+                  measure = MedQb)
 
-p6 <- data_clean |>
-  asc_CDs_boxplot(
-    lineage         = "CD8 T cells",
-    hierarchy_level = 4,
-    tissue          = "blood",
-    measure         = CVQb
-  )
+p2 <- data_clean |>
+  asc_CDs_boxplot(lineage = "CD4 T cells",
+                  hierarchy_level = 4,
+                  tissue = "blood",
+                  measure = CVQb)
+p1 / p2
+```
 
+```{r}
+#| label: CD8_T_cells
+#| message: false
+#| warning: false
+#| fig-height: 10
+#| fig-width: 9
 
-p7 <- data_clean |>
-  asc_CDs_boxplot(
-    lineage         = "T cells",
-    hierarchy_level = 4,
-    tissue          = "thymus",
-    measure         = MedQb
-  )
+p1 <- data_clean |>
+  asc_CDs_boxplot(lineage = "CD8 T cells",
+                  hierarchy_level = 4,
+                  tissue  = "blood",
+                  measure = MedQb)
 
-p8 <- data_clean |>
-  asc_CDs_boxplot(
-    lineage         = "T cells",
-    hierarchy_level = 4,
-    tissue          = "thymus",
-    measure         = CVQb
-  )
+p2 <- data_clean |>
+  asc_CDs_boxplot(lineage = "CD8 T cells",
+                  hierarchy_level = 4,
+                  tissue = "blood",
+                  measure = CVQb)
 
+p1 / p2
+```
 
-(p1 / p2) / (p3 / p4) / (p5 / p6) / (p7 / p8)
+```{r}
+#| label: Thymocytes
+#| message: false
+#| warning: false
+#| fig-height: 10
+#| fig-width: 9
 
+p1 <- data_clean |>
+  asc_CDs_boxplot(lineage = "thymocytes",
+                  hierarchy_level = 4,
+                  tissue = "thymus",
+                  measure = MedQb)
 
+p2 <- data_clean |>
+  asc_CDs_boxplot(lineage = "thymocytes",
+                  hierarchy_level = 4,
+                  tissue = "thymus",
+                  measure = CVQb)
 
+p1 / p2
 ```
 
 To look at the variation in ASC-related CD markers, a boxplot was generated for four selected immune cell types in their different relevant tissues. For each cell type, both MedQb and CVQb were visualized side by side to provide an overall overview of signal strength and internal variation.
 
 The following combinations are used in the analysis view:
+
+-   B cells from blood at hierarchy level 3
 
 -   B cells from tonsil at hierarchy level 3
 
@@ -131,12 +156,5 @@ The following combinations are used in the analysis view:
 
 -   CD8 T cells from blood at hierarchy level 4
 
--   T cells (instead of *Thymocytes*) from thymus at hierarchy level 4
+-   Thymocytes from thymus at hierarchy level 4
 
-The plots show the MedQb values for each lineage, so that both median values ​​and variation within the individual cell type-tissue combinations can be compared, and the visualizations can provide an overall overview of the quality of the CD marker measurements for the four selected immune populations.
-
-As the tonsil contains multiple stages of B cell maturation, it is expected that B cells (tonsil) show a wide spread in CD marker levels.
-
-Blood, which consists of CD4 and CD8 T-cells, has more aggregated signals, reflecting mature and stable T cell populations.
-
-If we look at T cells (thymus) again, a greater variation in signal strength is seen, which is consistent with the fact that early developmental stages of T cells are found in the thymus

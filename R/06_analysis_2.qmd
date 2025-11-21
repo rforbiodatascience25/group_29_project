@@ -6,45 +6,61 @@ editor_options:
   chunk_output_type: console
 ---
 
-### Creating auxiliary data frame
+## Creating auxiliary data frame
 
 ```{r}
-data_clean_analysis2 <- data_clean %>%
+data_clean_analysis2 <- data_clean |>
   mutate(CD_num = parse_number(CD)) |>
-  mutate(CD = factor(CD, levels = unique(CD[rev(order(CD_num))])))
+  mutate(CD = factor(CD, 
+                     levels = unique(CD[rev(order(CD_num))])))
 
 ```
 
 ```{r}
-data_clean_analysis2 |>
-  group_by(cell_type) |>
-  summarize(n = n())
+tube_bar <- data_clean |>
+  distinct(cell_type, 
+           tissue) |>
+  mutate(y = "TubeBar")  # dummy y-position above your markers
 ```
 
-### Making the heat dot plot
+## Making the heat dot plot
 
 ```{r}
-#| fig-height: 10000
-#| fig-width: 200
+#| fig-height: 15
+#| fig-width: 8
 
-ggplot(data = data_clean_analysis2, aes(x = cell_type, y = CD)) +
-  geom_point(aes(size = PEpos, color = log10(MedQb))) +
-  geom_tile(data = aux_data, aes(x = cell_type, y = y, fill = tissue), height = 2) +
-  scale_size_continuous(range = c(0.5, 2)) +
-  scale_color_gradient2(low = "lightblue", mid = "orange", high = "darkred", midpoint = 3) +
-  scale_fill_manual(values = c("blood" = "#93aa9b", "tonsil" = "#c8b145", "thymus" = "#bb6e36")) +
+ggplot(data = data_clean_analysis2, 
+       aes(x = cell_type, 
+           y = CD)) +
+  geom_point(aes(size = PEpos, 
+                 color = log10(MedQb))) +
+  geom_tile(data = tube_bar, 
+            aes(x = cell_type, 
+                y = y, 
+                fill = tissue), 
+            height = 0.5) +
+  scale_size_continuous(breaks = c(5, 20, 60, 100), 
+                        range = c(1, 6)) +
+  scale_color_gradientn(colors = c("lightblue", "orange", "darkred"), 
+                        values = scales::rescale(c(2, 3, 4, 5))) +
+  scale_fill_manual(values = c("blood" = "#93aa9b", 
+                               "tonsil" = "#c8b145", 
+                               "thymus" = "#bb6e36")) +
   scale_x_discrete(position = "top") +
   coord_cartesian(clip = "off") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0, hjust = 0, size = 5),
-        axis.text.y = element_text(size = 5), 
+  theme_minimal(base_size = 8) +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 0, 
+                                   size = 6),
+        axis.text.y = element_text(size = 7),
+        axis.title = element_text(size = 8), 
+        legend.position = "right",
+        plot.margin = margin(5, 5, 5, 5),
         panel.grid = element_blank()) +
-
-  labs(
-    x = "Cell Type",
-    y = "Marker",
-    size = "Frequency of Positive Cells (%)",
-    color = "Fluorescence [log10(Median ABC)]"
-  )
+  labs(x = "Cell Type",
+       y = "Marker",
+       size = "Frequency of Positive Cells (%)",
+       color = "Fluorescence [log10(Median ABC)]")
 
 ```

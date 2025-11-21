@@ -191,11 +191,12 @@ columns <- c("CD",
              "tissue",
              "lineage",
              "cell_type",
-             "estimate", 
+             "estimate",
              "conf.low", 
              "conf.high",
              "p.value",
-             "is_significant")
+             "is_significant",
+             "any_significant")
 
 data_aug <- data_clean |>
   cell_type_order() |>
@@ -215,15 +216,43 @@ data_aug <- data_clean |>
   unnest(model_object_tidy) |>
   mutate(is_significant = case_when(term == "(Intercept)" ~ "reference",
                                     p.value < 0.05 ~ "yes",
-                                    p.value >= 0.05 ~ "no")) |>
-  mutate(cell_type = case_when(
-    term == "(Intercept)" & tissue == "blood" & lineage == "B cells" ~ "Bnaive",
-    term == "(Intercept)" & tissue == "tonsil" ~ "BnaiveTo",
-    term == "(Intercept)" & lineage == "CD4 T cells" ~ "TCD4naive", 
-    term == "(Intercept)" & lineage == "CD8 T cells" ~ "TCD8naive",
-    term == "(Intercept)" & tissue == "thymus"  ~ "DN34p",
-    .default = str_remove(term, "cell_type")),
-    .after = lineage) |>
+                                    p.value >= 0.05 ~ "no"),
+          any_significant = case_when(any(is_significant == "yes") ~ "yes",
+                                     .default = "no")) |>
+  mutate(
+    intercept = estimate[term == "(Intercept)"],
+    estimate = case_when(
+      term == "(Intercept)" ~ estimate,
+      term != "(Intercept)" ~ estimate + intercept),
+    conf.low = case_when(
+      term == "(Intercept)" ~ conf.low,
+      term != "(Intercept)" ~ conf.low + intercept),
+    conf.high = case_when(
+      term == "(Intercept)" ~ conf.high,
+      term != "(Intercept)" ~ conf.high + intercept),
+    cell_type = case_when(
+      term == "(Intercept)" & tissue == "blood" & lineage == "B cells" ~ "Bnaive",
+      term == "(Intercept)" & tissue == "tonsil" ~ "BnaiveTo",
+      term == "(Intercept)" & lineage == "CD4 T cells" ~ "TCD4naive", 
+      term == "(Intercept)" & lineage == "CD8 T cells" ~ "TCD8naive",
+      term == "(Intercept)" & tissue == "thymus"  ~ "DN34p",
+    .default = str_remove(term, "cell_type"))) |>
   select(columns) |>
   ungroup()
+
+data_aug |>
+  filter(lineage == "B cells",
+         CD == "CD11a") |>
+    cell_type_order() |>
+  ggplot(aes(x = cell_type,
+             y = estimate,
+             color = is_significant,
+             shape = tissue)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = conf.low,
+                    ymax = conf.high)) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1))
 ```
