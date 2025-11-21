@@ -6,10 +6,28 @@ editor_options:
   chunk_output_type: console
 ---
 
+# Loading libraries
+
+```{r}
+
+library("tidyverse")
+
+source(file = "R/99_proj_func.R")
+```
+
+# Loading data files
+
+```{r}
+
+data_aug <- read_csv(file = "data/data_aug.csv")
+
+```
+
 ## Creating auxiliary data frame
 
 ```{r}
-data_clean_analysis2 <- data_clean |>
+
+data_analysis2 <- data_aug |>
   mutate(CD_num = parse_number(CD)) |>
   mutate(CD = factor(CD, 
                      levels = unique(CD[rev(order(CD_num))])))
@@ -17,10 +35,12 @@ data_clean_analysis2 <- data_clean |>
 ```
 
 ```{r}
-tube_bar <- data_clean |>
+
+tube_bar <- data_aug |>
   distinct(cell_type, 
            tissue) |>
   mutate(y = "TubeBar")  # dummy y-position above your markers
+
 ```
 
 ## Making the heat dot plot
@@ -29,7 +49,7 @@ tube_bar <- data_clean |>
 #| fig-height: 15
 #| fig-width: 8
 
-ggplot(data = data_clean_analysis2, 
+ggplot(data = data_analysis2, 
        aes(x = cell_type, 
            y = CD)) +
   geom_point(aes(size = PEpos, 
