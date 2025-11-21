@@ -42,7 +42,7 @@ pca_data |>
   labs(title = "PCA plot",
        x = "PC1",
        y = "PC2",
-       color = "cell type") +
+       color = "cell lineage") +
   theme_bw()+
     theme(
       legend.key.size = unit(0.4, "lines"),   #height of each legend row
@@ -51,3 +51,21 @@ pca_data |>
       legend.spacing.x = unit(0.2, "lines")   #horizontal spacing
   ) 
 ```
+
+# Text
+
+### Populating all cells in dataset
+
+When you make a PCA plot you need all numeric rows and columns to be filled with data. So firstly we needed to fill the empty cells with data. These were empty due to the different cell types and CD's. Unpopulated cells was populated with the median for the column. We avoided using the mean due to outliers potentially skewing the data.
+
+### PCA
+
+After all numeric cells were populated the function `prcomp` was used to make the the PCA.
+
+### Plot
+
+On the plot we have PC1 on the x-axis and PC2 on the y-axis. Usually most variation can be captured with the first two principal components. The points are stratified using tissue type (blood, tonsil, thymus) as the shapes and cell lineage as the color.
+
+### Plot interpretation
+
+As we can see on the plot we have some nice clustering. We see all the cells from thymus clustered nicely and tonsil points are also somewhat clustered. In the blood we see two different clusters, with one containing all blood B cells except for one, and the other one containing the rest of the cell lineages. We can also see that the B cell lineage from blood and thymus didn't vary much in PC1 but PC2 set them apart.
