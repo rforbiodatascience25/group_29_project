@@ -95,12 +95,11 @@ plot_cd_expression <- function(data, lineage_filter, cds, cell_type_exclude = NU
     filter(lineage %in% lineage_filter,
            CD %in% cds)
   
-  # Exclude specific cell types if provided
   if (!is.null(cell_type_exclude)) {
     df <- df |> filter(!str_detect(cell_type, cell_type_exclude))
   }
   
-  df |> 
+  df |>
     cell_type_order() |>
     ggplot(aes(x = cell_type,
                y = estimate,
@@ -111,12 +110,14 @@ plot_cd_expression <- function(data, lineage_filter, cds, cell_type_exclude = NU
     facet_wrap(~ CD, ncol = 2, scales = "free_y") +
     scale_color_manual(
       name = "Significance",
-      values = c("reference" = "black",
-                 "yes" = "#29cf8f",  # mint green
-                 "no"  = "#fa2840")  # reddish-pink
+      values = c(
+        "reference" = "black",
+        "yes"       = "#29cf8f",
+        "no"        = "#fa2840"
+      )
     ) +
     scale_shape_discrete(name = "Tissue") +
-    theme_minimal(base_size = 14) +
+    theme_minimal() +
     theme(
       axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
       strip.text = element_text(size = 14, face = "bold"),
