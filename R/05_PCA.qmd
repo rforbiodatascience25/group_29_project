@@ -24,6 +24,8 @@ PCA_aug <- read_csv(file = "data/PCA_aug.csv")
 
 # Make the PCA set
 
+After all numeric cells were populated the function `prcomp` was used to make the the PCA.
+
 ```{r}
 
 PCA_data <- PCA_aug |> 
@@ -32,7 +34,9 @@ PCA_data <- PCA_aug |>
 
 ```
 
-# Make the plott
+# Make the plot
+
+On the plot we have PC1 on the x-axis and PC2 on the y-axis. Usually most variation can be captured with the first two principal components. The points are stratified using tissue type (blood, tonsil, thymus) as the shapes and cell lineage as the color.
 
 ```{r}
 
@@ -58,20 +62,96 @@ PCA_data |>
 
 ```
 
-# Text
-
-### Populating all cells in dataset
-
-When you make a PCA plot you need all numeric rows and columns to be filled with data. So firstly we needed to fill the empty cells with data. These were empty due to the different cell types and CD's. Unpopulated cells was populated with the median for the column. We avoided using the mean due to outliers potentially skewing the data.
-
-### PCA
-
-After all numeric cells were populated the function `prcomp` was used to make the the PCA.
-
-### Plot
-
-On the plot we have PC1 on the x-axis and PC2 on the y-axis. Usually most variation can be captured with the first two principal components. The points are stratified using tissue type (blood, tonsil, thymus) as the shapes and cell lineage as the color.
-
 ### Plot interpretation
 
-As we can see on the plot we have some nice clustering. We see all the cells from thymus clustered nicely and tonsil points are also somewhat clustered. In the blood we see two different clusters, with one containing all blood B cells except for one, and the other one containing the rest of the cell lineages. We can also see that the B cell lineage from blood and thymus didn't vary much in PC1 but PC2 set them apart.
+As we can see on the plot we have some nice clustering. We see all the cells from thymus clustered nicely and tonsil cells are also somewhat clustered. In the blood we see two different clusters, with one containing all blood B cells except for one, and the other one containing the rest of the cell lineages. We can also see that the B cell lineage from blood and thymus didn't vary much in PC1 but PC2 set them apart.
+
+# Rotation matrix
+
+with PEpos
+
+```{r}
+library(ggrepel)
+library(dplyr)
+library(stringr)
+
+arrow_style <- arrow(angle = 30, 
+                     ends = "first", 
+                     type = "closed", 
+                     length = grid::unit(5, "pt"))
+
+PCA_data |>
+  tidy(matrix = "rotation") |>
+  pivot_wider(names_from = "PC", 
+              names_prefix = "PC", 
+              values_from = "value") |>
+  
+  # keep only PEpos variables
+  filter(str_starts(column, "PEpos")) |>
+  
+  mutate(arrow_length = sqrt(PC1^2 + PC2^2)) |>
+  filter(arrow_length > 0.1) |>
+  
+  ggplot(aes(PC1, PC2)) +
+  geom_segment(
+    aes(xend = 0, yend = 0),
+    arrow = arrow_style
+  ) +
+  geom_text_repel(
+    aes(label = column),
+    size = 3,
+    color = "hotpink",
+    min.segment.length = 0,
+    direction = "both",
+    max.overlaps = Inf
+  ) +
+  xlim(-0.12, 0.13) +
+  ylim(-0.11, 0.15) +
+  coord_fixed(ratio = 1) +
+  theme_minimal(base_size = 16)
+
+
+```
+
+With MedQb
+
+```{r}
+library(ggrepel)
+library(dplyr)
+library(stringr)
+
+arrow_style <- arrow(angle = 30, 
+                     ends = "first", 
+                     type = "closed", 
+                     length = grid::unit(5, "pt"))
+
+PCA_data |>
+  tidy(matrix = "rotation") |>
+  pivot_wider(names_from = "PC", 
+              names_prefix = "PC", 
+              values_from = "value") |>
+  
+  # keep only MedQb variables
+  filter(str_starts(column, "MedQb")) |>
+  
+  mutate(arrow_length = sqrt(PC1^2 + PC2^2)) |>
+  filter(arrow_length > 0.01) |>
+  
+  ggplot(aes(PC1, PC2))+
+  geom_segment(
+    aes(xend = 0, yend = 0),
+    arrow = arrow_style
+  ) +
+  geom_text_repel(
+    aes(label = str_remove(column, "MedQb_")),
+    size = 3,
+    color = "hotpink",
+    min.segment.length = 0,
+    direction = "both",
+    max.overlaps = Inf
+  ) +
+  xlim(-0.12, 0.13) +
+  ylim(-0.11, 0.15) +
+  coord_fixed(ratio = 1) +
+  theme_minimal(base_size = 16)
+```
