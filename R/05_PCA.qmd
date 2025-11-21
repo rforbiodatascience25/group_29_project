@@ -41,6 +41,7 @@ pca_data |>
        x = "PC1",
        y = "PC2",
        color = "cell type") +
+  theme_bw()+  
     theme(
       legend.key.size = unit(0.4, "lines"),   #height of each legend row
       legend.text = element_text(size = 7),   #smaller text
