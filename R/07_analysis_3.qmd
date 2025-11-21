@@ -31,6 +31,12 @@ data_aug <- read_csv(here::here("data", "data_aug.csv"))
 
 ```
 
+#Analysis of Fluorescence Variation Across Immune Cell Types and Tissues
+
+The purpose of these plots is to examine and compare the fluorescence signals across key immune cell types and tissues. By displaying both the median fluorescence (MedQb) and the coefficient of variation (CVQb) for the selected cells, we can see both the signal strength and signal stability for the different CD markers.
+
+We use the four cell types B cells from tonsil and blood, CD4 and CD8 T cells from blood, and thymocytes from the thymus for biologically different environments in the immune system. By visualizing, we can see how fluorescence levels vary between mature and immature cellshow signal variation depends on tissue type whether the expression of CD markers is stable or heterogeneous within a given location and which cell types show the most or least variation in the CD marker profiles and see patterns and features in the biology.
+
 # Flourescence of B cells
 
 ```{r}
@@ -55,6 +61,8 @@ p2 <- data_aug |>
 p1 / p2
 ```
 
+In boxplots for B cells in blood exhibit a more uniform and stable fluorescence pattern, which is also expected since blood primarily contains mature and less varied B cell populations.
+
 ```{r}
 #| label: B_cells_tonsil
 #| message: false
@@ -76,6 +84,8 @@ p2 <- data_aug |>
 
 p1 / p2
 ```
+
+Boxplots for B cells from the tonsil show both high and varying levels of fluorescence. This biologically makes sense as the tonsil contains many different maturation stages of B cells, which can be seen specifically in the plots as increased variation in MedQb and CVQb.
 
 # Flourescence of T cells
 
@@ -100,6 +110,8 @@ p2 <- data_aug |>
 p1 / p2
 ```
 
+CD4 T cells in the blood are predominantly mature, and therefore their fluorescence levels are close. They express a stable set of CD markers, which is reflected in predominantly high MedQb values ​​and low variation in CVQb. This is because the blood primarily contains mature, naive or memory CD4 cells.
+
 ```{r}
 #| label: CD8_T_cells
 #| message: false
@@ -121,6 +133,8 @@ p2 <- data_aug |>
 
 p1 / p2
 ```
+
+CD4 T cells show relatively homogeneous fluorescence with stable signal levels. However, a low level of variation is seen, consistent with the fact that CD4 cells in blood are typically mature and functionally show a more stable signal.
 
 ```{r}
 #| label: Thymocytes
@@ -144,16 +158,4 @@ p2 <- data_aug |>
 p1 / p2
 ```
 
-To look at the variation in ASC-related CD markers, a boxplot was generated for four selected immune cell types in their different relevant tissues. For each cell type, both MedQb and CVQb were visualized side by side to provide an overall overview of signal strength and internal variation.
-
-The following combinations are used in the analysis view:
-
--   B cells from blood at hierarchy level 3
-
--   B cells from tonsil at hierarchy level 3
-
--   CD4 T cells from blood at hierarchy level 4
-
--   CD8 T cells from blood at hierarchy level 4
-
--   Thymocytes from thymus at hierarchy level 4
+Thymocytes show more variable fluorescence signals across markers, which fits well with the biological heterogeneity in the thymus, where T cells are in many different stages of development.
