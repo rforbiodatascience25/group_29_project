@@ -84,123 +84,39 @@ data_analysis4 <- data_aug |>
 ## B cells
 
 ```{r}
-cds_interes <- c("CD11a", "CD69", "CD79b", "CD80")
+cds_interest_b <- c("CD11a", "CD69", "CD79b", "CD80")
 
-data_analysis4 |>
-  filter(lineage == "B cells",
-         CD %in% cds_interes) |>
-  cell_type_order() |>
-  ggplot(aes(x = cell_type,
-             y = estimate,
-             color = factor(is_significant, levels = c("reference", "yes", "no")),
-             shape = tissue)) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = conf.low,
-                    ymax = conf.high),
-                width = 0.4) +
-  facet_wrap(~ CD, ncol = 2, scales = "free_y") +
-  scale_color_manual(
-    name = "Significance",
-    values = c("reference" = "black",
-               "yes" = "#29cf8f",
-               "no" = "#fa2840")
-  ) +
-  scale_shape_discrete(name = "Tissue") +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
-    strip.text = element_text(size = 14, face = "bold"),
-    axis.line = element_line(color = "black") # agrega líneas de los ejes
-  ) +
-  labs(
-    title = "Expression of Selected B-cell Markers",
-    x = "Cell Type",
-    y = "Estimate"
-  )
+plot_cd_expression(
+  data = data_aug,
+  lineage_filter = "B cells",
+  cds = cds_interest_b,
+  title = "Expression of Selected B-cell Markers"
+)
 
-
-```
-
-```{r}
-
-data_analysis4 |>
-  filter(lineage == "CD8 T cells") |>
-  distinct(CD) |>
-  print(n=113)
 ```
 
 ## T cells
 
 ```{r}
-cds_interes <- c("CD10", "CD25", "CD4_MEM-241", "CD62L")
+cds_interest_cd4 <- c("CD10", "CD25", "CD4_MEM-241", "CD62L")
 
-data_analysis4 |>
-  filter(lineage %in% c("thymocytes", "CD4 T cells"),
-         !str_detect(cell_type, "CD8"),
-         CD %in% cds_interes) |>
- cell_type_order() |>
-  ggplot(aes(x = cell_type,
-             y = estimate,
-             color = factor(is_significant, levels = c("reference", "yes", "no")),
-             shape = tissue)) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = conf.low,
-                    ymax = conf.high),
-                width = 0.4) +
-  facet_wrap(~ CD, ncol = 2, scales = "free_y") +
-  scale_color_manual(
-    name = "Significance",
-    values = c("reference" = "black",
-               "yes" = "#29cf8f",
-               "no" = "#fa2840")
-  ) +
-  scale_shape_discrete(name = "Tissue") +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
-    strip.text = element_text(size = 14, face = "bold"),
-    axis.line = element_line(color = "black") # agrega líneas de los ejes
-  ) +
- labs(
-    title = "Expression of Selected CD4 T Cell and Thymocyte Markers",
-    x = "Cell Type",
-    y = "Estimate"
-  )
+plot_cd_expression(
+  data = data_aug,
+  lineage_filter = c("thymocytes", "CD4 T cells"),
+  cds = cds_interest_cd4,
+  cell_type_exclude = "CD8",
+  title = "Expression of Selected CD4 T Cell and Thymocyte Markers"
+)
 ```
 
 ```{r}
-cds_interes <- c("CD27", "CD38", "CD71", "CD95")
+cds_interest_cd8 <- c("CD27", "CD38", "CD71", "CD95")
 
-data_analysis4 |>
-  filter(lineage %in% c("thymocytes", "CD8 T cells"),
-         !str_detect(cell_type, "CD4"),
-         CD %in% cds_interes) |>
- cell_type_order() |>
-  ggplot(aes(x = cell_type,
-             y = estimate,
-             color = factor(is_significant, levels = c("reference", "yes", "no")),
-             shape = tissue)) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = conf.low,
-                    ymax = conf.high),
-                width = 0.4) +
-  facet_wrap(~ CD, ncol = 2, scales = "free_y") +
-  scale_color_manual(
-    name = "Significance",
-    values = c("reference" = "black",
-               "yes" = "#29cf8f",
-               "no" = "#fa2840")
-  ) +
-  scale_shape_discrete(name = "Tissue") +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
-    strip.text = element_text(size = 14, face = "bold"),
-    axis.line = element_line(color = "black") # agrega líneas de los ejes
-  ) +
- labs(
-    title = "Expression of Selected CD8 T Cell and Thymocyte Markers",
-    x = "Cell Type",
-    y = "Estimate"
-  )
+plot_cd_expression(
+  data = data_aug,
+  lineage_filter = c("thymocytes", "CD8 T cells"),
+  cds = cds_interest_cd8,
+  cell_type_exclude = "CD4",
+  title = "Expression of Selected CD8 T Cell and Thymocyte Markers"
+)
 ```
