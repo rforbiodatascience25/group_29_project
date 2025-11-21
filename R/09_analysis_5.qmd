@@ -1,0 +1,86 @@
+---
+title: "Analysis 5"
+format: html
+editor: visual
+---
+
+# Loading packages
+
+```{r}
+
+library("tidyverse")
+library("broom")
+
+source(file = "R/99_proj_func.R")
+```
+
+# Loading data files
+
+```{r}
+
+data_clean <- read_csv(file = "data/data_clean.csv")
+```
+
+# Differences in CD makers on CD4 and CD8 T cells
+
+```{r}
+
+CD4_vs_CD8 <- data_clean |>
+  filter(lineage %in% c("CD4 T cells", "CD8 T cells"),
+         cell_type != "CD4ISP",
+         cell_type != "TCD8RAdim",
+         hierarchy_level == 4) |>
+  mutate(pair = case_when(str_ends(cell_type, "naive") ~ "naive",
+                          str_ends(cell_type, "CM") ~ "CM",
+                          str_ends(cell_type, "EM") ~ "EM",
+                          str_detect(cell_type, "TEMRA") ~ "TEMRA",
+                          str_detect(cell_type, "SP1ap") ~ "SP1ap",
+                          str_detect(cell_type, "SP1am") ~ "SP1am")) |>
+  select(-c("CVQb", "count", "PEpos")) 
+
+columns <- c("tissue", 
+             "CD", 
+             "pair", 
+             "p.value", 
+             "estimate", 
+             "conf.low", 
+             "conf.high")
+
+CD4_vs_CD8_sig  <- CD4_vs_CD8 |>
+  group_by(tissue, CD, pair) |>
+  nest() |>
+  mutate(model_object = map(.x = data,
+                   .f = ~lm(formula = MedQb ~ cell_type,
+                            data = .x))) |>
+  mutate(model_object_tidy = map(.x = model_object,
+                                 .f = ~tidy(.x, 
+                                           conf.int = TRUE,
+                                           conf.level = 0.95))) |>
+  unnest(model_object_tidy) |>
+  filter(str_starts(term, "cell_type")) |>
+  select(columns) |>
+  ungroup()|>
+  mutate(is_significant = case_when(p.value < 0.05 ~ "yes",
+                                    p.value >= 0.05 ~ "no"))
+  
+
+CD4_vs_CD8_aug <- CD4_vs_CD8 |>
+  left_join(y = CD4_vs_CD8_sig,
+            by = c("tissue", "CD", "pair"),
+            relationship = "many-to-one") |>
+  group_by(tissue, CD) |>
+  mutate(any_significant = case_when(any(is_significant == "yes") ~ "yes",
+                                     .default = "no"))
+
+CD4_vs_CD8_aug |>
+  filter(is_significant == "yes",
+         pair == "CM") |>
+  ggplot(aes(x = CD,
+             y = MedQb,
+             fill = CD)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  facet_wrap(~ cell_type, ncol = 2)
+```

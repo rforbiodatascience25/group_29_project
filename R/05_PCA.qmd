@@ -34,7 +34,7 @@ pca_data |>
   ggplot(aes(.fittedPC1, 
              .fittedPC2,
              shape = tissue,
-             color = cell_type)) +
+             color = lineage)) +
   geom_point(size = 1.5,
              alpha = 0.4) +
   labs(title = "PCA plot",
