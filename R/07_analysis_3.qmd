@@ -27,7 +27,7 @@ source(here::here("R", "99_proj_func.R"))
 #| message: false
 #| warning: false
 
-data_clean <- read_csv(here::here("data", "data_clean.csv"))
+data_aug <- read_csv(here::here("data", "data_aug.csv"))
 
 ```
 
@@ -40,13 +40,13 @@ data_clean <- read_csv(here::here("data", "data_clean.csv"))
 #| fig-height: 10
 #| fig-width: 9
 
-p1 <- data_clean |>
+p1 <- data_aug |>
   asc_CDs_boxplot(lineage = "B cells",
                   hierarchy_level = 3,
                   tissue = "blood",
                   measure = MedQb)
 
-p2 <- data_clean |>
+p2 <- data_aug |>
   asc_CDs_boxplot(lineage = "B cells",
                   hierarchy_level = 3,
                   tissue = "blood",
@@ -62,13 +62,13 @@ p1 / p2
 #| fig-height: 10
 #| fig-width: 9
 
-p1 <- data_clean |>
+p1 <- data_aug |>
   asc_CDs_boxplot(lineage = "B cells",
                   hierarchy_level = 3,
                   tissue = "tonsil",
                   measure = MedQb)
 
-p2 <- data_clean |>
+p2 <- data_aug |>
   asc_CDs_boxplot(lineage = "B cells",
                   hierarchy_level = 3,
                   tissue = "tonsil",
@@ -86,13 +86,13 @@ p1 / p2
 #| fig-height: 12
 #| fig-width: 9
 
-p1 <- data_clean |>
+p1 <- data_aug |>
   asc_CDs_boxplot(lineage = "CD4 T cells",
                   hierarchy_level = 4,
                   tissue = "blood",
                   measure = MedQb)
 
-p2 <- data_clean |>
+p2 <- data_aug |>
   asc_CDs_boxplot(lineage = "CD4 T cells",
                   hierarchy_level = 4,
                   tissue = "blood",
@@ -107,13 +107,13 @@ p1 / p2
 #| fig-height: 10
 #| fig-width: 9
 
-p1 <- data_clean |>
+p1 <- data_aug |>
   asc_CDs_boxplot(lineage = "CD8 T cells",
                   hierarchy_level = 4,
                   tissue  = "blood",
                   measure = MedQb)
 
-p2 <- data_clean |>
+p2 <- data_aug |>
   asc_CDs_boxplot(lineage = "CD8 T cells",
                   hierarchy_level = 4,
                   tissue = "blood",
@@ -129,13 +129,13 @@ p1 / p2
 #| fig-height: 10
 #| fig-width: 9
 
-p1 <- data_clean |>
+p1 <- data_aug |>
   asc_CDs_boxplot(lineage = "thymocytes",
                   hierarchy_level = 4,
                   tissue = "thymus",
                   measure = MedQb)
 
-p2 <- data_clean |>
+p2 <- data_aug |>
   asc_CDs_boxplot(lineage = "thymocytes",
                   hierarchy_level = 4,
                   tissue = "thymus",

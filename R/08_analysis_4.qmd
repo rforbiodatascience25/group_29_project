@@ -20,7 +20,7 @@ source(file = "R/99_proj_func.R")
 
 ```{r}
 
-data_clean <- read_csv(file = "data/data_clean.csv")
+data_aug <- read_csv(file = "data/data_aug.csv")
 ```
 
 # Maturation of immune cells
@@ -38,7 +38,7 @@ columns <- c("CD",
              "is_significant",
              "any_significant")
 
-data_aug <- data_clean |>
+data_analysis4 <- data_aug |>
   cell_type_order() |>
   filter(hierarchy_level %in% c(3, 4),
          !cell_type %in% c("Tgd", "TCD4", "TCD8")) |>
@@ -85,7 +85,7 @@ data_aug <- data_clean |>
 
 ```{r}
 
-data_aug |>
+data_analysis4 |>
   filter(lineage == "B cells",
          CD == "CD11a") |>
     cell_type_order() |>
@@ -100,7 +100,7 @@ data_aug |>
   theme(axis.text.x = element_text(angle = 90, 
                                    vjust = 0.5, 
                                    hjust = 1))
-data_aug |>
+data_analysis4 |>
   filter(lineage == "B cells",
          CD == "CD69") |>
     cell_type_order() |>
@@ -115,7 +115,7 @@ data_aug |>
   theme(axis.text.x = element_text(angle = 90, 
                                    vjust = 0.5, 
                                    hjust = 1))
-data_aug |>
+data_analysis4 |>
   filter(lineage == "B cells",
          CD == "CD79b") |>
     cell_type_order() |>
@@ -130,7 +130,7 @@ data_aug |>
   theme(axis.text.x = element_text(angle = 90, 
                                    vjust = 0.5, 
                                    hjust = 1))
-data_aug |>
+data_analysis4 |>
   filter(lineage == "B cells",
          CD == "CD80") |>
     cell_type_order() |>
@@ -152,7 +152,7 @@ data_aug |>
 ```{r}
 cds_interes <- c("CD11a", "CD69", "CD79b", "CD80")
 
-data_aug |>
+data_analysis4 |>
   filter(lineage == "B cells",
          CD %in% cds_interes) |>
   cell_type_order() |>
@@ -189,7 +189,7 @@ data_aug |>
 
 ```{r}
 
-data_aug |>
+data_analysis4 |>
   filter(lineage == "CD8 T cells") |>
   distinct(CD) |>
   print(n=113)
@@ -199,7 +199,7 @@ data_aug |>
 
 ```{r}
 
-data_aug |>
+data_analysis4 |>
   filter(lineage %in% c("thymocytes", "CD4 T cells"),
          !str_detect(cell_type, "CD8"),
          CD == "CD10") |>
@@ -216,7 +216,7 @@ data_aug |>
                                    vjust = 0.5, 
                                    hjust = 1))
 
-data_aug |>
+data_analysis4 |>
   filter(lineage %in% c("thymocytes", "CD4 T cells"),
          !str_detect(cell_type, "CD8"),
          CD == "CD25") |>
@@ -233,7 +233,7 @@ data_aug |>
                                    vjust = 0.5, 
                                    hjust = 1))
 
-data_aug |>
+data_analysis4 |>
   filter(lineage %in% c("thymocytes", "CD4 T cells"),
          !str_detect(cell_type, "CD8"),
          CD == "CD4_MEM-241") |>
@@ -250,7 +250,7 @@ data_aug |>
                                    vjust = 0.5, 
                                    hjust = 1))
 
-data_aug |>
+data_analysis4 |>
   filter(lineage %in% c("thymocytes", "CD4 T cells"),
          !str_detect(cell_type, "CD8"),
          CD == "CD62L") |>
@@ -271,7 +271,7 @@ data_aug |>
 ```{r}
 cds_interes <- c("CD10", "CD25", "CD4_MEM-241", "CD62L")
 
-data_aug |>
+data_analysis4 |>
   filter(lineage %in% c("thymocytes", "CD4 T cells"),
          !str_detect(cell_type, "CD8"),
          CD %in% cds_interes) |>
@@ -307,7 +307,7 @@ data_aug |>
 
 ```{r}
 
-data_aug |>
+data_analysis4 |>
   filter(lineage %in% c("thymocytes", "CD8 T cells"),
          !str_detect(cell_type, "CD4"),
          CD == "CD27") |>
@@ -324,7 +324,7 @@ data_aug |>
                                    vjust = 0.5, 
                                    hjust = 1))
 
-data_aug |>
+data_analysis4 |>
   filter(lineage %in% c("thymocytes", "CD8 T cells"),
          !str_detect(cell_type, "CD4"),
          CD == "CD38") |>
@@ -341,7 +341,7 @@ data_aug |>
                                    vjust = 0.5, 
                                    hjust = 1))
 
-data_aug |>
+data_analysis4 |>
   filter(lineage %in% c("thymocytes", "CD8 T cells"),
          !str_detect(cell_type, "CD4"),
          CD == "CD71") |>
@@ -358,7 +358,7 @@ data_aug |>
                                    vjust = 0.5, 
                                    hjust = 1))
 
-data_aug |>
+data_analysis4 |>
   filter(lineage %in% c("thymocytes", "CD8 T cells"),
          !str_detect(cell_type, "CD4"),
          CD == "CD95") |>
@@ -379,7 +379,7 @@ data_aug |>
 ```{r}
 cds_interes <- c("CD27", "CD38", "CD71", "CD95")
 
-data_aug |>
+data_analysis4 |>
   filter(lineage %in% c("thymocytes", "CD8 T cells"),
          !str_detect(cell_type, "CD4"),
          CD %in% cds_interes) |>

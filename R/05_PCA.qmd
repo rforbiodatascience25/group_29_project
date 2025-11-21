@@ -1,28 +1,32 @@
 ---
 title: "05_PCA"
 format: html
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Loading libraries
 
 ```{r}
-library(broom)
+
+library("tidyverse")
+library("broom")
+
 ```
 
-# Filling PCA_nested data set with median in empty cells
+# Loading data files
 
 ```{r}
-PCA_filled <- PCA_nested |>
-  mutate(across(
-    where(is.numeric),
-    ~ if_else(is.na(.x), median(.x, na.rm = TRUE), .x)
-  ))
+
+PCA_aug <- read_csv(file = "data/PCA_aug.csv")
+
 ```
 
 # Make the PCA set
 
 ```{r}
-pca_data <- PCA_filled|> 
+
+PCA_data <- PCA_aug |> 
   select(where(is.numeric)) |>
   prcomp(scale = TRUE)
 
@@ -31,8 +35,9 @@ pca_data <- PCA_filled|>
 # Make the plott
 
 ```{r}
-pca_data |> 
-  augment(data = PCA_filled) |>
+
+PCA_data |> 
+  augment(data = PCA_aug) |>
   ggplot(aes(.fittedPC1, 
              .fittedPC2,
              shape = tissue,
@@ -45,11 +50,12 @@ pca_data |>
        color = "cell lineage") +
   theme_bw()+
     theme(
-      legend.key.size = unit(0.4, "lines"),   #height of each legend row
-      legend.text = element_text(size = 7),   #smaller text
-      legend.spacing.y = unit(0.1, "lines"),  #vertical space between rows
-      legend.spacing.x = unit(0.2, "lines")   #horizontal spacing
-  ) 
+      legend.key.size = unit(0.4, "lines"),
+      legend.text = element_text(size = 7),
+      legend.spacing.y = unit(0.1, "lines"),
+      legend.spacing.x = unit(0.2, "lines")
+  )
+
 ```
 
 # Text

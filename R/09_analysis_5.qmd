@@ -12,20 +12,33 @@ library("tidyverse")
 library("broom")
 
 source(file = "R/99_proj_func.R")
+
 ```
 
 # Loading data files
 
 ```{r}
 
-data_clean <- read_csv(file = "data/data_clean.csv")
+data_aug <- read_csv(file = "data/data_aug.csv")
+
 ```
 
 # Differences in CD makers on CD4 and CD8 T cells
 
 ```{r}
 
-CD4_vs_CD8 <- data_clean |>
+columns <- c("tissue", 
+             "CD",
+             "cell_type",
+             "pair",
+             "estimate", 
+             "conf.low", 
+             "conf.high",
+             "p.value",
+             "is_significant",
+             "any_significant")
+
+CD4_vs_CD8_aug  <- data_aug |>
   filter(lineage %in% c("CD4 T cells", "CD8 T cells"),
          cell_type != "CD4ISP",
          cell_type != "TCD8RAdim",
@@ -36,51 +49,57 @@ CD4_vs_CD8 <- data_clean |>
                           str_detect(cell_type, "TEMRA") ~ "TEMRA",
                           str_detect(cell_type, "SP1ap") ~ "SP1ap",
                           str_detect(cell_type, "SP1am") ~ "SP1am")) |>
-  select(-c("CVQb", "count", "PEpos")) 
-
-columns <- c("tissue", 
-             "CD", 
-             "pair", 
-             "p.value", 
-             "estimate", 
-             "conf.low", 
-             "conf.high")
-
-CD4_vs_CD8_sig  <- CD4_vs_CD8 |>
   group_by(tissue, CD, pair) |>
   nest() |>
   mutate(model_object = map(.x = data,
-                   .f = ~lm(formula = MedQb ~ cell_type,
+                   .f = ~lm(formula = log(MedQb) ~ cell_type,
                             data = .x))) |>
   mutate(model_object_tidy = map(.x = model_object,
                                  .f = ~tidy(.x, 
                                            conf.int = TRUE,
                                            conf.level = 0.95))) |>
   unnest(model_object_tidy) |>
-  filter(str_starts(term, "cell_type")) |>
+  mutate(is_significant = case_when(term == "(Intercept)" ~ "reference",
+                                    p.value < 0.05 ~ "yes",
+                                    p.value >= 0.05 ~ "no"),
+          any_significant = case_when(any(is_significant == "yes") ~ "yes",
+                                     .default = "no")) |>
+  mutate(
+    intercept = estimate[term == "(Intercept)"],
+    estimate = case_when(
+      term == "(Intercept)" ~ estimate,
+      term != "(Intercept)" ~ estimate + intercept),
+    conf.low = case_when(
+      term == "(Intercept)" ~ conf.low,
+      term != "(Intercept)" ~ conf.low + intercept),
+    conf.high = case_when(
+      term == "(Intercept)" ~ conf.high,
+      term != "(Intercept)" ~ conf.high + intercept),
+    cell_type = case_when(
+      term == "(Intercept)" & pair == "naive" ~ "TCD4naive",
+      term == "(Intercept)" & pair == "CM" ~ "TCD4CM",
+      term == "(Intercept)" & pair == "EM" ~ "TCD4EM", 
+      term == "(Intercept)" & pair == "TEMRA" ~ "TCD4TEMRA",
+      .default = str_remove(term, "cell_type"))) |>
   select(columns) |>
-  ungroup()|>
-  mutate(is_significant = case_when(p.value < 0.05 ~ "yes",
-                                    p.value >= 0.05 ~ "no"))
-  
-
-CD4_vs_CD8_aug <- CD4_vs_CD8 |>
-  left_join(y = CD4_vs_CD8_sig,
-            by = c("tissue", "CD", "pair"),
-            relationship = "many-to-one") |>
-  group_by(tissue, CD) |>
-  mutate(any_significant = case_when(any(is_significant == "yes") ~ "yes",
-                                     .default = "no"))
+  ungroup() |>
+  filter(any_significant == "yes") |>
+  mutate(lineage = case_when(str_detect(cell_type, "CD4") ~ "CD4 T cells",
+                             .default = "CD8 T cells"),
+         .before = cell_type)
 
 CD4_vs_CD8_aug |>
-  filter(is_significant == "yes",
-         pair == "CM") |>
   ggplot(aes(x = CD,
-             y = MedQb,
-             fill = CD)) +
-  geom_boxplot() +
-  scale_y_log10() +
+             y = estimate,
+             color = lineage)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = conf.low,
+                    ymax = conf.high)) +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  facet_wrap(~ cell_type, ncol = 2)
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 1)) +
+  facet_wrap(~ pair) +
+  theme(legend.position = "bottom")
+
 ```

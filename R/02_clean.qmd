@@ -53,68 +53,25 @@ thymus_clean <- thymus |>
 
 ```{r}
 
-level_3 <- c("Tgd", 
-             "TCD8", 
-             "TCD4", 
-             "Bnaive", 
-             "BnatEff", 
-             "BIgM", 
-             "BswMem",
-             "Bdn", 
-             "B27high", 
-             "BnaiveTo", 
-             "CC", 
-             "CB", 
-             "UnswtMem", 
-             "SwtMem", 
-             "PC")
-
-data_merged <- bind_rows(blood_clean,
-                         tonsil_clean,
-                         thymus_clean)
-
-data_clean <- data_merged |>
-  filter(CD != "FMO") |>
-  mutate(hierarchy_level = case_when(cell_type == "Lymphs" ~ 1,
-                                     cell_type %in% c("T", "B") ~ 2,
-                                     cell_type %in% level_3 ~ 3,
-                                     .default = 4),
-         .after = cell_type) |>
-  mutate(lineage = case_when(tissue == "thymus" ~ "thymocytes",
-                             str_detect(cell_type, "CD4") ~ "CD4 T cells",
-                             str_detect(cell_type, "CD8") ~ "CD8 T cells",
-                             str_starts(cell_type, "T") ~ "T cells",
-                             .default = "B cells"),
-         .before = cell_type)
+data_clean <- bind_rows(blood_clean,
+                        tonsil_clean,
+                        thymus_clean)
 ```
 
 # Preparing data set for PCA
 
 ```{r}
-PCA_nested <- data_merged |>
+PCA_clean <- data_clean |>
   pivot_wider(id_cols = c("tissue", "cell_type"),
               names_from = "CD",
               values_from = c("MedQb", "PEpos"),
               values_fn = mean) |>
-  mutate(lineage = case_when(tissue == "thymus" ~ "thymocytes",
-                             str_detect(cell_type, "CD4") ~ "CD4 T cells",
-                             str_detect(cell_type, "CD8") ~ "CD8 T cells",
-                             str_starts(cell_type, "T") ~ "T cells",
-                             .default = "B cells"),
-         .before = cell_type)
-
-#max_len <- PCA_nested |>
-  #select(starts_with(c("MedQb", "PEpos"))) |> 
-  #map(lengths) |>
-  #unlist() |>
-  #max()
-
-#PCA_clean <- PCA_nested |>
-  #mutate(across(
-    #starts_with(c("MedQb","PEpos")),
-    #~ map(.x, ~ c(.x, rep(NA, max_len - length(.x)))))) |>
-  #unnest() |>
-  #filter(!if_all(-c(tissue, cell_type), is.na))
+  mutate(across(
+    where(is.numeric),
+    ~ if_else(is.na(.x), 
+              median(.x, 
+                     na.rm = TRUE), .x)
+  ))
   
 ```
 
