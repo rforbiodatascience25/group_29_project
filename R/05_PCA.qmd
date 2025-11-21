@@ -28,7 +28,7 @@ pca_data <- PCA_filled|>
 
 ```
 
-# Make the plot
+# Make the plott
 
 ```{r}
 pca_data |> 
