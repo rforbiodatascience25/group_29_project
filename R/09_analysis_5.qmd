@@ -12,6 +12,7 @@ editor_options:
 
 library("tidyverse")
 library("broom")
+library("patchwork")
 
 source(file = "R/99_proj_func.R")
 
@@ -27,6 +28,12 @@ data_aug <- read_csv(file = "data/data_aug.csv")
 
 # Differences in CD makers on CD4 and CD8 T cells
 
+In the data set, the `CD4 T cells` and `CD8 T cells` exist in two similar and parallel subsets in the `thymus`, `SP1ap` and `SP1am`, and four subsets in the `blood`, `naive`, `central memory` (CM) `effector memory` (EM) and `TEMRA`. It is therefore interesting to investigate differences in CD marker expression between `CD4` and `CD8` T cells for each pair of subset.
+
+## Applying a linear model
+
+To assess significant differences in CD marker expression between each pair, a linear model was applied using the `map()` function as described in analysis 4. In order to compare the CDs for a specific subset between `CD4` and `CD8`, the data must be grouped by the pair, hence why the variable `pair` was added. As the `CD4 T cells` are listed first in the function `cell_type_order`, their estimate corresponds the intercept, while the estimate of the `CD8 T cells` is the slope, corresponding to how much the CD expression differs from the `CD4 T cells`. Lastly, the full estimates were calculated by adding the intercept to the estimate of the `CD8 T cells`, and the variable `is_significant` and `any_significant` is added from the calculated p-value.
+
 ```{r}
 
 columns <- c("tissue", 
@@ -41,16 +48,16 @@ columns <- c("tissue",
              "any_significant")
 
 CD4_vs_CD8  <- data_aug |>
-  filter(lineage %in% c("CD4 T cells", "CD8 T cells"),
+  filter(str_detect(cell_type, "CD4") | str_detect(cell_type, "CD8"),
          cell_type != "CD4ISP",
          cell_type != "TCD8RAdim",
          hierarchy_level == 4) |>
-  mutate(pair = case_when(str_ends(cell_type, "naive") ~ "naive",
+  mutate(pair = case_when(str_detect(cell_type, "SP1ap") ~ "SP1ap",
+                          str_detect(cell_type, "SP1am") ~ "SP1am",
+                          str_ends(cell_type, "naive") ~ "naive",
                           str_ends(cell_type, "CM") ~ "CM",
                           str_ends(cell_type, "EM") ~ "EM",
-                          str_detect(cell_type, "TEMRA") ~ "TEMRA",
-                          str_detect(cell_type, "SP1ap") ~ "SP1ap",
-                          str_detect(cell_type, "SP1am") ~ "SP1am")) |>
+                          str_detect(cell_type, "TEMRA") ~ "TEMRA")) |>
   group_by(tissue, CD, pair) |>
   nest() |>
   mutate(model_object = map(.x = data,
@@ -78,6 +85,8 @@ CD4_vs_CD8  <- data_aug |>
       term == "(Intercept)" ~ conf.high,
       term != "(Intercept)" ~ conf.high + intercept),
     cell_type = case_when(
+      term == "(Intercept)" & pair == "SP1ap" ~ "CD4SP1ap",
+      term == "(Intercept)" & pair == "SP1am" ~ "CD4SP1am",
       term == "(Intercept)" & pair == "naive" ~ "TCD4naive",
       term == "(Intercept)" & pair == "CM" ~ "TCD4CM",
       term == "(Intercept)" & pair == "EM" ~ "TCD4EM", 
@@ -92,112 +101,47 @@ CD4_vs_CD8  <- data_aug |>
 
 ```
 
+## Visualization of significant CDs between each pair
+
+The significant CDs for each pair are visualized with an error bar plot of the estimate and the confidence intervals by using the function `plot_CD4vsCD8()`. The six figures are plotted together by using the package `patchwork`.
+
 ```{r}
 
 p1 <- CD4_vs_CD8 |>
-  filter(pair == "naive") |>
-  ggplot(aes(x = CD,
-             y = estimate,
-             color = lineage)) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = conf.low,
-                    ymax = conf.high),
-                width = 0.4) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, 
-                                   vjust = 0.5, 
-                                   hjust = 1)) +
-  theme(legend.position = "none") +
-  scale_color_manual(values = c("CD4 T cells" = "navy",
-                                "CD8 T cells" = "hotpink")) +
-  labs(title = "CD4naive vs CD8naive",
-       x = "Significant CDs",
-       y = "Estimate of log(MedQb)",
-       color = "Lineage")
+  CD_order() |>
+  plot_CD4vsCD8(pair = "SP1ap",
+                legend_position = "none")
 
 p2 <- CD4_vs_CD8 |>
-  filter(pair == "CM") |>
-  ggplot(aes(x = CD,
-             y = estimate,
-             color = lineage)) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = conf.low,
-                    ymax = conf.high),
-                width = 0.4) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, 
-                                   vjust = 0.5, 
-                                   hjust = 1)) +
-  theme(legend.position = "none") +
-  scale_color_manual(values = c("CD4 T cells" = "navy",
-                                "CD8 T cells" = "hotpink")) +
-  labs(title = "CD4CM vs CD8CM",
-       x = "Significant CDs",
-       y = "Estimate of log(MedQb)",
-       color = "Lineage")
+  CD_order() |>
+  plot_CD4vsCD8(pair = "SP1am",
+                legend_position = "none")
 
 p3 <- CD4_vs_CD8 |>
-  filter(pair == "EM") |>
-  ggplot(aes(x = CD,
-             y = estimate,
-             color = lineage)) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = conf.low,
-                    ymax = conf.high),
-                width = 0.4) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, 
-                                   vjust = 0.5, 
-                                   hjust = 1)) +
-  theme(legend.position = "none") +
-  scale_color_manual(values = c("CD4 T cells" = "navy",
-                                "CD8 T cells" = "hotpink")) +
-  labs(title = "CD4EM vs CD8EM",
-       x = "Significant CDs",
-       y = "Estimate of log(MedQb)",
-       color = "Lineage")
-
-p4 <- CD4_vs_CD8 |>
-  filter(pair == "TEMRA") |>
-  ggplot(aes(x = CD,
-             y = estimate,
-             color = lineage)) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin = conf.low,
-                    ymax = conf.high),
-                width = 0.4) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, 
-                                   vjust = 0.5, 
-                                   hjust = 1)) +
-  theme(legend.position = "bottom") +
-  scale_color_manual(values = c("CD4 T cells" = "navy",
-                                "CD8 T cells" = "hotpink")) +
-  labs(title = "CD4TEMRA vs CD8TEMRA",
-       x = "Significant CDs",
-       y = "Estimate of log(MedQb)",
-       color = "Lineage")
-
-(p1 + p2) / (p3 + p4)
-```
-
-```{r}
-
-p1 <- CD4_vs_CD8 |>
+  CD_order() |>
   plot_CD4vsCD8(pair = "naive",
                 legend_position = "none")
 
-p2 <- CD4_vs_CD8 |>
+p4 <- CD4_vs_CD8 |>
+  CD_order() |>
   plot_CD4vsCD8(pair = "CM",
                 legend_position = "none")
 
-p3 <- CD4_vs_CD8 |>
+p5 <- CD4_vs_CD8 |>
+  CD_order() |>
   plot_CD4vsCD8(pair = "EM",
                 legend_position = "none")
 
-p4 <- CD4_vs_CD8 |>
+p6 <- CD4_vs_CD8 |>
+  CD_order() |>
   plot_CD4vsCD8(pair = "TEMRA",
-                legend_position = "none")
+                legend_position = "bottom")
 
-(p1 + p2) / (p3 + p4)
+(p1 + p2) / (p3 + p4) / (p5 + p6) +
+  plot_annotation(
+    title = "Significant CD Markers Differentiating CD4 and CD8 T Cell Subsets",
+    caption = "Source: ...") &
+  theme(plot.caption = element_text(size = 11))
 ```
+
+The CD markers that generally show the biggest difference are as expected the lineage-specific markers `CD4` and `CD8`, which are significant for all the pairs. However...

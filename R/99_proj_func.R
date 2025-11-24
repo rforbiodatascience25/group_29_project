@@ -52,11 +52,28 @@ cell_type_order <- function(data){
                                          "B27high")))
 }
 
+CD_order <- function(data, reverse = FALSE){
+  if (reverse == FALSE) {
+    data |>
+      mutate(CD_num = parse_number(CD),
+             CD = fct_reorder(CD, CD_num)) |>
+      select(-CD_num)
+  }
+  
+  if (reverse == TRUE) {
+    data |>
+      mutate(CD_num = parse_number(CD),
+             CD = fct_reorder(CD, CD_num),
+             CD = fct_rev(CD)) |>
+      select(-CD_num)
+  }
+
+}
+
 asc_CDs_boxplot <- function(data, lineage, hierarchy_level, tissue, measure){
   measure <- enquo(measure)
   
   data|>
-    cell_type_order() |>
     filter(lineage == !!lineage,
            hierarchy_level == !!hierarchy_level,
            tissue == !!tissue) |>
