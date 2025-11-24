@@ -25,6 +25,10 @@ data_aug <- read_csv(file = "data/data_aug.csv")
 
 # Maturation of immune cells
 
+This analysis explores how immune cells mature in different tissues (blood, tonsil, and thymus) using the dataset (data_aug). The idea is to see how the expression of several cell markers (CDs) changes depending on the type of cell and where it comes from. Instead of just looking at raw values, models and graphs are used to make it easier to compare how these markers behave in different conditions.
+
+The data come from flow cytometry and include information about each cell’s type, lineage, and tissue of origin. The code groups and analyzes the data to find patterns that might show differences in how cells develop or activate. It’s basically a way to summarize how certain cell markers vary across different stages of immune cell maturation.
+
 ```{r}
 
 columns <- c("CD", 
@@ -81,13 +85,15 @@ data_analysis4 <- data_aug |>
   ungroup()
 ```
 
+For the B cells, the analysis focuses on markers like CD11a, CD69, CD79b, and CD80, which are related to how these cells activate and differentiate. For T cells, the analysis is divided between CD4 and CD8 cells. The CD4 group includes markers like CD10, CD25, CD4_MEM-241, and CD62L, while the CD8 group includes CD27, CD38, CD71, and CD95. The plots compare expression levels across tissues, helping visualize how these cells evolve from early to more mature stages.
+
 ## B cells
 
 ```{r}
 cds_interest_b <- c("CD11a", "CD69", "CD79b", "CD80")
 
 plot_cd_expression(
-  data = data_aug,
+  data = data_analysis4,
   lineage_filter = "B cells",
   cds = cds_interest_b,
   title = "Expression of Selected B-cell Markers"
@@ -95,13 +101,15 @@ plot_cd_expression(
 
 ```
 
+**B cell markers:** CD11a (cell adhesion), CD69 (early activation), CD79b (B cell receptor signaling), CD80 (co-stimulation).
+
 ## T cells
 
 ```{r}
 cds_interest_cd4 <- c("CD10", "CD25", "CD4_MEM-241", "CD62L")
 
 plot_cd_expression(
-  data = data_aug,
+  data = data_analysis4,
   lineage_filter = c("thymocytes", "CD4 T cells"),
   cds = cds_interest_cd4,
   cell_type_exclude = "CD8",
@@ -109,14 +117,20 @@ plot_cd_expression(
 )
 ```
 
+**CD4 T cell markers:** CD10 (early maturation), CD25 (activation), CD4_MEM-241 (memory), CD62L (migration).
+
 ```{r}
 cds_interest_cd8 <- c("CD27", "CD38", "CD71", "CD95")
 
 plot_cd_expression(
-  data = data_aug,
+  data = data_analysis4,
   lineage_filter = c("thymocytes", "CD8 T cells"),
   cds = cds_interest_cd8,
   cell_type_exclude = "CD4",
   title = "Expression of Selected CD8 T Cell and Thymocyte Markers"
 )
 ```
+
+**CD8 T cell markers:** CD27 (memory), CD38 (activation), CD71 (proliferation), CD95 (apoptosis).
+
+Overall, the goal is to get a clearer picture of how immune cells change as they mature, and how their protein expression shifts depending on the tissue. The graphs make it easier to see those changes and understand the development of B and T cells in a more intuitive way.
