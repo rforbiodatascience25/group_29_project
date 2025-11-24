@@ -55,7 +55,8 @@ thymus_clean <- thymus |>
 
 data_clean <- bind_rows(blood_clean,
                         tonsil_clean,
-                        thymus_clean)
+                        thymus_clean) |>
+  filter(CD != "FMO")
 ```
 
 # Preparing data set for PCA

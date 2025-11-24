@@ -45,7 +45,6 @@ level_3 <- c("Tgd",
              "PC")
 
 data_aug <- data_clean |>
-  filter(CD != "FMO") |>
   mutate(hierarchy_level = case_when(cell_type == "Lymphs" ~ 1,
                                      cell_type %in% c("T", "B") ~ 2,
                                      cell_type %in% level_3 ~ 3,

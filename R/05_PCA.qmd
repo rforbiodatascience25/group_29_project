@@ -155,3 +155,12 @@ PCA_data |>
   coord_fixed(ratio = 1) +
   theme_minimal(base_size = 16)
 ```
+
+## Maybe try something like this to filter the vectors
+
+```{r}
+
+top_vars <- rotation_df %>%
+  mutate(contrib = abs(PC1) + abs(PC2)) %>% 
+  slice_max(contrib, n = 20)
+```
