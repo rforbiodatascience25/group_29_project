@@ -109,3 +109,38 @@ data_clean |>
                   tissue = "blood",
                   measure = MedQb)
 ```
+
+# Maybe to be deleted
+
+```{r}  data_aug |>   filter(tissue == "blood",          lineage == "B cells",          !is.na(CVQb),          !is.na(MedQb)) |>   summarise(cor = cor(log(CVQb), log(MedQb)))}
+```
+
+In boxplots for B cells in blood exhibit a more uniform and stable fluorescence pattern, which is also expected since blood primarily contains mature and less varied B cell populations.
+
+```{r} #| label: B_cells_tonsil #| message: false #| warning: false #| fig-height: 10 #| fig-width: 9  p1 <- data_aug |>   asc_CDs_boxplot(lineage = "B cells",                   hierarchy_level = 3,                   tissue = "tonsil",                   measure = MedQb)  p2 <- data_aug |>   asc_CDs_boxplot(lineage = "B cells",                   hierarchy_level = 3,                   tissue = "tonsil",                   measure = CVQb)  data_aug |>   filter(lineage == "B cells",          tissue == "tonsil") |>   ggplot(aes(x = log(CVQb),              y = log(MedQb))) +   geom_point(color = "hotpink",              alpha = 0.5) +   geom_smooth(method = "lm",               color = "navy",               se = FALSE) +   theme_bw()  p1 / p2 / p3}
+```
+
+```{r} data_aug |>   filter(tissue == "tonsil",          lineage == "B cells",          !is.na(CVQb),          !is.na(MedQb)) |>   summarise(cor = cor(log(CVQb), log(MedQb)))}
+```
+
+Boxplots for B cells from the tonsil show both high and varying levels of fluorescence. This biologically makes sense as the tonsil contains many different maturation stages of B cells, which can be seen specifically in the plots as increased variation in MedQb and CVQb.
+
+# Flourescence of T cells
+
+```{r} #| label: CD4_T_cells #| message: false #| warning: false #| fig-height: 12 #| fig-width: 9  p1 <- data_aug |>   asc_CDs_boxplot(lineage = "CD4 T cells",                   hierarchy_level = 4,                   tissue = "blood",                   measure = MedQb)  p2 <- data_aug |>   asc_CDs_boxplot(lineage = "CD4 T cells",                   hierarchy_level = 4,                   tissue = "blood",                   measure = CVQb) p3 <-data_clean |>   filter(lineage == "CD4 T cells",          tissue == "blood") |>   ggplot(aes(x = CVQb,              y = MedQb)) +   geom_point(color = "hotpink",              alpha = 0.5) +   scale_x_log10() +   scale_y_log10()  p1 / p2 / p3}
+```
+
+CD4 T cells in the blood are predominantly mature, and therefore their fluorescence levels are close. They express a stable set of CD markers, which is reflected in predominantly high MedQb values ​​and low variation in CVQb. This is because the blood primarily contains mature, naive or memory CD4 cells.
+
+```{r} #| label: CD8_T_cells #| message: false #| warning: false #| fig-height: 10 #| fig-width: 9  p1 <- data_aug |>   asc_CDs_boxplot(lineage = "CD8 T cells",                   hierarchy_level = 4,                   tissue  = "blood",                   measure = MedQb)  p2 <- data_aug |>   asc_CDs_boxplot(lineage = "CD8 T cells",                   hierarchy_level = 4,                   tissue = "blood",                   measure = CVQb)  p3 <-data_clean |>   filter(lineage == "CD8 T cells",          tissue == "blood") |>   ggplot(aes(x = CVQb,              y = MedQb)) +   geom_point(color = "hotpink",              alpha = 0.5) +   scale_x_log10() +   scale_y_log10()  p1 / p2 / p3}
+```
+
+CD4 T cells show relatively homogeneous fluorescence with stable signal levels. However, a low level of variation is seen, consistent with the fact that CD4 cells in blood are typically mature and functionally show a more stable signal.
+
+```{r} #| label: Thymocytes #| message: false #| warning: false #| fig-height: 10 #| fig-width: 9  p1 <- data_aug |>   asc_CDs_boxplot(lineage = "thymocytes",                   hierarchy_level = 4,                   tissue = "thymus",                   measure = MedQb)  p2 <- data_aug |>   asc_CDs_boxplot(lineage = "thymocytes",                   hierarchy_level = 4,                   tissue = "thymus",                   measure = CVQb) p3 <-data_clean |>   filter(lineage == "thymocytes",          tissue == "thymus") |>   ggplot(aes(x = CVQb,              y = MedQb)) +   geom_point(color = "hotpink",              alpha = 0.5) +   scale_x_log10() +   scale_y_log10()  p1 / p2 / p3}
+```
+
+Thymocytes show more variable fluorescence signals across markers, which fits well with the biological heterogeneity in the thymus, where T cells are in many different stages of development.
+
+```{r}     pivot_wider(id_cols = c("tissue", "lineage"),               names_from = term,               values_from = c("estimate", "conf.low", "conf.high")) |>   rename(intercept = "estimate_intercept",          slope = "estimate_slope",          low_intercept = "conf.low_intercept",          low_slope = "conf.low_slope",          high_intercept = "conf.high_intercept",          high_slope = "conf.high_slope")    data_analysis3 <- data_aug |>   filter(lineage != "T cells",          !hierarchy_level %in% c(1, 2)) |>   left_join(y = data_lm,             by = c("tissue","lineage"),             relationship = "many-to-one") |>   mutate(pred = intercept + slope * log(CVQb),          pred_low = low_intercept + low_slope * log(CVQb),          pred_high = high_intercept + high_slope * log(CVQb))  data_analysis3 |>   filter(lineage == "B cells",          tissue == "blood") |>   ggplot(aes(x = log(CVQb),              y = log(MedQb))) +   geom_point(color = "grey",              alpha = 0.5) +   geom_line(aes(x = log(CVQb),                 y = pred),             color = "hotpink") +   geom_line(aes(x = log(CVQb),                 y = pred_low),             color = "navy") +   geom_line(aes(x = log(CVQb),                 y = pred_high),             color = "navy") +   theme_bw()}
+```
