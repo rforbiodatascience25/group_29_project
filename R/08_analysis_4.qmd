@@ -29,6 +29,10 @@ This analysis explores how immune cells mature in different tissues (blood, tons
 
 The data come from flow cytometry and include information about each cell’s type, lineage, and tissue of origin. The code groups and analyzes the data to find patterns that might show differences in how cells develop or activate. It’s basically a way to summarize how certain cell markers vary across different stages of immune cell maturation.
 
+To study these differences in a structured way, a linear model is applied to the log-transformed median fluorescence values (log(MedQb)). This model helps estimate how marker expression changes across cell types while accounting for variability between tissues and lineages. In this model, the naive cell population acts as the reference group, meaning that all other cell types are compared to it. This allows us to see how marker expression increases or decreases relative to naive (immature) cells as they progress through maturation or activation stages.
+
+Each model produces an estimate of the average expression for each cell type and its corresponding confidence interval. Positive estimates indicate higher expression compared to naive cells, while negative ones show lower expression. These comparisons reveal how specific CD markers evolve during the immune cell development process, showing, for example, which markers become more prominent as cells activate or differentiate.
+
 ```{r}
 
 columns <- c("CD", 
@@ -85,6 +89,8 @@ data_analysis4 <- data_aug |>
   ungroup()
 ```
 
+The results are then combined into a single table called data_analysis4, which serves as the base for visualization and further interpretation. The function plot_cd_expression() is used to visualize these model results, plotting the estimated expression levels and their confidence intervals for each CD marker across tissues and cell types. The color indicates statistical significance, and the point shape represents the tissue of origin, allowing clear visual comparison between blood, tonsil, and thymus.
+
 For the B cells, the analysis focuses on markers like CD11a, CD69, CD79b, and CD80, which are related to how these cells activate and differentiate. For T cells, the analysis is divided between CD4 and CD8 cells. The CD4 group includes markers like CD10, CD25, CD4_MEM-241, and CD62L, while the CD8 group includes CD27, CD38, CD71, and CD95. The plots compare expression levels across tissues, helping visualize how these cells evolve from early to more mature stages.
 
 ## B cells
@@ -133,4 +139,4 @@ plot_cd_expression(
 
 **CD8 T cell markers:** CD27 (memory), CD38 (activation), CD71 (proliferation), CD95 (apoptosis).
 
-Overall, the goal is to get a clearer picture of how immune cells change as they mature, and how their protein expression shifts depending on the tissue. The graphs make it easier to see those changes and understand the development of B and T cells in a more intuitive way.
+Overall, the goal is to get a clearer picture of how immune cells change as they mature, how their protein expression shifts depending on the tissue, and how these differences relate to the naive reference cells. The comparison against naive populations makes it easier to see which markers increase or decrease as cells become more mature or activated. Using linear modeling together with visualization provides a clear and intuitive way to interpret these changes, helping to understand the development and activation of B and T cells across different tissues.
