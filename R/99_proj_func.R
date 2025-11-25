@@ -222,4 +222,8 @@ top_vars |>
   labs(title = title)
   
 }
+
+save_plot <- function(plot, filename) {
+  ggsave(paste0("results/", filename), plot, dpi = 300, width = 7, height = 5)
+}
   
