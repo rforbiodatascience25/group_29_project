@@ -223,42 +223,7 @@ top_vars |>
   
 }
 
-plot_scatter <- function(data, params, measure, lineage, tissue, color){
-  measure <- enquo(measure)
-  measure_str <- as_name(measure)
-  
-  measure_intercept <- params |> 
-    filter(lineage == !!lineage,
-           tissue == !!tissue) |>
-    pull(paste0(measure_str, "_intercept"))
-  
-  measure_slope <- params |> 
-    filter(lineage == !!lineage,
-           tissue == !!tissue) |>
-    pull(paste0(measure_str, "_slope"))
-  
-  measure_cor <- params |> 
-    filter(lineage == !!lineage,
-           tissue == !!tissue) |>
-    pull(paste0(measure_str, "_cor"))
-  
-  data |>
-    filter(lineage == !!lineage,
-           tissue == !!tissue,
-           !hierarchy_level %in% c(1, 2),
-           lineage != "T cells") |>
-    drop_na(MedQb, !!measure) |>
-    ggplot(aes(x = log(!!measure),
-               y = log(MedQb))) +
-    geom_point(color = "black",
-               alpha = 0.5) +
-    geom_smooth(method = "lm",
-                color = color) +
-    theme_bw() + 
-    labs(title = paste0(lineage, " from ", tissue),
-         subtitle = paste0("y = ", round(measure_slope, 2), 
-                           " * x + ", 
-                           round(measure_intercept, 2), 
-                           ", cor = ", 
-                           round(measure_cor, 2)))
+save_plot <- function(plot, filename) {
+  ggsave(paste0("results/", filename), plot, dpi = 300, width = 7, height = 5)
 }
+  
