@@ -13,9 +13,10 @@ editor: visual
 #| message: false
 #| warning: false
 
-library(tidyverse)
-library(scales)
-library(patchwork)
+library("tidyverse")
+library("scales")
+library("patchwork")
+library("broom")
 
 source(here::here("R", "99_proj_func.R"))
 ```
@@ -31,7 +32,7 @@ data_aug <- read_csv(here::here("data", "data_aug.csv"))
 
 ```
 
-#Analysis of Fluorescence Variation Across Immune Cell Types and Tissues
+# Analysis of Fluorescence Variation Across Immune Cell Types and Tissues
 
 The purpose of these plots is to examine and compare the fluorescence signals across key immune cell types and tissues. By displaying both the median fluorescence (MedQb) and the coefficient of variation (CVQb) for the selected cells, we can see both the signal strength and signal stability for the different CD markers.
 
@@ -46,195 +47,183 @@ We use the four cell types B cells from tonsil and blood, CD4 and CD8 T cells fr
 #| fig-height: 10
 #| fig-width: 9
 
-p1 <- data_aug |>
+data_aug |>
   asc_CDs_boxplot(lineage = "B cells",
                   hierarchy_level = 3,
                   tissue = "blood",
                   measure = MedQb)
 
-p2 <- data_aug |>
+data_aug |>
   asc_CDs_boxplot(lineage = "B cells",
                   hierarchy_level = 3,
                   tissue = "blood",
                   measure = CVQb)
 
 data_aug |>
+    asc_CDs_boxplot(lineage = "B cells",
+                  hierarchy_level = 3,
+                  tissue = "blood",
+                  measure = PEpos)
+
+p1 / p2 / p3
+```
+
+From the plots, it looks like that there might be a correlation between the three variables. When the `MedQb` increases, the `CVQb` seems to decrease. For `PEpos` the correlation does not seem as strong, but it may increase, when `MedQb` increases.
+
+# Applying a linear model
+
+In the next part, this is assessed by creating a linear model of the two variables, `CVQb` and `PEpos`, against `MedQb`. Additionally, the correlation coefficients are calculated.
+
+```{r}
+
+columns <- c("tissue",
+             "lineage",
+             "term_CVQb",
+             "estimate_CVQb",
+             "term_PEpos",
+             "estimate_PEpos")
+
+data_lm <- data_aug |>
+  filter(lineage != "T cells",
+         !hierarchy_level %in% c(1, 2)) |>
+  group_by(tissue, lineage) |>
+  nest() |>
+  mutate(model_object_CVQb = map(.x = data,
+                   .f = ~lm(formula = log(MedQb) ~ log(CVQb),
+                            data = .x)),
+         model_object_PEpos = map(.x = data,
+                   .f = ~lm(formula = log(MedQb) ~ log(PEpos),
+                            data = .x))) |>
+  mutate(model_object_tidy_CVQb = map(.x = model_object_CVQb,
+                                 .f = ~tidy(.x, 
+                                           conf.int = TRUE,
+                                           conf.level = 0.95)),
+         model_object_tidy_PEpos = map(.x = model_object_PEpos,
+                                 .f = ~tidy(.x, 
+                                           conf.int = TRUE,
+                                           conf.level = 0.95))) |>
+  unnest(model_object_tidy_CVQb,
+         model_object_tidy_PEpos) |>
+  rename(term_CVQb = "term",
+         term_PEpos = "term1",
+         estimate_CVQb = "estimate",
+         estimate_PEpos = "estimate1") |>
+  select(columns) |>
+  ungroup() |>
+  mutate(
+    term_CVQb = case_when(
+      term_CVQb == "(Intercept)" ~ "intercept",
+      term_CVQb != "(Intercept)" ~ "slope"),
+    term_PEpos = case_when(
+      term_PEpos == "(Intercept)" ~ "intercept",
+      term_PEpos != "(Intercept)" ~ "slope")) |>
+  pivot_longer(cols = c(term_CVQb, term_PEpos, estimate_CVQb, estimate_PEpos),
+                        names_to = c(".value", "measure"),
+                        names_pattern = "(.*)_(.*)") |>
+  mutate(measure = str_remove(measure, "term_")) |>
+  pivot_wider(id_cols = c("tissue", "lineage"),
+              names_from = c("measure", "term"),
+              values_from = estimate)
+
+
+
+```
+
+The correlation coefficient is now calculated.
+
+```{r}
+
+data_params <- data_aug |>
+  filter(!is.na(MedQb), 
+         !is.na(CVQb), 
+         !is.na(PEpos),
+         lineage != "T cells",
+         !hierarchy_level %in% c(1, 2)) |>
+  group_by(tissue, lineage) |>
+  summarise(CVQb_cor = cor(log(CVQb), log(MedQb)),
+            PEpos_cor = cor(log(PEpos), log(MedQb))) |>
+  left_join(y = data_lm,
+            by = c("tissue", "lineage"),
+            relationship = "one-to-one")
+```
+
+In the last, scatter plots with the linear model are created.
+
+For CVQb:
+
+```{r}
+
+CVQb_intercept <- data_params |> 
+    filter(lineage == "B cells",
+           tissue == "blood") |>
+  pull(CVQb_intercept)
+
+
+CVQb_slope <- data_params |> 
+    filter(lineage == "B cells",
+           tissue == "blood") |>
+  pull(CVQb_slope)
+
+CVQb_cor <- data_params |> 
+    filter(lineage == "B cells",
+           tissue == "blood") |>
+  pull(CVQb_cor)
+  
+p1 <- data_aug |>
   filter(lineage == "B cells",
          tissue == "blood") |>
   ggplot(aes(x = log(CVQb),
              y = log(MedQb))) +
-  geom_point(color = "hotpink",
+  geom_point(color = "grey",
              alpha = 0.5) +
   geom_smooth(method = "lm",
-              color = "navy",
-              se = FALSE) +
-  theme_bw()
-
-p1 / p2 / p3
+              color = "blue") +
+  theme_bw() + 
+  labs(title = "something",
+       subtitle = paste0("y = ", round(CVQb_intercept, 2), 
+                         " ", 
+                         round(CVQb_slope, 2), 
+                         " * x, correlation coefficient = ", 
+                         round(CVQb_cor, 2)))
 ```
 
-```{r}
-data_aug |>
-  filter(tissue == "blood",
-         lineage == "B cells",
-         !is.na(CVQb),
-         !is.na(MedQb)) |>
-  summarise(cor = cor(log(CVQb), log(MedQb)))
-
-```
-
-In boxplots for B cells in blood exhibit a more uniform and stable fluorescence pattern, which is also expected since blood primarily contains mature and less varied B cell populations.
+For PEpos:
 
 ```{r}
-#| label: B_cells_tonsil
-#| message: false
-#| warning: false
-#| fig-height: 10
-#| fig-width: 9
 
-p1 <- data_aug |>
-  asc_CDs_boxplot(lineage = "B cells",
-                  hierarchy_level = 3,
-                  tissue = "tonsil",
-                  measure = MedQb)
+PEpos_intercept <- data_params |> 
+    filter(lineage == "B cells",
+           tissue == "blood") |>
+  pull(PEpos_intercept)
 
+
+PEpos_slope <- data_params |> 
+    filter(lineage == "B cells",
+           tissue == "blood") |>
+  pull(PEpos_slope)
+
+PEpos_cor <- data_params |> 
+    filter(lineage == "B cells",
+           tissue == "blood") |>
+  pull(PEpos_cor)
+  
 p2 <- data_aug |>
-  asc_CDs_boxplot(lineage = "B cells",
-                  hierarchy_level = 3,
-                  tissue = "tonsil",
-                  measure = CVQb)
-
-data_aug |>
   filter(lineage == "B cells",
-         tissue == "tonsil") |>
-  ggplot(aes(x = log(CVQb),
+         tissue == "blood") |>
+  ggplot(aes(x = log(PEpos),
              y = log(MedQb))) +
-  geom_point(color = "hotpink",
+  geom_point(color = "grey",
              alpha = 0.5) +
   geom_smooth(method = "lm",
-              color = "navy",
-              se = FALSE) +
-  theme_bw()
+              color = "hotpink") +
+  theme_bw() + 
+  labs(title = "something",
+       subtitle = paste0("y = ", round(PEpos_intercept, 2), 
+                         " + ", 
+                         round(PEpos_slope, 2), 
+                         " * x, correlation coefficient = ", 
+                         round(PEpos_cor, 2)))
 
-p1 / p2 / p3
 
-
+p1 + p2
 ```
-
-```{r}
-data_aug |>
-  filter(tissue == "tonsil",
-         lineage == "B cells",
-         !is.na(CVQb),
-         !is.na(MedQb)) |>
-  summarise(cor = cor(log(CVQb), log(MedQb)))
-```
-
-```{r}
-
-
-```
-
-Boxplots for B cells from the tonsil show both high and varying levels of fluorescence. This biologically makes sense as the tonsil contains many different maturation stages of B cells, which can be seen specifically in the plots as increased variation in MedQb and CVQb.
-
-# Flourescence of T cells
-
-```{r}
-#| label: CD4_T_cells
-#| message: false
-#| warning: false
-#| fig-height: 12
-#| fig-width: 9
-
-p1 <- data_aug |>
-  asc_CDs_boxplot(lineage = "CD4 T cells",
-                  hierarchy_level = 4,
-                  tissue = "blood",
-                  measure = MedQb)
-
-p2 <- data_aug |>
-  asc_CDs_boxplot(lineage = "CD4 T cells",
-                  hierarchy_level = 4,
-                  tissue = "blood",
-                  measure = CVQb)
-p3 <-data_clean |>
-  filter(lineage == "CD4 T cells",
-         tissue == "blood") |>
-  ggplot(aes(x = CVQb,
-             y = MedQb)) +
-  geom_point(color = "hotpink",
-             alpha = 0.5) +
-  scale_x_log10() +
-  scale_y_log10()
-
-p1 / p2 / p3
-```
-
-CD4 T cells in the blood are predominantly mature, and therefore their fluorescence levels are close. They express a stable set of CD markers, which is reflected in predominantly high MedQb values ​​and low variation in CVQb. This is because the blood primarily contains mature, naive or memory CD4 cells.
-
-```{r}
-#| label: CD8_T_cells
-#| message: false
-#| warning: false
-#| fig-height: 10
-#| fig-width: 9
-
-p1 <- data_aug |>
-  asc_CDs_boxplot(lineage = "CD8 T cells",
-                  hierarchy_level = 4,
-                  tissue  = "blood",
-                  measure = MedQb)
-
-p2 <- data_aug |>
-  asc_CDs_boxplot(lineage = "CD8 T cells",
-                  hierarchy_level = 4,
-                  tissue = "blood",
-                  measure = CVQb)
-
-p3 <-data_clean |>
-  filter(lineage == "CD8 T cells",
-         tissue == "blood") |>
-  ggplot(aes(x = CVQb,
-             y = MedQb)) +
-  geom_point(color = "hotpink",
-             alpha = 0.5) +
-  scale_x_log10() +
-  scale_y_log10()
-
-p1 / p2 / p3
-```
-
-CD4 T cells show relatively homogeneous fluorescence with stable signal levels. However, a low level of variation is seen, consistent with the fact that CD4 cells in blood are typically mature and functionally show a more stable signal.
-
-```{r}
-#| label: Thymocytes
-#| message: false
-#| warning: false
-#| fig-height: 10
-#| fig-width: 9
-
-p1 <- data_aug |>
-  asc_CDs_boxplot(lineage = "thymocytes",
-                  hierarchy_level = 4,
-                  tissue = "thymus",
-                  measure = MedQb)
-
-p2 <- data_aug |>
-  asc_CDs_boxplot(lineage = "thymocytes",
-                  hierarchy_level = 4,
-                  tissue = "thymus",
-                  measure = CVQb)
-p3 <-data_clean |>
-  filter(lineage == "thymocytes",
-         tissue == "thymus") |>
-  ggplot(aes(x = CVQb,
-             y = MedQb)) +
-  geom_point(color = "hotpink",
-             alpha = 0.5) +
-  scale_x_log10() +
-  scale_y_log10()
-
-p1 / p2 / p3
-```
-
-Thymocytes show more variable fluorescence signals across markers, which fits well with the biological heterogeneity in the thymus, where T cells are in many different stages of development.
