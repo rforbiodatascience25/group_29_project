@@ -27,7 +27,7 @@ data_aug <- read_csv(file = "data/data_aug.csv")
 
 The **aim** of this visualization is to have a summarized, comprehensive view of all CD markers used in our data set. From it, the user can extract preliminary insight about constitutive, cohort- and tissue-associated markers, which will be further expanded in following analyses.
 
-A pre-processing step is taken to generate an auxiliary data frame for plotting an upper horizontal bar for identifying cell types by tissue, named **tube_bar**.
+A pre-processing step is taken to generate an auxiliary data frame for plotting an upper horizontal bar for identifying cell types by tissue, named **tube_bar**. This keeps only one distinct cell type entry per tissue, which is needed for non-redundant marker classification.
 
 ```{r}
 
