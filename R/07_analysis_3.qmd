@@ -17,6 +17,7 @@ library("tidyverse")
 library("scales")
 library("patchwork")
 library("broom")
+library("rlang")
 
 source(here::here("R", "99_proj_func.R"))
 ```
@@ -36,7 +37,7 @@ data_aug <- read_csv(here::here("data", "data_aug.csv"))
 
 The purpose of these plots is to examine and compare the fluorescence signals across key immune cell types and tissues. By displaying both the median fluorescence (MedQb) and the coefficient of variation (CVQb) for the selected cells, we can see both the signal strength and signal stability for the different CD markers.
 
-We use the four cell types B cells from tonsil and blood, CD4 and CD8 T cells from blood, and thymocytes from the thymus for biologically different environments in the immune system. By visualizing, we can see how fluorescence levels vary between mature and immature cellshow signal variation depends on tissue type whether the expression of CD markers is stable or heterogeneous within a given location and which cell types show the most or least variation in the CD marker profiles and see patterns and features in the biology.
+We use the four cell types B cells from tonsil and blood, CD4 and CD8 T cells from blood, and thymocytes from the thymus for biologically different environments in the immune system. By visualizing, we can see how fluorescence levels vary between mature and immature cells, how signal variation depends on tissue type whether the expression of CD markers is stable or heterogeneous within a given location and which cell types show the most or least variation in the CD marker profiles.
 
 # Flourescence of B cells
 
@@ -47,19 +48,19 @@ We use the four cell types B cells from tonsil and blood, CD4 and CD8 T cells fr
 #| fig-height: 10
 #| fig-width: 9
 
-data_aug |>
+p1 <- data_aug |>
   asc_CDs_boxplot(lineage = "B cells",
                   hierarchy_level = 3,
                   tissue = "blood",
                   measure = MedQb)
 
-data_aug |>
+p2 <- data_aug |>
   asc_CDs_boxplot(lineage = "B cells",
                   hierarchy_level = 3,
                   tissue = "blood",
                   measure = CVQb)
 
-data_aug |>
+p3 <- data_aug |>
     asc_CDs_boxplot(lineage = "B cells",
                   hierarchy_level = 3,
                   tissue = "blood",
@@ -125,11 +126,9 @@ data_lm <- data_aug |>
               names_from = c("measure", "term"),
               values_from = estimate)
 
-
-
 ```
 
-The correlation coefficient is now calculated.
+The correlation coefficient is now calculated and the two data frames are joined.
 
 ```{r}
 
@@ -140,90 +139,91 @@ data_params <- data_aug |>
          lineage != "T cells",
          !hierarchy_level %in% c(1, 2)) |>
   group_by(tissue, lineage) |>
-  summarise(CVQb_cor = cor(log(CVQb), log(MedQb)),
-            PEpos_cor = cor(log(PEpos), log(MedQb))) |>
+  summarise(CVQb_cor = cor(log(CVQb), 
+                           log(MedQb)),
+            PEpos_cor = cor(log(PEpos), 
+                            log(MedQb))) |>
   left_join(y = data_lm,
             by = c("tissue", "lineage"),
             relationship = "one-to-one")
 ```
 
-In the last, scatter plots with the linear model are created.
-
-For CVQb:
+In the last part, scatter plots with the linear model are created.
 
 ```{r}
 
-CVQb_intercept <- data_params |> 
-    filter(lineage == "B cells",
-           tissue == "blood") |>
-  pull(CVQb_intercept)
-
-
-CVQb_slope <- data_params |> 
-    filter(lineage == "B cells",
-           tissue == "blood") |>
-  pull(CVQb_slope)
-
-CVQb_cor <- data_params |> 
-    filter(lineage == "B cells",
-           tissue == "blood") |>
-  pull(CVQb_cor)
-  
 p1 <- data_aug |>
-  filter(lineage == "B cells",
-         tissue == "blood") |>
-  ggplot(aes(x = log(CVQb),
-             y = log(MedQb))) +
-  geom_point(color = "grey",
-             alpha = 0.5) +
-  geom_smooth(method = "lm",
-              color = "blue") +
-  theme_bw() + 
-  labs(title = "something",
-       subtitle = paste0("y = ", round(CVQb_intercept, 2), 
-                         " ", 
-                         round(CVQb_slope, 2), 
-                         " * x, correlation coefficient = ", 
-                         round(CVQb_cor, 2)))
-```
-
-For PEpos:
-
-```{r}
-
-PEpos_intercept <- data_params |> 
-    filter(lineage == "B cells",
-           tissue == "blood") |>
-  pull(PEpos_intercept)
+  plot_scatter(params = data_params,
+               measure = CVQb,
+               lineage = "B cells",
+               tissue = "blood",
+               color = "blue")
 
 
-PEpos_slope <- data_params |> 
-    filter(lineage == "B cells",
-           tissue == "blood") |>
-  pull(PEpos_slope)
-
-PEpos_cor <- data_params |> 
-    filter(lineage == "B cells",
-           tissue == "blood") |>
-  pull(PEpos_cor)
-  
 p2 <- data_aug |>
-  filter(lineage == "B cells",
-         tissue == "blood") |>
-  ggplot(aes(x = log(PEpos),
-             y = log(MedQb))) +
-  geom_point(color = "grey",
-             alpha = 0.5) +
-  geom_smooth(method = "lm",
-              color = "hotpink") +
-  theme_bw() + 
-  labs(title = "something",
-       subtitle = paste0("y = ", round(PEpos_intercept, 2), 
-                         " + ", 
-                         round(PEpos_slope, 2), 
-                         " * x, correlation coefficient = ", 
-                         round(PEpos_cor, 2)))
+  plot_scatter(params = data_params,
+               measure = PEpos,
+               lineage = "B cells",
+               tissue = "blood",
+               color = "hotpink")
 
+p3 <- data_aug |>
+  plot_scatter(params = data_params,
+               measure = CVQb,
+               lineage = "B cells",
+               tissue = "tonsil",
+               color = "blue")
 
-p1 + p2
+p4 <- data_aug |>
+  plot_scatter(params = data_params,
+               measure = PEpos,
+               lineage = "B cells",
+               tissue = "tonsil",
+               color = "hotpink")
+
+p5 <- data_aug |>
+  plot_scatter(params = data_params,
+               measure = CVQb,
+               lineage = "CD4 T cells",
+               tissue = "blood",
+               color = "blue")
+
+p6 <- data_aug |>
+  plot_scatter(params = data_params,
+               measure = PEpos,
+               lineage = "CD4 T cells",
+               tissue = "blood",
+               color = "hotpink")
+
+p7 <- data_aug |>
+  plot_scatter(params = data_params,
+               measure = CVQb,
+               lineage = "CD8 T cells",
+               tissue = "blood",
+               color = "blue")
+
+p8 <- data_aug |>
+  plot_scatter(params = data_params,
+               measure = PEpos,
+               lineage = "CD8 T cells",
+               tissue = "blood",
+               color = "hotpink")
+
+p9 <- data_aug |>
+  plot_scatter(params = data_params,
+               measure = CVQb,
+               lineage = "thymocytes",
+               tissue = "thymus",
+               color = "blue")
+
+p10 <- data_aug |>
+  plot_scatter(params = data_params,
+               measure = PEpos,
+               lineage = "thymocytes",
+               tissue = "thymus",
+               color = "hotpink")
+
+(p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
+  plot_annotation(caption = "cor: correlation coefficient") &
+  theme(plot.caption = element_text(size = 11))
 ```
