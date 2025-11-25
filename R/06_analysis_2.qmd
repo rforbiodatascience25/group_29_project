@@ -81,6 +81,7 @@ data_aug |>
        size = "Frequency of Positive Cells (%)",
        color = "Fluorescence [log10(Median ABC)]")
 
+ggsave("analysis2_plot.jpg", last_plot(), path = "data", width = 5000, height = 7000, units = "px", create.dir = FALSE)
 ```
 
 This is a heat-dot plot that shows the relative fluorescence of every surface marker from CD1a to C100. For every cell type analysed, the size of the dot is proportional to the percentage of cells marked, while the color portrays the amount of fluorescence, represented as the log10 of the antibody binding capability (ABC). The cell types are also segmented by tissue (blood, tonsil and thymus).
