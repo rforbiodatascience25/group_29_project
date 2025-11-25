@@ -27,20 +27,20 @@ data_aug <- read_csv(file = "data/data_aug.csv")
 
 The **aim** of this visualization is to have a summarized, comprehensive view of all CD markers used in our data set. From it, the user can extract preliminary insight about constitutive, cohort- and tissue-associated markers, which will be further expanded in following analyses.
 
-Please, explain what you do here and what it is used for. Why are we performing this step? Also I have made a function for the CD_order so i deleted the first chunk.
+A pre-processing step is taken to generate an auxiliary data frame for plotting an upper horizontal bar for identifying cell types by tissue, named **tube_bar**.
 
 ```{r}
 
 tube_bar <- data_aug |>
   distinct(cell_type, 
            tissue) |>
-  mutate(y = "TubeBar")  # dummy y-position above your markers
+  mutate(y = "TubeBar")  
 
 ```
 
 ## Making the heat dot plot
 
-The plot is generated using dplyr's **ggplot2**. Our data set, data_clean was slightly modified for the analysis; new columns with labels for CD number and tissue were added to allow for correct alphabetical display of CD markers and segmentation by tissue in the auxiliary bar plot, respectively. Discrete intervals for dot size are displayed in the legend for a comprehensive view of the plot, as well as a color gradient bar for fluorescence.
+The plot shown below is generated using dplyr's **ggplot2**. Our data set, data_aug was slightly modified for the analysis; new columns with labels for CD number and tissue were added to allow for correct alphabetical display of CD markers using the custom function **CD_order()**. Additionally, tube_bar is plotted over the upper x-axis. Discrete intervals for dot size are displayed in the legend for a comprehensive view of the plot, as well as a color gradient bar for fluorescence.
 
 ```{r}
 #| fig-height: 15
@@ -84,5 +84,3 @@ data_aug |>
 ```
 
 This is a heat-dot plot that shows the relative fluorescence of every surface marker from CD1a to C100. For every cell type analysed, the size of the dot is proportional to the percentage of cells marked, while the color portrays the amount of fluorescence, represented as the log10 of the antibody binding capability (ABC). The cell types are also segmented by tissue (blood, tonsil and thymus).
-
-As expected, there are wide variations in CD marker distribution. While some markers are universally abundant (CD11a, CD44, CD81), others are only abundant in some cell types and tissues. CD45, the leukocyte common antigen, is by definition expressed in all white cells, while considerable enrichment for CD markers from CD2 to CD7 is seen in leukocytes from thymus, which are essentially CD4 and CD8 T-cells.
