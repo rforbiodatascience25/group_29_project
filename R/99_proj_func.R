@@ -179,3 +179,47 @@ plot_CD4vsCD8 <- function(data, pair, legend_position) {
          y = "Estimate of log(MedQb)",
          color = "Lineage")
 }
+
+PCA_rotation <- function(data, prefix, amount, arrow_min, xlimits, ylimits, title) {
+  arrow_style <- arrow(angle = 30, 
+                       ends = "first", 
+                       type = "closed", 
+                       length = grid::unit(5, "pt"))
+  Plot_data <- data |>
+    tidy(matrix = "rotation") |>
+    pivot_wider(names_from = "PC", 
+                names_prefix = "PC", 
+                values_from = "value")
+  
+
+
+  data|>
+    mutate(contrib = abs(PC1) + abs(PC2)) %>% 
+    slice_max(contrib, n = amount)
+
+top_vars |>
+  filter(str_starts(column, prefix)) |>
+  mutate(arrow_length = sqrt(PC1^2 + PC2^2)) |>
+  filter(arrow_length > arrow_min) |>
+    
+  ggplot(aes(PC1, PC2)) +
+  geom_segment(
+    aes(xend = 0, yend = 0),
+    arrow = arrow_style
+    ) +
+  geom_text_repel(
+    aes(label = str_remove(column, prefix)),
+    size = 3,
+    color = "hotpink",
+    min.segment.length = 0,
+    direction = "both",
+    max.overlaps = Inf
+  ) +
+  xlim(xlimits) +
+  ylim(ylimits) +
+  coord_fixed(ratio = 1) +
+  theme_minimal(base_size = 16)+
+  labs(title = title)
+  
+}
+  
