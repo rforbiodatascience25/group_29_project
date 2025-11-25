@@ -28,6 +28,8 @@ thymus <- read_csv(file = "data/thymus_load.csv")
 
 # Cleaning each data set
 
+Each dataset is standardized using the function pivot_selected_variables(), which reshapes wide data into a tidy long format. It extracts only the selected variables (CVQb, MedQb, count, PEpos), splits the variable names into cell_type and measurement columns, and tags each observation with its tissue. This ensures that all datasets share the same column structure and can be merged later without conflicts.
+
 ```{r}
 
 selected_measures <- c("CVQb", "MedQb", "count", "PEpos")
@@ -50,6 +52,8 @@ thymus_clean <- thymus |>
 ```
 
 # Merge the three cleaned data sets
+
+Here the cleaned datasets from blood, tonsil, and thymus are combined into one large table (data_clean) using bind_rows(). Control samples labeled “FMO” are filtered out since they are used only for calibration. The result is a clean, uniform dataset containing all immune-cell measurements, ready for further analysis.
 
 ```{r}
 

@@ -26,6 +26,14 @@ PCA_clean <- read_csv(file = "data/PCA_clean.csv")
 
 # Add variables
 
+Here we enrich the dataset with two new variables:
+
+-   hierarchy_level: assigns a numeric level (1–4) describing how specific or mature each cell type is.
+
+-   lineage: groups cells into larger categories such as thymocytes, CD4 T cells, CD8 T cells, T cells, or B cells.
+
+These new variables make it easier to visualize and compare immune-cell maturation patterns across tissues.
+
 ```{r}
 
 level_3 <- c("Tgd", 
@@ -57,6 +65,8 @@ data_aug <- data_clean |>
                              .default = "B cells"),
          .before = cell_type)
 ```
+
+The same lineage classification is applied to the PCA dataset so that both data_aug and PCA_aug share identical labels.
 
 ```{r}
 
