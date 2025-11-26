@@ -71,12 +71,12 @@ Rotation matrix all values
 ```{r}
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(
+full_rota <- PCA_rotation(
   data   = PCA_data,
   prefix = ".*",
   amount = Inf,
-  xlimits = c(-0.12, 0.13),
-  ylimits = c(-0.11, 0.15),
+  xlimits = c(-0.15, 0.15),
+  ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix all values"
 )
 ```
@@ -86,12 +86,12 @@ PEpos all values
 ```{r}
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(
+full_rota_PEpos <- PCA_rotation(
   data   = PCA_data,
   prefix = "PEpos_",
   amount = Inf,
-  xlimits = c(-0.12, 0.13),
-  ylimits = c(-0.11, 0.15),
+  xlimits = c(-0.15, 0.15),
+  ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix all values PEpos"
 )
 ```
@@ -101,12 +101,12 @@ PEpos top 10 values
 ```{r}
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(
+PEpos_top10 <- PCA_rotation(
   data   = PCA_data,
   prefix = "MedQb_",
   amount = 10,
-  xlimits = c(-0.12, 0.13),
-  ylimits = c(-0.11, 0.15),
+  xlimits = c(-0.15, 0.15),
+  ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix top 10 values PEpos"
 )
 ```
@@ -116,12 +116,12 @@ MedQb all values
 ```{r}
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(
+full_rota_MedQb <- PCA_rotation(
   data   = PCA_data,
   prefix = "MedQb_",
   amount = Inf,
-  xlimits = c(-0.12, 0.13),
-  ylimits = c(-0.11, 0.15),
+  xlimits = c(-0.15, 0.15),
+  ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix all values MedQb"
 )
 ```
@@ -132,12 +132,12 @@ MedQb top 10 values
 
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(
+MedQb_top10 <- PCA_rotation(
   data   = PCA_data,
   prefix = "MedQb_",
   amount = 10,
-  xlimits = c(-0.12, 0.13),
-  ylimits = c(-0.11, 0.15),
+  xlimits = c(-0.15, 0.15),
+  ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix top 10 values MedQb"
 )
 
