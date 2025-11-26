@@ -11,16 +11,11 @@ editor_options:
 library(tidyverse)
 library(broom)
 library(ggrepel)
-library(dplyr)
-library(stringr)
-library(tidyr)
-library(ggplot2)
 ```
 
 # Loading data files
 
 ```{r}
-
 PCA_aug <- read_csv(file = "data/PCA_aug.csv")
 
 ```
@@ -49,12 +44,14 @@ PCA_data |>
              .fittedPC2,
              shape = tissue,
              color = lineage)) +
-  geom_point(size = 1.5,
-             alpha = 0.4) +
+  geom_point(size = 3,
+             alpha = 0.8) +
   labs(title = "PCA plot",
        x = "PC1",
        y = "PC2",
        color = "cell lineage") +
+  scale_color_brewer(palette = "Set1")+
+
   theme_bw()+
     theme(
       legend.key.size = unit(0.4, "lines"),
@@ -76,14 +73,18 @@ Rotation matrix all values
 ```{r}
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(
+full_rota <- PCA_rotation(
   data   = PCA_data,
   prefix = ".*",
   amount = Inf,
-  xlimits = c(-0.12, 0.13),
-  ylimits = c(-0.11, 0.15),
+  xlimits = c(-0.15, 0.15),
+  ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix all values"
 )
+save_plot(plot = full_rota,
+          filename = "All values.png",
+          width = 8,
+          height = 9)
 ```
 
 PEpos all values
@@ -91,14 +92,18 @@ PEpos all values
 ```{r}
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(
+full_rota_PEpos <- PCA_rotation(
   data   = PCA_data,
   prefix = "PEpos_",
   amount = Inf,
-  xlimits = c(-0.12, 0.13),
-  ylimits = c(-0.11, 0.15),
+  xlimits = c(-0.15, 0.15),
+  ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix all values PEpos"
 )
+save_plot(plot = full_rota_PEpos,
+          filename = "PEpos all values.png",
+          width = 8,
+          height = 9)
 ```
 
 PEpos top 10 values
@@ -106,14 +111,18 @@ PEpos top 10 values
 ```{r}
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(
+PEpos_top10 <- PCA_rotation(
   data   = PCA_data,
   prefix = "MedQb_",
   amount = 10,
-  xlimits = c(-0.12, 0.13),
-  ylimits = c(-0.11, 0.15),
+  xlimits = c(-0.15, 0.15),
+  ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix top 10 values PEpos"
 )
+save_plot(plot = PEpos_top10,
+          filename = "PEpos top 10 values.png",
+          width = 8,
+          height = 9)
 ```
 
 MedQb all values
@@ -121,14 +130,18 @@ MedQb all values
 ```{r}
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(
+full_rota_MedQb <- PCA_rotation(
   data   = PCA_data,
   prefix = "MedQb_",
   amount = Inf,
-  xlimits = c(-0.12, 0.13),
-  ylimits = c(-0.11, 0.15),
+  xlimits = c(-0.15, 0.15),
+  ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix all values MedQb"
 )
+save_plot(plot = full_rota_MedQb,
+          filename = "MedQb all values.png",
+          width = 8,
+          height = 9)
 ```
 
 MedQb top 10 values
@@ -137,13 +150,16 @@ MedQb top 10 values
 
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(
+MedQb_top10 <- PCA_rotation(
   data   = PCA_data,
   prefix = "MedQb_",
   amount = 10,
-  xlimits = c(-0.12, 0.13),
-  ylimits = c(-0.11, 0.15),
+  xlimits = c(-0.15, 0.15),
+  ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix top 10 values MedQb"
 )
-
+save_plot(plot = MedQb_top10,
+          filename = "MedQb top 10 values.png",
+          width = 8,
+          height = 9)
 ```
