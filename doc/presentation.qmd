@@ -24,7 +24,8 @@ editor_options:
 
 ::::: columns
 ::: {.column width="50%" style="font-size:70%"}
--   Something something
+-   CD4 and CD8 T cells go through parallel stages
+-   How
 
 | Pair  | Count |
 |-------|-------|
