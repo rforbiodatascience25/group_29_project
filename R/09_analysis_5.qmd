@@ -3,6 +3,7 @@ title: "Analysis 5"
 format:
   html:
     embed-resources: true
+output-dir: ../results
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -14,7 +15,6 @@ execute:
 # Loading packages
 
 ```{r}
-#| include: false
 
 library("tidyverse")
 library("broom")
@@ -28,7 +28,6 @@ source(here::here("R", "99_proj_func.R"))
 # Loading data files
 
 ```{r}
-#| include: false
 
 data_aug <- read_csv(file = here::here("data/data_aug.csv"))
 
@@ -149,9 +148,8 @@ p6 <- CD4_vs_CD8 |>
 
 (p1 + p2) / (p3 + p4) / (p5 + p6) +
   plot_annotation(
-    title = "Significant CD Markers Differentiating CD4 and CD8 T Cell Subsets",
-    caption = "Source: ...") &
-  theme(plot.caption = element_text(size = 11))
+    title = "Significant CD Markers Differentiating CD4 and CD8 T Cell Subsets") &
+  theme(plot.title = element_text(size = 18))
 ```
 
 The CD markers that generally show the biggest difference are as expected the lineage-specific markers `CD4` and `CD8`, which are significant for all the pairs.
@@ -167,11 +165,12 @@ sig_CD_count <- CD4_vs_CD8 |>
   ggplot(aes(x = pair,
              y = count_CD)) +
   geom_col(fill = "hotpink") + 
-  theme_bw(base_size = 14) +
-  labs(title = "Count of significant CDs for each pair",
+  theme_bw(base_size = 13) +
+  labs(subtitle = "Count of significant CDs for each pair",
        x = "Pair",
        y = "Count")
 
+sig_CD_count
 ```
 
 # Plot export and document rendering
@@ -188,7 +187,7 @@ p3 <- CD4_vs_CD8 |>
 final_plot <- sig_CD_count / p3
 
 save_plot(plot = final_plot,
-          filename = "09_analysis_5_plot.png",
+          filename = "09_key_plot.png",
           width = 7,
           height = 9)
 ```
