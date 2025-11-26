@@ -4,6 +4,8 @@ format:
   html:
     embed-resources: true
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Loading packages
@@ -33,11 +35,9 @@ data_aug <- read_csv(here::here("data", "data_aug.csv"))
 
 ```
 
-# Analysis of Fluorescence Variation Across Immune Cell Types and Tissues
+# **CVQb and PEpos Relate to the Median Signal in Immune Cells**
 
-The purpose of these plots is to examine and compare the fluorescence signals across key immune cell types and tissues. By displaying both the median fluorescence (MedQb) and the coefficient of variation (CVQb) for the selected cells, we can see both the signal strength and signal stability for the different CD markers.
-
-We use the four cell types B cells from tonsil and blood, CD4 and CD8 T cells from blood, and thymocytes from the thymus for biologically different environments in the immune system. By visualizing, we can see how fluorescence levels vary between mature and immature cells, how signal variation depends on tissue type whether the expression of CD markers is stable or heterogeneous within a given location and which cell types show the most or least variation in the CD marker profiles.
+The purpose of these plots is to examine and compare the fluorescence signals across key immune cell types and tissues.
 
 # Flourescence of B cells
 
@@ -223,7 +223,17 @@ p10 <- data_aug |>
                tissue = "thymus",
                color = "hotpink")
 
-(p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
+final_plot <- (p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
   plot_annotation(caption = "cor: correlation coefficient") &
   theme(plot.caption = element_text(size = 11))
+```
+
+# Plot export and document rendering
+
+```{r}
+
+save_plot(plot = final_plot,
+          filename = "07_analysis_3_plot",
+          width = 8,
+          height = 9)
 ```
