@@ -185,7 +185,7 @@ PCA_rotation <- function(data, prefix, amount, arrow_min, xlimits, ylimits, titl
                        ends = "first", 
                        type = "closed", 
                        length = grid::unit(5, "pt"))
-  Plot_data <- data |>
+  rotation_data <- data |>
     tidy(matrix = "rotation") |>
     pivot_wider(names_from = "PC", 
                 names_prefix = "PC", 
@@ -193,14 +193,14 @@ PCA_rotation <- function(data, prefix, amount, arrow_min, xlimits, ylimits, titl
   
 
 
-  data|>
+  top_vars <- rotation_data|>
     mutate(contrib = abs(PC1) + abs(PC2)) %>% 
     slice_max(contrib, n = amount)
 
-top_vars |>
-  filter(str_starts(column, prefix)) |>
-  mutate(arrow_length = sqrt(PC1^2 + PC2^2)) |>
-  filter(arrow_length > arrow_min) |>
+  plot_data <- top_vars |>
+    filter(str_starts(column, prefix)) |>
+    mutate(arrow_length = sqrt(PC1^2 + PC2^2)) |>
+    filter(arrow_length > arrow_min) |>
     
   ggplot(aes(PC1, PC2)) +
   geom_segment(
@@ -223,6 +223,7 @@ top_vars |>
   
 }
 
+
 save_plot <- function(plot, filename, width = 5, height = 7) {
   ggsave(paste0("results/", filename), 
          plot, 
@@ -230,4 +231,3 @@ save_plot <- function(plot, filename, width = 5, height = 7) {
          width = width, 
          height = height)
 }
-  
