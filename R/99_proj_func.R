@@ -180,7 +180,7 @@ plot_CD4vsCD8 <- function(data, pair, legend_position) {
          color = "Lineage")
 }
 
-PCA_rotation <- function(data, prefix, amount, xlimits, ylimits, title) {
+PCA_rotation <- function(filename, data, prefix, amount, xlimits, ylimits, title) {
   arrow_style <- arrow(
     angle  = 30, 
     ends   = "first", 
@@ -224,6 +224,50 @@ PCA_rotation <- function(data, prefix, amount, xlimits, ylimits, title) {
     labs(title = title)
 }
 
+
+heat_dot_plot <- function(data_for_plot, filename, w, h){
+  tube_bar <- data_for_plot |>
+    distinct(cell_type, 
+             tissue) |>
+    mutate(y = "TubeBar")  
+  
+  data_for_plot |>
+  CD_order(reverse = TRUE) |>
+  ggplot(aes(x = cell_type, 
+             y = CD)) +
+  geom_point(aes(size = PEpos, 
+                 color = log10(MedQb))) +
+  geom_tile(data = tube_bar, 
+            aes(x = cell_type, 
+                y = y, 
+                fill = tissue), 
+            height = 0.5) +
+  scale_size_continuous(breaks = c(5, 20, 60, 100), 
+                        range = c(1, 6)) +
+  scale_color_gradientn(colors = c("lightblue", "orange", "darkred"), 
+                        values = scales::rescale(c(2, 3, 4, 5))) +
+  scale_fill_manual(values = c("blood" = "#93aa9b", 
+                               "tonsil" = "#c8b145", 
+                               "thymus" = "#bb6e36")) +
+  scale_x_discrete(position = "top") +
+  coord_cartesian(clip = "off") +
+  theme_minimal(base_size = 20) +
+  theme(axis.text.x = element_text(angle = 90, 
+                                   vjust = 0.5, 
+                                   hjust = 0, 
+                                   size = 15),
+        axis.text.y = element_text(size = 15),
+        axis.title = element_text(size = 20), 
+        legend.position = "right",
+        plot.margin = margin(5, 5, 5, 5),
+        panel.grid = element_blank()) +
+  labs(x = "Cell Type",
+       y = "Marker",
+       size = "Frequency of Positive Cells (%)",
+       color = "Fluorescence [log10(Median ABC)]")
+
+ggsave(filename, last_plot(), path = "doc/images/", width = w, height = h, units = "px", create.dir = FALSE)
+}
 
 
 save_plot <- function(plot, filename, width = 5, height = 7) {
