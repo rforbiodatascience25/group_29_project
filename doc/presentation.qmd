@@ -18,13 +18,13 @@ editor_options:
 
 ## Analysis 3
 
-::: columns
+::::: columns
 ::: {.column width="50%"}
 :::
 
 ::: {.column width="50%"}
 :::
-:::
+:::::
 
 ## Analysis 4
 
