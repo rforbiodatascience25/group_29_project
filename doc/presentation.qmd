@@ -1,24 +1,46 @@
 ---
 title: "Group 29 Presentation"
-format: revealjs
+format: 
+  revealjs:
+    embed-resources: true
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
-## Quarto
+## Introduction
 
-Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <https://quarto.org/docs/presentations/>.
+## Materials and Methods
 
-## Bullets
+## Analysis 1
 
-When you click the **Render** button a document will be generated that includes:
+## Analysis 2
 
--   Content authored with markdown
--   Output from executable code
+## Analysis 3
 
-## Code
+## Analysis 4
 
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+## Analysis 5
 
-```{r}
-1 + 1
-```
+::::: columns
+::: {.column width="50%" style="font-size:70%"}
+-   Something something
+
+| Pair  | Count |
+|-------|-------|
+| SP1ap | 24    |
+| SP1am | 15    |
+| Naive | 18    |
+| CM    | 23    |
+| EM    | 25    |
+| TEMRA | 22    |
+
+: Count of significant CDs
+:::
+
+::: {.column width="50%"}
+![](images/09_analysis_5_plot.png)
+:::
+:::::
+
+## Discussion
