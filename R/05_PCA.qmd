@@ -11,16 +11,11 @@ editor_options:
 library(tidyverse)
 library(broom)
 library(ggrepel)
-library(dplyr)
-library(stringr)
-library(tidyr)
-library(ggplot2)
 ```
 
 # Loading data files
 
 ```{r}
-
 PCA_aug <- read_csv(file = "data/PCA_aug.csv")
 
 ```
