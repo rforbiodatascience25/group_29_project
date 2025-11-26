@@ -220,7 +220,7 @@ PCA_rotation <- function(data, prefix, amount, xlimits, ylimits, title) {
     xlim(xlimits) +
     ylim(ylimits) +
     coord_fixed(ratio = 1) +
-    theme_minimal(base_size = 16) +
+    theme_bw(base_size = 16) +
     labs(title = title)
 }
 
