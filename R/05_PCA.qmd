@@ -8,10 +8,13 @@ editor_options:
 # Loading libraries
 
 ```{r}
-
-library("tidyverse")
-library("broom")
-
+library(tidyverse)
+library(broom)
+library(ggrepel)
+library(dplyr)
+library(stringr)
+library(tidyr)
+library(ggplot2)
 ```
 
 # Loading data files
@@ -66,223 +69,81 @@ PCA_data |>
 
 As we can see on the plot we have some nice clustering. We see all the cells from thymus clustered nicely and tonsil cells are also somewhat clustered. In the blood we see two different clusters, with one containing all blood B cells except for one, and the other one containing the rest of the cell lineages. We can also see that the B cell lineage from blood and thymus didn't vary much in PC1 but PC2 set them apart.
 
-# Rotation matrix full
+# Rotation matrices
 
-### with PEpos
-
-```{r}
-library(ggrepel)
-library(dplyr)
-library(stringr)
-
-arrow_style <- arrow(angle = 30, 
-                     ends = "first", 
-                     type = "closed", 
-                     length = grid::unit(5, "pt"))
-
-PCA_data |>
-  tidy(matrix = "rotation") |>
-  pivot_wider(names_from = "PC", 
-              names_prefix = "PC", 
-              values_from = "value") |>
-  
-  # keep only PEpos variables
-  filter(str_starts(column, "PEpos")) |>
-  
-  mutate(arrow_length = sqrt(PC1^2 + PC2^2)) |>
-  filter(arrow_length > 0.1) |>
-  
-  ggplot(aes(PC1, PC2)) +
-  geom_segment(
-    aes(xend = 0, yend = 0),
-    arrow = arrow_style
-  ) +
-  geom_text_repel(
-    aes(label = column),
-    size = 3,
-    color = "hotpink",
-    min.segment.length = 0,
-    direction = "both",
-    max.overlaps = Inf
-  ) +
-  xlim(-0.12, 0.13) +
-  ylim(-0.11, 0.15) +
-  coord_fixed(ratio = 1) +
-  theme_minimal(base_size = 16)
-
-
-```
-
-### With MedQb
+Rotation matrix all values
 
 ```{r}
-library(ggrepel)
-library(dplyr)
-library(stringr)
-
-arrow_style <- arrow(angle = 30, 
-                     ends = "first", 
-                     type = "closed", 
-                     length = grid::unit(5, "pt"))
-
-PCA_data|>
-  tidy(matrix = "rotation") |>
-  pivot_wider(names_from = "PC", 
-              names_prefix = "PC", 
-              values_from = "value") |>
-  
-  # keep only MedQb variables
-  filter(str_starts(column, "MedQb")) |>
-  
-  mutate(arrow_length = sqrt(PC1^2 + PC2^2)) |>
-  filter(arrow_length > 0.01) |>
-  
-  ggplot(aes(PC1, PC2))+
-  geom_segment(
-    aes(xend = 0, yend = 0),
-    arrow = arrow_style
-  ) +
-  geom_text_repel(
-    aes(label = str_remove(column, "MedQb_")),
-    size = 3,
-    color = "hotpink",
-    min.segment.length = 0,
-    direction = "both",
-    max.overlaps = Inf
-  ) +
-  xlim(-0.12, 0.13) +
-  ylim(-0.11, 0.15) +
-  coord_fixed(ratio = 1) +
-  theme_minimal(base_size = 16)
-```
-
-## Maybe try something like this to filter the vectors
-
-```{r}
-
-#top_vars <- rotation_df %>%
-  #mutate(contrib = abs(PC1) + abs(PC2)) %>% 
-  #slice_max(contrib, n = 10)
-```
-
-# Rotation matrix top 10 values
-
-### With PEpos
-
-```{r}
-#Make set
-PCA_pepos <- PCA_data |>
-  tidy(matrix = "rotation") |>
-  pivot_wider(names_from = "PC", 
-              names_prefix = "PC", 
-              values_from = "value")
-
-#Top values
-top_vars <- PCA_pepos %>%
-  filter(str_starts(column, "PEpos")) |>
-  mutate(contrib = abs(PC1) + abs(PC2)) %>% 
-  slice_max(contrib, n = 10)
-
-arrow_style <- arrow(angle = 30, 
-                     ends = "first", 
-                     type = "closed", 
-                     length = grid::unit(5, "pt"))
-
-top_vars |>
-  mutate(arrow_length = sqrt(PC1^2 + PC2^2)) |>
-  filter(arrow_length > 0.1) |>
-  
-  ggplot(aes(PC1, PC2)) +
-  geom_segment(
-    aes(xend = 0, yend = 0),
-    arrow = arrow_style
-  ) +
-  geom_text_repel(
-    aes(label = str_remove(column, "PEpos_")),
-    size = 3,
-    color = "hotpink",
-    min.segment.length = 0,
-    direction = "both",
-    max.overlaps = Inf
-  ) +
-  xlim(-0.12, 0.13) +
-  ylim(-0.11, 0.15) +
-  coord_fixed(ratio = 1) +
-  theme_minimal(base_size = 16)+
-  labs(title = "Rotation matrix top 10 values MedQb")
-```
-
-### With MedQb
-
-```{r}
-#Make set
-PCA_medqb <- PCA_data |>
-  tidy(matrix = "rotation") |>
-  pivot_wider(names_from = "PC", 
-              names_prefix = "PC", 
-              values_from = "value")
-
-#Top values
-top_vars <- PCA_medqb |>
-  filter(str_starts(column, "MedQb")) |>
-  mutate(contrib = abs(PC1) + abs(PC2)) |> 
-  slice_max(contrib, n = 10)
-
-arrow_style <- arrow(angle = 30, 
-                     ends = "first", 
-                     type = "closed", 
-                     length = grid::unit(5, "pt"))
-
-top_vars |>
-  mutate(arrow_length = sqrt(PC1^2 + PC2^2)) |>
-  filter(arrow_length > 0.1) |>
-  
-  ggplot(aes(PC1, PC2)) +
-  geom_segment(
-    aes(xend = 0, yend = 0),
-    arrow = arrow_style
-  ) +
-  geom_text_repel(
-    aes(label = str_remove(column, "MedQb_")),
-    size = 3,
-    color = "hotpink",
-    min.segment.length = 0,
-    direction = "both",
-    max.overlaps = Inf
-  ) +
-  xlim(-0.12, 0.13) +
-  ylim(-0.11, 0.15) +
-  coord_fixed(ratio = 1) +
-  theme_minimal(base_size = 16)+
-  labs(title = "Rotation matrix top 10 values MedQb")
-
-
-
-```
-
-```{r}
-
-library(ggrepel)
-library(dplyr)
-library(stringr)
-library(broom)      # for tidy()
-library(tidyr)      # for pivot_wider
-library(ggplot2)
-
 source(file = "R/99_proj_func.R")
 
-p <- PCA_rotation2(PCA_data, "MedQb_", 10, c(-0.12, 0.13), c(-0.11, 0.15), "test")
-print(p)
+PCA_rotation(
+  data   = PCA_data,
+  prefix = ".*",
+  amount = Inf,
+  xlimits = c(-0.12, 0.13),
+  ylimits = c(-0.11, 0.15),
+  title   = "Rotation matrix all values"
+)
 ```
 
+PEpos all values
+
 ```{r}
-PCA_rotation2(
+source(file = "R/99_proj_func.R")
+
+PCA_rotation(
+  data   = PCA_data,
+  prefix = "PEpos_",
+  amount = Inf,
+  xlimits = c(-0.12, 0.13),
+  ylimits = c(-0.11, 0.15),
+  title   = "Rotation matrix all values PEpos"
+)
+```
+
+PEpos top 10 values
+
+```{r}
+source(file = "R/99_proj_func.R")
+
+PCA_rotation(
   data   = PCA_data,
   prefix = "MedQb_",
   amount = 10,
   xlimits = c(-0.12, 0.13),
   ylimits = c(-0.11, 0.15),
-  title   = "test"
+  title   = "Rotation matrix top 10 values PEpos"
+)
+```
+
+MedQb all values
+
+```{r}
+source(file = "R/99_proj_func.R")
+
+PCA_rotation(
+  data   = PCA_data,
+  prefix = "MedQb_",
+  amount = Inf,
+  xlimits = c(-0.12, 0.13),
+  ylimits = c(-0.11, 0.15),
+  title   = "Rotation matrix all values MedQb"
+)
+```
+
+MedQb top 10 values
+
+```{r}
+
+source(file = "R/99_proj_func.R")
+
+PCA_rotation(
+  data   = PCA_data,
+  prefix = "MedQb_",
+  amount = 10,
+  xlimits = c(-0.12, 0.13),
+  ylimits = c(-0.11, 0.15),
+  title   = "Rotation matrix top 10 values MedQb"
 )
 
 ```
