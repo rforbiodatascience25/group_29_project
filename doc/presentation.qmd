@@ -19,10 +19,20 @@ editor_options:
 ## Analysis 3
 
 ::: columns
-::: {.column width="50%"}
+::: {.column width="50%" style="font-size:70%"}
+**CVQb:**
+
+-   Blue lines show a negative correlation → higher CVQb = lower MedQb
+
+-   Tonsil B cells: line is flat → almost no relationship
+
+**PEpos:**
+
+-   Pink lines show a positive correlation → higher PEpos = higher MedQb
 :::
 
 ::: {.column width="50%"}
+![](images/07_analysis_3_plot.png)
 :::
 :::
 
@@ -30,7 +40,7 @@ editor_options:
 
 ## Analysis 5
 
-::::: columns
+::: columns
 ::: {.column width="50%" style="font-size:70%"}
 -   Something something
 
@@ -49,6 +59,6 @@ editor_options:
 ::: {.column width="50%"}
 ![](images/09_analysis_5_plot.png)
 :::
-:::::
+:::
 
 ## Discussion
