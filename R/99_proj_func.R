@@ -53,14 +53,14 @@ cell_type_order <- function(data){
 }
 
 CD_order <- function(data, reverse = FALSE){
-  if (reverse == FALSE) {
+  if (!reverse) {
     data |>
       mutate(CD_num = parse_number(CD),
              CD = fct_reorder(CD, CD_num)) |>
       select(-CD_num)
   }
   
-  if (reverse == TRUE) {
+  else {
     data |>
       mutate(CD_num = parse_number(CD),
              CD = fct_reorder(CD, CD_num),
@@ -223,46 +223,11 @@ PCA_rotation <- function(data, prefix, amount, arrow_min, xlimits, ylimits, titl
   
 }
 
-PCA_rotation2 <- function(data, prefix, amount, xlimits, ylimits, title) {
-  arrow_style <- arrow(
-    angle  = 30, 
-    ends   = "first", 
-    type   = "closed", 
-    length = grid::unit(5, "pt")
-  )
-  
-  rotation_data <- data |>
-    tidy(matrix = "rotation") |>
-    pivot_wider(
-      names_from   = "PC", 
-      names_prefix = "PC", 
-      values_from  = "value"
-    )
-  
-  plot_data <- rotation_data |>
-    filter(str_starts(column, prefix)) |>
-    mutate(
-      contrib      = abs(PC1) + abs(PC2),
-      arrow_length = sqrt(PC1^2 + PC2^2)
-    ) |>
-    slice_max(contrib, n = amount)    # <- no arrow_length filter
-  
-  ggplot(plot_data, aes(PC1, PC2)) +
-    geom_segment(
-      aes(xend = 0, yend = 0),
-      arrow = arrow_style
-    ) +
-    geom_text_repel(
-      aes(label = str_remove(column, prefix)),
-      size = 3,
-      color = "hotpink",
-      min.segment.length = 0,
-      direction = "both",
-      max.overlaps = Inf
-    ) +
-    xlim(xlimits) +
-    ylim(ylimits) +
-    coord_fixed(ratio = 1) +
-    theme_minimal(base_size = 16) +
-    labs(title = title)
+
+save_plot <- function(plot, filename, width = 5, height = 7) {
+  ggsave(paste0("results/", filename), 
+         plot, 
+         dpi = 300, 
+         width = width, 
+         height = height)
 }
