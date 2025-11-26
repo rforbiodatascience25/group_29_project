@@ -100,7 +100,7 @@ cds_significant <- data_analysis4 |>
   summarise(n_significant_CDs = n_distinct(CD)) |>
   arrange(desc(n_significant_CDs))        
 
-write_csv(cds_significant, "results/cds_significant.csv")
+cds_significant
 ```
 
 The results are then combined into a single table called data_analysis4, which serves as the base for visualization and further interpretation. The function plot_cd_expression() is used to visualize these model results, plotting the estimated expression levels and their confidence intervals for each CD marker across tissues and cell types. The color indicates statistical significance, and the point shape represents the tissue of origin, allowing clear visual comparison between blood, tonsil, and thymus.

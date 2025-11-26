@@ -28,6 +28,36 @@ editor_options:
 
 ## Analysis 4
 
+:::::::: columns
+:::::: {.column width="70%"}
+::::: columns
+::: {.column width="35%"}
+![](../results/08_key_plot_1.png){width="291"} ![](../results/08_key_plot_2.png){width="291"}
+:::
+
+::: {.column width="35%" style="font-size: 50%"}
+![](../results/08_key_plot_3.png){width="291"}
+
+| Lineage     | Significant CDs |
+|-------------|-----------------|
+| B cells     | 104             |
+| Thymocytes  | 74              |
+| CD4 T cells | 51              |
+| CD8 T cells | 46              |
+
+: Number of significant CD markers (p \< 0.05)
+:::
+:::::
+::::::
+
+::: {.column width="30%" style="font-size: 30%"}
+-   **Table:** B cells had the most significant markers, showing stronger activation changes.
+-   **B cells:** Tonsil B cells are more activated (CD69, CD80), while blood B cells mature gradually (CD11a, CD80).
+-   **CD4 T cells:** Mature from thymus to blood, losing CD10 and gaining CD25 and CD4_MEM-241.
+-   **CD8 T cells:** Move from active thymus cells to mature blood cells with higher CD27 and CD95.
+:::
+::::::::
+
 ## Analysis 5
 
 ::::: columns
