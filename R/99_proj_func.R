@@ -141,19 +141,19 @@ plot_cd_expression <- function(data, lineage_filter, cds, cell_type_exclude = NU
       )
     ) +
     scale_shape_discrete(name = "Tissue") +
-    theme_minimal() +
+    theme_minimal(base_size = 12) +
     theme(
       axis.text.x = element_text(angle = 90, 
                                  vjust = 0.5, 
                                  hjust = 1),
-      strip.text = element_text(size = 14, 
+      strip.text = element_text(size = 10, 
                                 face = "bold"),
       axis.line = element_line(color = "black")
     ) +
     labs(
       title = title,
       x = "Cell Type",
-      y = "Estimate"
+      y = "log(MedQb)"
     )
 }
 
@@ -167,16 +167,16 @@ plot_CD4vsCD8 <- function(data, pair, legend_position) {
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
                   width = 0.4) +
-    theme_bw(base_size = 14) +
+    theme_bw(base_size = 13) +
     theme(axis.text.x = element_text(angle = 90, 
                                      vjust = 0.5, 
                                      hjust = 1),
           legend.position = legend_position) +
     scale_color_manual(values = c("CD4 T cells" = "navy",
                                   "CD8 T cells" = "hotpink")) +
-    labs(title = paste0("CD4", pair, " vs CD8", pair),
+    labs(subtitle = paste0("CD4", pair, " vs CD8", pair),
          x = "Significant CDs",
-         y = "Estimate of log(MedQb)",
+         y = "log(MedQb)",
          color = "Lineage")
 }
 
@@ -226,7 +226,7 @@ PCA_rotation <- function(data, prefix, amount, xlimits, ylimits, title) {
 
 
 
-save_plot <- function(plot, filename, width = 5, height = 7) {
+save_plot <- function(plot, filename, width = 7, height = 5) {
   ggsave(here::here(paste0("results/", filename)), 
          plot, 
          dpi = 300, 

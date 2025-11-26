@@ -12,15 +12,16 @@ editor_options:
 
 library("tidyverse")
 library("broom")
+library("patchwork")
 
-source(file = "R/99_proj_func.R")
+source(here::here(file = "R/99_proj_func.R"))
 ```
 
 # Loading data files
 
 ```{r}
 
-data_aug <- read_csv(file = "data/data_aug.csv")
+data_aug <- read_csv(here::here(file = "data/data_aug.csv"))
 ```
 
 # Maturation of immune cells
@@ -103,6 +104,26 @@ cds_significant <- data_analysis4 |>
 cds_significant
 ```
 
+A column plot of the count of significant CDs for each lineage is created below.
+
+```{r}
+
+sig_CD_count <- data_analysis4 |>
+  group_by(lineage) |>
+  filter(is_significant == "yes") |>
+  summarise(count_CD = n_distinct(CD)) |>
+  mutate(lineage = fct_rev(fct_reorder(lineage, count_CD))) |>
+  ggplot(aes(x = lineage,
+             y = count_CD)) +
+  geom_col(fill = "#fa2840") + 
+  theme_bw(base_size = 13) +
+  labs(subtitle = "Count of significant CDs for each pair",
+       x = "Lineage",
+       y = "Count")
+
+sig_CD_count
+```
+
 The results are then combined into a single table called data_analysis4, which serves as the base for visualization and further interpretation. The function plot_cd_expression() is used to visualize these model results, plotting the estimated expression levels and their confidence intervals for each CD marker across tissues and cell types. The color indicates statistical significance, and the point shape represents the tissue of origin, allowing clear visual comparison between blood, tonsil, and thymus.
 
 For the B cells, the analysis focuses on markers like CD11a, CD69, CD79b, and CD80, which are related to how these cells activate and differentiate. For T cells, the analysis is divided between CD4 and CD8 cells. The CD4 group includes markers like CD10, CD25, CD4_MEM-241, and CD62L, while the CD8 group includes CD27, CD38, CD71, and CD95. The plots compare expression levels across tissues, helping visualize how these cells evolve from early to more mature stages.
@@ -112,14 +133,14 @@ For the B cells, the analysis focuses on markers like CD11a, CD69, CD79b, and CD
 ```{r}
 cds_interest_b <- c("CD11a", "CD69", "CD79b", "CD80")
 
-p_b <- plot_cd_expression(
+p1 <- plot_cd_expression(
   data = data_analysis4,
   lineage_filter = "B cells",
   cds = cds_interest_b,
-  title = "Expression of Selected B-cell Markers"
+  title = "Significant CDs during B cell maturation"
 )
 
-save_plot(p_b, "08_key_plot_1.png")
+p1
 ```
 
 **B cell markers:** CD11a (cell adhesion), CD69 (early activation), CD79b (B cell receptor signaling), CD80 (co-stimulation).
@@ -129,15 +150,15 @@ save_plot(p_b, "08_key_plot_1.png")
 ```{r}
 cds_interest_cd4 <- c("CD10", "CD25", "CD4_MEM-241", "CD62L")
 
-p_cd4 <- plot_cd_expression(
+p2 <- plot_cd_expression(
   data = data_analysis4,
   lineage_filter = c("thymocytes", "CD4 T cells"),
   cds = cds_interest_cd4,
   cell_type_exclude = "CD8",
-  title = "Expression of Selected CD4 T Cell and Thymocyte Markers"
+  title = "Significant CDs during CD8 T cell maturation"
 )
 
-save_plot(p_cd4, "08_key_plot_2.png")
+p2
 ```
 
 **CD4 T cell markers:** CD10 (early maturation), CD25 (activation), CD4_MEM-241 (memory), CD62L (migration).
@@ -145,17 +166,34 @@ save_plot(p_cd4, "08_key_plot_2.png")
 ```{r}
 cds_interest_cd8 <- c("CD27", "CD38", "CD71", "CD95")
 
-p_cd8 <- plot_cd_expression(
+p3 <- plot_cd_expression(
   data = data_analysis4,
   lineage_filter = c("thymocytes", "CD8 T cells"),
   cds = cds_interest_cd8,
   cell_type_exclude = "CD4",
-  title = "Expression of Selected CD8 T Cell and Thymocyte Markers"
+  title = "Significant CDs during CD8 T cell maturation"
 )
 
-save_plot(p_cd8, "08_key_plot_3.png")
+p3
 ```
 
 **CD8 T cell markers:** CD27 (memory), CD38 (activation), CD71 (proliferation), CD95 (apoptosis).
 
 Overall, the goal is to get a clearer picture of how immune cells change as they mature, how their protein expression shifts depending on the tissue, and how these differences relate to the naive reference cells. The comparison against naive populations makes it easier to see which markers increase or decrease as cells become more mature or activated. Using linear modeling together with visualization provides a clear and intuitive way to interpret these changes, helping to understand the development and activation of B and T cells across different tissues.
+
+## Export plots
+
+```{r}
+
+final_plot <- p1 / p2
+
+save_plot(plot = final_plot, 
+          filename = "08_key_plot_1.png",
+          width = 7,
+          height = 8.5)
+
+save_plot(plot = sig_CD_count, 
+          filename = "08_key_plot_2.png",
+          height = 4)
+
+```
