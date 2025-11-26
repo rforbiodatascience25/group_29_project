@@ -137,11 +137,41 @@ p6 <- CD4_vs_CD8 |>
   plot_CD4vsCD8(pair = "TEMRA",
                 legend_position = "bottom")
 
-(p1 + p2) / (p3 + p4) / (p5 + p6) +
+final_plot <- (p1 + p2) / (p3 + p4) / (p5 + p6) +
   plot_annotation(
     title = "Significant CD Markers Differentiating CD4 and CD8 T Cell Subsets",
     caption = "Source: ...") &
   theme(plot.caption = element_text(size = 11))
 ```
 
-The CD markers that generally show the biggest difference are as expected the lineage-specific markers `CD4` and `CD8`, which are significant for all the pairs. However...
+The CD markers that generally show the biggest difference are as expected the lineage-specific markers `CD4` and `CD8`, which are significant for all the pairs.
+
+Below are the number of significant CDs for each pair calculated.
+
+```{r}
+
+CD4_vs_CD8 |>
+  group_by(pair) |>
+  mutate(pair = factor(pair,
+                       levels = c("SP1ap",
+                                  "SP1am",
+                                  "naive",
+                                  "CM",
+                                  "EM",
+                                  "TEMRA"))) |>
+  distinct(CD) |>
+  summarise(count = n()) |>
+  ggtexttable(rows = NULL,
+              theme = ttheme("mBlue"))
+
+```
+
+# Plot export and document rendering
+
+```{r}
+
+save_plot(plot = final_plot,
+          filename = "09_analysis_5_plot.png",
+          width = 8,
+          height = 9)
+```
