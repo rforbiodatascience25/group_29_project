@@ -31,20 +31,12 @@ editor_options:
 ## Analysis 5
 
 ::::: columns
-::: {.column width="50%" style="font-size:70%"}
+::: {.column width="50%" style="font-size:50%"}
 -   CD4 and CD8 T cells go through parallel stages
--   How
-
-| Pair  | Count |
-|-------|-------|
-| SP1ap | 24    |
-| SP1am | 15    |
-| Naive | 18    |
-| CM    | 23    |
-| EM    | 25    |
-| TEMRA | 22    |
-
-: Count of significant CDs
+-   How do the CD markers differ between CD4 and CD8 T cells for each stage?
+    -   As expected CD4 and CD8 are significant different for all pairs
+    -   CD59 is significant for all stages except TEMRA with a higher log(MedQb) for CD8
+    -   SP1am and Naive have the lowest number of significant CDs → CD4 and CD8 more similar in these stages
 :::
 
 ::: {.column width="50%"}

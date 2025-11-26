@@ -167,7 +167,7 @@ plot_CD4vsCD8 <- function(data, pair, legend_position) {
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
                   width = 0.4) +
-    theme_bw() +
+    theme_bw(base_size = 14) +
     theme(axis.text.x = element_text(angle = 90, 
                                      vjust = 0.5, 
                                      hjust = 1),
@@ -225,7 +225,7 @@ PCA_rotation <- function(data, prefix, amount, arrow_min, xlimits, ylimits, titl
 
 
 save_plot <- function(plot, filename, width = 5, height = 7) {
-  ggsave(paste0("results/", filename), 
+  ggsave(here::here(paste0("results/", filename)), 
          plot, 
          dpi = 300, 
          width = width, 
