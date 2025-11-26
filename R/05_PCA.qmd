@@ -44,12 +44,14 @@ PCA_data |>
              .fittedPC2,
              shape = tissue,
              color = lineage)) +
-  geom_point(size = 1.5,
-             alpha = 0.4) +
+  geom_point(size = 3,
+             alpha = 0.8) +
   labs(title = "PCA plot",
        x = "PC1",
        y = "PC2",
        color = "cell lineage") +
+  scale_color_brewer(palette = "Set1")+
+
   theme_bw()+
     theme(
       legend.key.size = unit(0.4, "lines"),
@@ -79,6 +81,10 @@ full_rota <- PCA_rotation(
   ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix all values"
 )
+save_plot(plot = full_rota,
+          filename = "All values.png",
+          width = 8,
+          height = 9)
 ```
 
 PEpos all values
@@ -94,6 +100,10 @@ full_rota_PEpos <- PCA_rotation(
   ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix all values PEpos"
 )
+save_plot(plot = full_rota_PEpos,
+          filename = "PEpos all values.png",
+          width = 8,
+          height = 9)
 ```
 
 PEpos top 10 values
@@ -109,6 +119,10 @@ PEpos_top10 <- PCA_rotation(
   ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix top 10 values PEpos"
 )
+save_plot(plot = PEpos_top10,
+          filename = "PEpos top 10 values.png",
+          width = 8,
+          height = 9)
 ```
 
 MedQb all values
@@ -124,6 +138,10 @@ full_rota_MedQb <- PCA_rotation(
   ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix all values MedQb"
 )
+save_plot(plot = full_rota_MedQb,
+          filename = "MedQb all values.png",
+          width = 8,
+          height = 9)
 ```
 
 MedQb top 10 values
@@ -140,5 +158,8 @@ MedQb_top10 <- PCA_rotation(
   ylimits = c(-0.15, 0.15),
   title   = "Rotation matrix top 10 values MedQb"
 )
-
+save_plot(plot = MedQb_top10,
+          filename = "MedQb top 10 values.png",
+          width = 8,
+          height = 9)
 ```
