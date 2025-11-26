@@ -89,6 +89,20 @@ data_analysis4 <- data_aug |>
   ungroup()
 ```
 
+## Significant CDs
+
+This section shows how many CD markers were significant (p \< 0.05) in each lineage.
+
+```{r}
+cds_significant <- data_analysis4 |>
+  filter(is_significant == "yes") |>      
+  group_by(lineage) |>                    
+  summarise(n_significant_CDs = n_distinct(CD)) |>
+  arrange(desc(n_significant_CDs))        
+
+write_csv(cds_significant, "results/cds_significant.csv")
+```
+
 The results are then combined into a single table called data_analysis4, which serves as the base for visualization and further interpretation. The function plot_cd_expression() is used to visualize these model results, plotting the estimated expression levels and their confidence intervals for each CD marker across tissues and cell types. The color indicates statistical significance, and the point shape represents the tissue of origin, allowing clear visual comparison between blood, tonsil, and thymus.
 
 For the B cells, the analysis focuses on markers like CD11a, CD69, CD79b, and CD80, which are related to how these cells activate and differentiate. For T cells, the analysis is divided between CD4 and CD8 cells. The CD4 group includes markers like CD10, CD25, CD4_MEM-241, and CD62L, while the CD8 group includes CD27, CD38, CD71, and CD95. The plots compare expression levels across tissues, helping visualize how these cells evolve from early to more mature stages.
