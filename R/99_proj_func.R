@@ -53,14 +53,14 @@ cell_type_order <- function(data){
 }
 
 CD_order <- function(data, reverse = FALSE){
-  if (reverse == FALSE) {
+  if (!reverse) {
     data |>
       mutate(CD_num = parse_number(CD),
              CD = fct_reorder(CD, CD_num)) |>
       select(-CD_num)
   }
   
-  if (reverse == TRUE) {
+  else {
     data |>
       mutate(CD_num = parse_number(CD),
              CD = fct_reorder(CD, CD_num),
@@ -223,7 +223,11 @@ top_vars |>
   
 }
 
-save_plot <- function(plot, filename) {
-  ggsave(paste0("results/", filename), plot, dpi = 300, width = 7, height = 5)
+save_plot <- function(plot, filename, width = 5, height = 7) {
+  ggsave(paste0("results/", filename), 
+         plot, 
+         dpi = 300, 
+         width = width, 
+         height = height)
 }
   
