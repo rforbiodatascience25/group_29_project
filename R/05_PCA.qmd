@@ -223,9 +223,9 @@ PCA_medqb <- PCA_data |>
               values_from = "value")
 
 #Top values
-top_vars <- PCA_medqb %>%
+top_vars <- PCA_medqb |>
   filter(str_starts(column, "MedQb")) |>
-  mutate(contrib = abs(PC1) + abs(PC2)) %>% 
+  mutate(contrib = abs(PC1) + abs(PC2)) |> 
   slice_max(contrib, n = 10)
 
 arrow_style <- arrow(angle = 30, 
@@ -271,5 +271,18 @@ library(ggplot2)
 
 source(file = "R/99_proj_func.R")
 
-PCA_rotation(PCA_test, "MedQb_", 10, 0.01, c(-0.12, 0.13), c(-0.11, 0.15), "test")
+p <- PCA_rotation2(PCA_data, "MedQb_", 10, c(-0.12, 0.13), c(-0.11, 0.15), "test")
+print(p)
+```
+
+```{r}
+PCA_rotation2(
+  data   = PCA_data,
+  prefix = "MedQb_",
+  amount = 10,
+  xlimits = c(-0.12, 0.13),
+  ylimits = c(-0.11, 0.15),
+  title   = "test"
+)
+
 ```
