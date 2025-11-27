@@ -1,9 +1,15 @@
 ---
 title: "Analysis 5"
-format: html
+format:
+  html:
+    embed-resources: true
+output-dir: ../results
 editor: visual
 editor_options: 
   chunk_output_type: console
+execute: 
+  warning: false
+  message: false
 ---
 
 # Loading packages
@@ -13,8 +19,9 @@ editor_options:
 library("tidyverse")
 library("broom")
 library("patchwork")
+library("quarto")
 
-source(file = "R/99_proj_func.R")
+source(here::here("R", "99_proj_func.R"))
 
 ```
 
@@ -22,7 +29,7 @@ source(file = "R/99_proj_func.R")
 
 ```{r}
 
-data_aug <- read_csv(file = "data/data_aug.csv")
+data_aug <- read_csv(file = here::here("data/data_aug.csv"))
 
 ```
 
@@ -106,6 +113,8 @@ CD4_vs_CD8  <- data_aug |>
 The significant CDs for each pair are visualized with an error bar plot of the estimate and the confidence intervals by using the function `plot_CD4vsCD8()`. The six figures are plotted together by using the package `patchwork`.
 
 ```{r}
+#| fig-height: 10
+#| fig-width: 8
 
 p1 <- CD4_vs_CD8 |>
   CD_order() |>
@@ -137,41 +146,48 @@ p6 <- CD4_vs_CD8 |>
   plot_CD4vsCD8(pair = "TEMRA",
                 legend_position = "bottom")
 
-final_plot <- (p1 + p2) / (p3 + p4) / (p5 + p6) +
+(p1 + p2) / (p3 + p4) / (p5 + p6) +
   plot_annotation(
-    title = "Significant CD Markers Differentiating CD4 and CD8 T Cell Subsets",
-    caption = "Source: ...") &
-  theme(plot.caption = element_text(size = 11))
+    title = "Significant CD Markers Differentiating CD4 and CD8 T Cell Subsets") &
+  theme(plot.title = element_text(size = 18))
 ```
 
 The CD markers that generally show the biggest difference are as expected the lineage-specific markers `CD4` and `CD8`, which are significant for all the pairs.
 
-Below are the number of significant CDs for each pair calculated.
+Below are the number of significant CDs for each pair calculated and visualized.
 
 ```{r}
 
-CD4_vs_CD8 |>
+sig_CD_count <- CD4_vs_CD8 |>
   group_by(pair) |>
-  mutate(pair = factor(pair,
-                       levels = c("SP1ap",
-                                  "SP1am",
-                                  "naive",
-                                  "CM",
-                                  "EM",
-                                  "TEMRA"))) |>
-  distinct(CD) |>
-  summarise(count = n()) |>
-  ggtexttable(rows = NULL,
-              theme = ttheme("mBlue"))
+  summarise(count_CD = n_distinct(CD)) |>
+  mutate(pair = fct_rev(fct_reorder(pair, count_CD))) |>
+  ggplot(aes(x = pair,
+             y = count_CD)) +
+  geom_col(fill = "hotpink") + 
+  theme_bw(base_size = 13) +
+  labs(subtitle = "Count of significant CDs for each pair",
+       x = "Pair",
+       y = "Count")
 
+sig_CD_count
 ```
 
 # Plot export and document rendering
 
+As the figure above is too big for the presentation only the plot for the naive T cells are saved.
+
 ```{r}
 
+p3 <- CD4_vs_CD8 |>
+  CD_order() |>
+  plot_CD4vsCD8(pair = "naive",
+                legend_position = "bottom")
+
+final_plot <- sig_CD_count / p3
+
 save_plot(plot = final_plot,
-          filename = "09_analysis_5_plot.png",
-          width = 8,
+          filename = "09_key_plot.png",
+          width = 7,
           height = 9)
 ```
