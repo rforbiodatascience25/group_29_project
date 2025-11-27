@@ -224,7 +224,8 @@ p10 <- data_aug |>
                color = "hotpink")
 
 final_plot <- (p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
-  plot_annotation(caption = "cor: correlation coefficient") &
+  plot_annotation(title = "Correlation of the intensity to variation and positivity",
+                  caption = "cor: correlation coefficient") &
   theme(plot.caption = element_text(size = 11))
 ```
 
@@ -233,7 +234,7 @@ final_plot <- (p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
 ```{r}
 
 save_plot(plot = final_plot,
-          filename = "07_analysis_3_plot",
-          width = 8,
-          height = 9)
+          filename = "07_analysis_3_plot.png",
+          width = 7,
+          height = 9.3)
 ```
