@@ -47,7 +47,7 @@ editor_options:
 ![](images/07_analysis_3_plot.png)
 :::
 
-::: {.column width="50%"}
+::: {.column width="50%" style="font-size:50%"}
 **CVQb:**
 
 -   Blue lines show a negative correlation → higher CVQb = lower MedQb
