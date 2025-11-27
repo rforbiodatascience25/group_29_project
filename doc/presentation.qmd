@@ -38,7 +38,7 @@ editor_options:
 :::
 :::::
 
-## Analysis 4 
+## Analysis 4
 
 ::::: columns
 ::: {.column width="50%" style="font-size:50%"}
