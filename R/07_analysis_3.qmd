@@ -234,7 +234,7 @@ final_plot <- (p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
 ```{r}
 
 save_plot(plot = final_plot,
-          filename = "07_analysis_3_plot.png",
-          width = 7,
-          height = 9.3)
+          filename = "07_key_plot.png",
+          width = 7.5,
+          height = 9)
 ```
