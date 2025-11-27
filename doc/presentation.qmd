@@ -21,6 +21,17 @@ editor_options:
 ![](images/analysis2_presentation.jpg)
 :::
 
+::: columns
+::: {.column width="50%" style="font-size:70%"}
+**CVQb:**
+
+-   Blue lines show a negative correlation → higher CVQb = lower MedQb
+
+-   Tonsil B cells: line is flat → almost no relationship
+
+**PEpos:**
+
+-   Pink lines show a positive correlation → higher PEpos = higher MedQb
 ::: {.column width="50%"}
 -   Wide variations in CD marker distribution.
 -   **Tissue-related** clusters are common
@@ -32,6 +43,7 @@ editor_options:
 
 ::::: columns
 ::: {.column width="50%"}
+![](images/07_analysis_3_plot.png)
 :::
 
 ::: {.column width="50%"}
@@ -76,6 +88,6 @@ editor_options:
 ::: {.column width="50%"}
 ![](images/09_analysis_5_plot.png)
 :::
-:::::
+:::
 
 ## Discussion
