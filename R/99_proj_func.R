@@ -225,26 +225,23 @@ PCA_rotation <- function(filename, data, prefix, amount, xlimits, ylimits, title
 }
 
 
-heat_dot_plot <- function(data_for_plot, filename, w, h){
-  tube_bar <- data_for_plot |>
-    distinct(cell_type, 
-             tissue) |>
-    mutate(y = "TubeBar")  
-  
-  data_for_plot |>
+heat_dot_plot <- function(data, bar){
+  data |>
   CD_order(reverse = TRUE) |>
   ggplot(aes(x = cell_type, 
              y = CD)) +
   geom_point(aes(size = PEpos, 
                  color = log10(MedQb))) +
-  geom_tile(data = tube_bar, 
+  geom_tile(data = bar, 
             aes(x = cell_type, 
                 y = y, 
                 fill = tissue), 
             height = 0.5) +
   scale_size_continuous(breaks = c(5, 20, 60, 100), 
                         range = c(1, 6)) +
-  scale_color_gradientn(colors = c("lightblue", "orange", "darkred"), 
+  scale_color_gradientn(colors = c("lightblue", 
+                                   "orange", 
+                                   "darkred"), 
                         values = scales::rescale(c(2, 3, 4, 5))) +
   scale_fill_manual(values = c("blood" = "#93aa9b", 
                                "tonsil" = "#c8b145", 
@@ -262,11 +259,9 @@ heat_dot_plot <- function(data_for_plot, filename, w, h){
         plot.margin = margin(5, 5, 5, 5),
         panel.grid = element_blank()) +
   labs(x = "Cell Type",
-       y = "Marker",
+       y = "CD",
        size = "Frequency of Positive Cells (%)",
        color = "Fluorescence [log10(Median ABC)]")
-
-ggsave(filename, last_plot(), path = "doc/images/", width = w, height = h, units = "px", create.dir = FALSE)
 }
 
 

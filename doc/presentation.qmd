@@ -10,6 +10,24 @@ editor_options:
 
 ## Introduction
 
+::::: columns
+::: {.column width="50%" style="font-size:50%"}
+-   CD molecules are membrane proteins with diverse functions and distributions across immune cell types.
+
+-   Their expression patterns help distinguish cell lineages and reveal functional relationships
+
+**The aim of our project was to answer the questions:**
+
+-   How do the expression of CD markers on lymphocyte subsets change during maturation?
+
+-   How are fluorescence intensity, variability, and positivity (MedQb, CVQb, PEpos) related across CD markers in lymphocyte subsets?
+:::
+
+::: {.column width="50%" style="font-size:50%"}
+![DOI: 10.5772/intechopen.81568](images/CD_markers.png){width="409"}
+:::
+:::::
+
 ## Materials and Methods
 
 ## Analysis 1
@@ -21,7 +39,7 @@ editor_options:
 ![](images/analysis2_presentation.jpg)
 :::
 
-::: {.column width="50%"}
+::: {.column width="50%" style="font-size:50%"}
 -   Wide variations in CD marker distribution.
 -   **Tissue-related** clusters are common
 -   Some markers are universally expressed (e.g. CD45), while others are **lineage-specific**.
