@@ -9,7 +9,9 @@ pivot_selected_variables <- function(data, ID_col, variables, tissue){
            .before = ID_col)
 }
 
-cell_type_order <- function(data){
+cell_type_order <- function(data, reverse = FALSE){
+  
+  if (!reverse) {
   data |>
     mutate(cell_type = factor(cell_type, 
                               levels = c("DN34p",
@@ -50,6 +52,50 @@ cell_type_order <- function(data){
                                          "BswMem",
                                          "Bdn",
                                          "B27high")))
+  }
+  
+  else {
+    data |>
+      mutate(cell_type = factor(cell_type, 
+                                levels = rev(c("DN34p",
+                                           "DN34m1ap",
+                                           "CD4ISP",
+                                           "DP3m",
+                                           "DP3p",
+                                           "CD4SP1ap",
+                                           "CD4SP1am",
+                                           "CD8SP1ap",
+                                           "CD8SP1am",
+                                           "BnaiveTo",
+                                           "CC",
+                                           "CB",
+                                           "UnswtMem",
+                                           "SwtMem",
+                                           "PC",
+                                           "CD138negPC",
+                                           "CD138posPC",
+                                           "Lymphs",
+                                           "T",
+                                           "Tgd",
+                                           "TCD4",
+                                           "TCD4naive",
+                                           "TCD4CM",
+                                           "TCD4EM",
+                                           "TCD4TEMRA",
+                                           "TCD8",
+                                           "TCD8naive",
+                                           "TCD8CM",
+                                           "TCD8EM",
+                                           "TCD8TEMRA",
+                                           "TCD8RAdim",
+                                           "B",
+                                           "Bnaive",
+                                           "BnatEff",
+                                           "BIgM",
+                                           "BswMem",
+                                           "Bdn",
+                                           "B27high"))))
+  }
 }
 
 CD_order <- function(data, reverse = FALSE){
@@ -180,6 +226,46 @@ plot_CD4vsCD8 <- function(data, pair, legend_position) {
          color = "Lineage")
 }
 
+plot_scatter <- function(data, params, measure, lineage, tissue, color){
+  measure <- enquo(measure)
+  measure_str <- as_name(measure)
+  
+  measure_intercept <- params |> 
+    filter(lineage == !!lineage,
+           tissue == !!tissue) |>
+    pull(paste0(measure_str, "_intercept"))
+  
+  measure_slope <- params |> 
+    filter(lineage == !!lineage,
+           tissue == !!tissue) |>
+    pull(paste0(measure_str, "_slope"))
+  
+  measure_cor <- params |> 
+    filter(lineage == !!lineage,
+           tissue == !!tissue) |>
+    pull(paste0(measure_str, "_cor"))
+  
+  data |>
+    filter(lineage == !!lineage,
+           tissue == !!tissue,
+           !hierarchy_level %in% c(1, 2),
+           lineage != "T cells") |>
+    drop_na(MedQb, !!measure) |>
+    ggplot(aes(x = log(!!measure),
+               y = log(MedQb))) +
+    geom_point(color = "black",
+               alpha = 0.5) +
+    geom_smooth(method = "lm",
+                color = color) +
+    theme_bw() + 
+    labs(title = paste0(lineage, " from ", tissue),
+         subtitle = paste0("y = ", round(measure_slope, 2), 
+                           " * x + ", 
+                           round(measure_intercept, 2), 
+                           ", cor = ", 
+                           round(measure_cor, 2)))
+}
+
 PCA_rotation <- function(filename, data, prefix, amount, xlimits, ylimits, title) {
   arrow_style <- arrow(
     angle  = 30, 
@@ -227,41 +313,41 @@ PCA_rotation <- function(filename, data, prefix, amount, xlimits, ylimits, title
 
 heat_dot_plot <- function(data, bar){
   data |>
-  CD_order(reverse = TRUE) |>
-  ggplot(aes(x = cell_type, 
+    CD_order(reverse = TRUE) |>
+    ggplot(aes(x = cell_type, 
              y = CD)) +
-  geom_point(aes(size = PEpos, 
-                 color = log10(MedQb))) +
-  geom_tile(data = bar, 
-            aes(x = cell_type, 
-                y = y, 
-                fill = tissue), 
-            height = 0.5) +
-  scale_size_continuous(breaks = c(5, 20, 60, 100), 
+    geom_point(aes(size = PEpos, 
+                   color = log10(MedQb))) +
+    geom_tile(data = bar, 
+              aes(x = cell_type, 
+                  y = y, 
+                  fill = tissue), 
+              height = 0.5) +
+    scale_size_continuous(breaks = c(5, 20, 60, 100), 
                         range = c(1, 6)) +
-  scale_color_gradientn(colors = c("lightblue", 
-                                   "orange", 
-                                   "darkred"), 
-                        values = scales::rescale(c(2, 3, 4, 5))) +
-  scale_fill_manual(values = c("blood" = "#93aa9b", 
-                               "tonsil" = "#c8b145", 
-                               "thymus" = "#bb6e36")) +
-  scale_x_discrete(position = "top") +
-  coord_cartesian(clip = "off") +
-  theme_minimal(base_size = 20) +
-  theme(axis.text.x = element_text(angle = 90, 
-                                   vjust = 0.5, 
-                                   hjust = 0, 
-                                   size = 15),
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20), 
-        legend.position = "right",
-        plot.margin = margin(5, 5, 5, 5),
-        panel.grid = element_blank()) +
-  labs(x = "Cell Type",
-       y = "CD",
-       size = "Frequency of Positive Cells (%)",
-       color = "Fluorescence [log10(Median ABC)]")
+    scale_color_gradientn(colors = c("lightblue", 
+                                    "orange", 
+                                    "darkred"), 
+                          values = scales::rescale(c(2, 3, 4, 5))) +
+    scale_fill_manual(values = c("blood" = "#93aa9b", 
+                                "tonsil" = "#c8b145", 
+                                "thymus" = "#bb6e36")) +
+    scale_x_discrete(position = "top") +
+    coord_cartesian(clip = "off") +
+    theme_minimal(base_size = 20) +
+    theme(axis.text.x = element_text(angle = 90, 
+                                    vjust = 0.5, 
+                                    hjust = 0, 
+                                    size = 15),
+          axis.text.y = element_text(size = 15),
+          axis.title = element_text(size = 20), 
+          legend.position = "right",
+          plot.margin = margin(5, 5, 5, 5),
+          panel.grid = element_blank()) +
+    labs(x = "Cell Type",
+         y = "CD",
+         size = "Frequency of Positive Cells (%)",
+         color = "Fluorescence [log10(Median ABC)]")
 }
 
 

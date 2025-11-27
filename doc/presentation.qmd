@@ -16,7 +16,7 @@ editor_options:
 
 -   Their expression patterns help distinguish cell lineages and reveal functional relationships
 
-**The aim of our project was to answer the questions:**
+**Aim:**
 
 -   How do the expression of CD markers on lymphocyte subsets change during maturation?
 
@@ -30,23 +30,51 @@ editor_options:
 
 ## Materials and Methods
 
+::::: columns
+::: {.column width="50%" style="font-size:50%"}
+-   **Data from:** *Frontiers in Immunology*, “B Cell Biology,” vol. 10, Oct. 23, 2019. doi: 10.3389/fimmu.2019.02434
+
+-   Can be downloaded from their shiny app: <http://bioinformin.cesnet.cz/CDmaps/>
+
+**Sample of data_aug:**
+
+```{r}
+#| include: false
+
+library("tidyverse")
+
+data_aug <- read_csv(here::here("data/data_aug.csv"))
+```
+
+```{r}
+
+data_aug |>
+  slice_sample(n = 5)
+```
+:::
+
+::: {.column width="50%" style="font-size:50%"}
+![](images/Method.png)
+:::
+:::::
+
 ## Analysis 1
 
 ## Analysis 2
 
-![](images/analysis2_presentation.jpg)
+::: {.columns style="font-size:50%"}
+-   Wide variations in CD marker distribution
 
--   Wide variations in CD marker distribution.
 -   **Tissue-related** clusters are common
--   Some markers are universally expressed (e.g. CD45), while others are **lineage-specific**.
+
+-   Some markers are universally expressed (e.g. CD45), with others are **lineage-specific**
+
+![](images/06_key_plot.png)
+:::
 
 ## Analysis 3
 
 ::::: columns
-::: {.column width="50%"}
-![](images/07_analysis_3_plot.png)
-:::
-
 ::: {.column width="50%" style="font-size:50%"}
 **CVQb:**
 
@@ -56,7 +84,11 @@ editor_options:
 
 **PEpos:**
 
--   Pink lines show a positive correlation → higher PEpos = higher MedQb ::: {.column width="50%"}
+-   Pink lines show a positive correlation → higher PEpos = higher MedQb
+:::
+
+::: {.column width="50%"}
+![](images/07_key_plot.png)
 :::
 :::::
 
@@ -101,3 +133,23 @@ editor_options:
 :::::
 
 ## Discussion
+
+::::: columns
+::: {.column width="50%" style="font-size:50%"}
+**Why did we choose the linear model to assess significant difference for CDs?**
+
+-   Simplicity
+
+-   A two-way ANOVA could for example also have been used, but it depends on what the aim is.
+:::
+
+::: {.column width="50%" style="font-size:50%"}
+**Problems with missing values in the wide-format data set for PCA**
+
+-   Number of experiments for each CD differed → summarized the experiments by the mean
+
+-   Not every CD marker was measured across all cell types → replaced the missing value with the median for that specific CD
+
+-   Limits the variation in the data set, but necessary to avoid dropping observations
+:::
+:::::
