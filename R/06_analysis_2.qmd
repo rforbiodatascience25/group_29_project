@@ -48,6 +48,7 @@ The plot shown below is generated using dplyr's **ggplot2**; as the same plot wi
 
 data_aug |>
   drop_na(MedQb, PEpos) |>
+  cell_type_order() |>
   heat_dot_plot(bar = tube_bar)
 ```
 
@@ -70,9 +71,9 @@ data_aug |>
   mutate(CD_num = parse_number(CD)) |>
   filter(CD_num %in% CDs) |>
   drop_na(MedQb, PEpos) |>
+  cell_type_order() |>
   heat_dot_plot(bar = tube_bar) |>
   save_plot(filename = "06_key_plot.png",
-            width = 15,
-            height = 9)
-
+            width = 17,
+            height = 8)
 ```

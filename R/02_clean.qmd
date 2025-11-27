@@ -32,7 +32,7 @@ Each dataset is standardized using the function pivot_selected_variables(), whic
 
 ```{r}
 
-selected_measures <- c("CVQb", "MedQb", "count", "PEpos")
+selected_measures <- c("CVQb", "MedQb", "PEpos")
 
 blood_clean <- blood |> 
   pivot_selected_variables(ID_col = "CD",
