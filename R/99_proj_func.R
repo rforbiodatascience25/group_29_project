@@ -149,20 +149,19 @@ heat_dot_plot <- function(data){
                                  "thymus" = "#bb6e36")) +
     scale_x_discrete(position = "top") +
     coord_cartesian(clip = "off") +
-    theme_minimal(base_size = 20) +
+    theme_minimal() +
     theme(axis.text.x = element_text(angle = 90, 
                                      vjust = 0.5, 
-                                     hjust = 0, 
-                                     size = 15),
-          axis.text.y = element_text(size = 15),
-          axis.title = element_text(size = 20), 
+                                     hjust = 0),
+          axis.text.y = element_text(),
+          axis.title = element_text(), 
           legend.position = "right",
           plot.margin = margin(5, 5, 5, 5),
           panel.grid = element_blank()) +
     labs(x = "Cell Type",
          y = "CD",
-         size = "Frequency of Positive Cells (%)",
-         color = "Fluorescence [log10(Median ABC)]")
+         size = "PEpos (%)",
+         color = "log10(MedQb)")
 }
 
 # Analysis 3 - plots

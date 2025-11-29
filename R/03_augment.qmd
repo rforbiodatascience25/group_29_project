@@ -3,7 +3,8 @@ title: "Adding new variables"
 format:
   html:
     embed-resources: true
-output-dir: ../results
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -15,19 +16,21 @@ execute:
 ## Loading packages
 
 ```{r}
+#| label: load_packages_3
 
 library("tidyverse")
 
-source(file = "R/99_proj_func.R")
+source(file = here::here("R/99_proj_func.R"))
 ```
 
 ## Loading data files
 
 ```{r}
+#| label: load_data_3
 
-data_clean <- read_csv(file = "data/data_clean.csv")
+data_clean <- read_csv(file = here::here("data/data_clean.csv"))
 
-PCA_clean <- read_csv(file = "data/PCA_clean.csv")
+PCA_clean <- read_csv(file = here::here("data/PCA_clean.csv"))
 ```
 
 ## Add variables
@@ -41,6 +44,7 @@ Here we enrich the dataset with two new variables:
 These new variables make it easier to visualize and compare immune-cell maturation patterns across tissues.
 
 ```{r}
+#| label: add_var_3
 
 level_3 <- c("Tgd", 
              "TCD8", 
@@ -70,6 +74,7 @@ data_aug <- data_clean |>
 The same lineage classification is applied to the PCA dataset so that both data_aug and PCA_aug share identical labels.
 
 ```{r}
+#| label: add_var_PCA_3
 
 PCA_aug <- PCA_clean |>
   add_lineage()
@@ -78,10 +83,11 @@ PCA_aug <- PCA_clean |>
 ## Writing data files
 
 ```{r}
+#| label: write_data_3
 
 write_csv(x = data_aug,
-          file = "data/data_aug.csv")
+          file = here::here("data/data_aug.csv"))
 
 write_csv(x = PCA_aug,
-          file = "data/PCA_aug.csv")
+          file = here::here("data/PCA_aug.csv"))
 ```

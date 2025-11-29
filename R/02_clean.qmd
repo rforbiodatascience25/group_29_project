@@ -3,7 +3,8 @@ title: "Cleaning data"
 format:
   html:
     embed-resources: true
-output-dir: ../results
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -15,21 +16,23 @@ execute:
 ## Loading packages
 
 ```{r}
+#| label: load_packages_2
 
 library("tidyverse")
 
-source(file = "R/99_proj_func.R")
+source(file = here::here("R/99_proj_func.R"))
 ```
 
 ## Loading data files
 
 ```{r}
+#| label: load_data_2
 
-blood <- read_csv(file = "data/blood_load.csv")
+blood <- read_csv(file = here::here("data/blood_load.csv"))
 
-tonsil <- read_csv(file = "data/tonsil_load.csv")
+tonsil <- read_csv(file = here::here("data/tonsil_load.csv"))
 
-thymus <- read_csv(file = "data/thymus_load.csv")
+thymus <- read_csv(file = here::here("data/thymus_load.csv"))
 ```
 
 ## Cleaning each data set
@@ -37,6 +40,7 @@ thymus <- read_csv(file = "data/thymus_load.csv")
 Each dataset is standardized using the function `pivot_selected_variables()`, which reshapes wide data into a tidy long format. It extracts only the selected variables (`CVQb`, `MedQb`, `PEpos`), splits the variable names into `cell_type` and measurement columns, and tags each observation with its `tissue`. This ensures that all datasets share the same column structure and can be merged later without conflicts.
 
 ```{r}
+#| label: clean_data_2
 
 selected_measures <- c("CVQb", "MedQb", "PEpos")
 
@@ -62,6 +66,7 @@ thymus_clean <- thymus |>
 Here the cleaned datasets from blood, tonsil, and thymus are combined into one large table (`data_clean`) using `bind_row()`. Control samples labeled `FMO` are filtered out since they are used only for calibration. The result is a clean, uniform dataset containing all immune-cell measurements, ready for further analysis.
 
 ```{r}
+#| label: merge_data_2
 
 data_clean <- bind_rows(blood_clean,
                         tonsil_clean,
@@ -74,6 +79,7 @@ data_clean <- bind_rows(blood_clean,
 The format for a PCA must be wide. As we want to analyse how the cell types cluster based on their CD expression, a variable `cell_type` must be kept. The other variables will then be `CD_measure`, where the measure is either `MedQb` or `PEpos`, which is the opposite of the original wide-format that had `celltype_measure` as variables. As the number of experiments for each CD differs, the mean of all experiments was summarised during the conversion to the wide-format to avoid missing values. However, there was still some missing values due to not all CDs being tested on all cell types. These missing values were assigned with the median for the column, corresponding to the median for that specific CD. We avoided using the mean due to outliers potentially skewing the data.
 
 ```{r}
+#| label: clean_PCA_2
 
 PCA_clean <- data_clean |>
   pivot_wider(id_cols = c("tissue", "cell_type"),
@@ -92,10 +98,11 @@ PCA_clean <- data_clean |>
 ## Writing data files
 
 ```{r}
+#| label: write_data_2
 
 write_csv(x = data_clean,
-          file = "data/data_clean.csv")
+          file = here::here("data/data_clean.csv"))
 
 write_csv(x = PCA_clean,
-          file = "data/PCA_clean.csv")
+          file = here::here("data/PCA_clean.csv"))
 ```

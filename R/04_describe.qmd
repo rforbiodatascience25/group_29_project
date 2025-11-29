@@ -3,7 +3,8 @@ title: "Describing data"
 format:
   html:
     embed-resources: true
-output-dir: ../results
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -15,17 +16,20 @@ execute:
 ## Loading packages
 
 ```{r}
+#| label: load_packages_4
 
 library("tidyverse")
+library("table1")
 
-source(file = "R/99_proj_func.R")
+source(file = here::here("R/99_proj_func.R"))
 ```
 
 ## Loading data files
 
 ```{r}
+#| label: load_data_4
 
-data_clean <- read_csv(file = "data/data_clean.csv")
+data_clean <- read_csv(file = here::here("data/data_clean.csv"))
 
 ```
 
@@ -34,13 +38,14 @@ data_clean <- read_csv(file = "data/data_clean.csv")
 The data consists of immunological measurements from blood, tonsil and thymus. The dataset consists of `r nrow(data_clean)` observations and `r ncol(data_clean)` variables containing CD markers for the cell types in the specific tissue. An overview of the quantitative markers is given below using a `table1` summary of `data_clean` . **The data is structured in long format,** meaning that each combination of `tissue`, `cell_type` and `CD` appears as one row. This structure makes the dataset suitable for analysis and visualization.
 
 ```{r}
+#| label: create_table1_4
 
 data_clean |>
   mutate(tissue = factor(tissue,
                          levels = c("thymus", "tonsil", "blood"),
                          labels = c("Thymus", "Tonsil", "Blood"))) |>
   cell_type_order() |>
-  table1(~ MedQb + PEpos + cell_type + CD | tissue,
+  table1(~ CVQb + MedQb + PEpos + cell_type | tissue,
          data = _)
 
 

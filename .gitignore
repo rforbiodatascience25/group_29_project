@@ -5,3 +5,5 @@
 data
 data/_raw/
 .DS_Store
+
+/.quarto/

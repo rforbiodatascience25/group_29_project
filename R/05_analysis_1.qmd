@@ -3,7 +3,8 @@ title: "05_PCA"
 format:
   html:
     embed-resources: true
-output-dir: ../results
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -15,20 +16,22 @@ execute:
 ## Loading packages
 
 ```{r}
+#| label: load_packages_5
 
 library("tidyverse")
 library("broom")
 library("ggrepel")
 library("patchwork")
 
-source(file = "R/99_proj_func.R")
+source(file = here::here("R/99_proj_func.R"))
 ```
 
 ## Loading data files
 
 ```{r}
+#| label: load_data_5
 
-PCA_aug <- read_csv(file = "data/PCA_aug.csv")
+PCA_aug <- read_csv(file = here::here("data/PCA_aug.csv"))
 
 ```
 
@@ -37,6 +40,7 @@ PCA_aug <- read_csv(file = "data/PCA_aug.csv")
 After all numeric cells were populated the function `prcomp` was used to make the the PCA.
 
 ```{r}
+#| label: create_PCA_fit_5
 
 PCA_fit <- PCA_aug |> 
   select(where(is.numeric)) |>
@@ -49,6 +53,7 @@ PCA_fit <- PCA_aug |>
 On the plot we have PC1 on the x-axis and PC2 on the y-axis. Usually most variation can be captured with the first two principal components. The points are stratified using tissue type (blood, tonsil, thymus) as the shapes and cell lineage as the color.
 
 ```{r}
+#| label: create_scatterplot_5
 
 scatter_plot <- PCA_fit |> 
   augment(data = PCA_aug) |>
@@ -79,6 +84,7 @@ As we can see on the plot we have some nice clustering. We see all the cells fro
 **Rotation matrix - all variables:**
 
 ```{r}
+#| label: create_rotplot1_5
 
 PCA_fit |> 
   PCA_rotation(prefix = ".*",
@@ -94,6 +100,7 @@ As the plot of the rotation matrix is very cluttered, the variables are separate
 **MedQb - all variables:**
 
 ```{r}
+#| label: create_rotplot2_5
 
 PCA_fit |> 
   PCA_rotation(prefix = "MedQb_",
@@ -107,6 +114,7 @@ PCA_fit |>
 **MedQb - top 10 variables:**
 
 ```{r}
+#| label: create_rotplot3_5
 
 MedQb_top10 <- PCA_fit |>
   PCA_rotation(prefix = "MedQb_",
@@ -121,6 +129,7 @@ MedQb_top10
 **PEpos - all variables:**
 
 ```{r}
+#| label: create_rotplot4_5
 
 PCA_fit |>
   PCA_rotation(prefix = "PEpos_",
@@ -134,6 +143,7 @@ PCA_fit |>
 **PEpos - top 10 variables:**
 
 ```{r}
+#| label: create_rotplot5_5
 
 PEpos_top10 <- PCA_fit |>
   PCA_rotation(prefix = "PEpos_",
@@ -148,6 +158,7 @@ PEpos_top10
 ## Plot export
 
 ```{r}
+#| label: export_plots_5
 
 MedQb_top10 <- MedQb_top10 +
     labs(title = "Rotation matrix for top 10 longest vectors")

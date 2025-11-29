@@ -3,8 +3,68 @@ title: "Master document"
 format:
   html:
     embed-resources: true
-output-dir: ../results
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
 ---
+
+# Load data
+
+{{< include 01_load.qmd >}}
+
+# Clean data
+
+{{< include 02_clean.qmd >}}
+
+# Augment data
+
+{{< include 03_augment.qmd >}}
+
+# Describe data
+
+{{< include 04_describe.qmd >}}
+
+# Analysis 1
+
+{{< include 05_analysis_1.qmd  >}}
+
+# Analysis 2
+
+{{< include 06_analysis_2.qmd >}}
+
+# Analysis 3
+
+{{< include 07_analysis_3.qmd >}}
+
+# Analysis 4
+
+{{< include 08_analysis_4.qmd >}}
+
+# Analysis 5
+
+{{< include 09_analysis_5.qmd >}}
+
+# Render documents
+
+```{r}
+
+quarto::quarto_render("01_load.qmd")
+
+quarto::quarto_render("02_clean.qmd")
+
+quarto::quarto_render("03_augment.qmd")
+
+quarto::quarto_render("04_describe.qmd")
+
+quarto::quarto_render("05_analysis_1.qmd")
+
+quarto::quarto_render("06_analysis_2.qmd")
+
+quarto::quarto_render("07_analysis_3.qmd")
+
+quarto::quarto_render("08_analysis_4.qmd")
+
+quarto::quarto_render("09_analysis_5.qmd")
+```

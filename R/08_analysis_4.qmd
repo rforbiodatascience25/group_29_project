@@ -3,7 +3,8 @@ title: "Analysis 4"
 format:
   html:
     embed-resources: true
-output-dir: ../results
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -15,7 +16,7 @@ execute:
 ## Loading packages
 
 ```{r}
-#| label: load_packages
+#| label: load_packages_8
 
 library("tidyverse")
 library("broom")
@@ -27,7 +28,7 @@ source(here::here(file = "R/99_proj_func.R"))
 ## Loading data files
 
 ```{r}
-#| label: load_data
+#| label: load_data_8
 
 data_aug <- read_csv(here::here(file = "data/data_aug.csv"))
 ```
@@ -41,7 +42,7 @@ To study these differences in a structured way, a linear model is applied to the
 The data is first filtered based on `hierarchy` and `cell_type` as only the most specific cell subsets should be included in the analysis. Then the data is grouped and the data is filtered to ensure that there are more than one observation per `cell_type` in each group. Then the linear model applied. Each model produces an estimate of the average expression for each `cell_type` and its corresponding confidence interval. Lastly, the full estimates are calculated by retrieving and adding the `intercept` for each group. As the variable `cell_type` is lost during the transformation, it is recreated by using the variable `term`.
 
 ```{r}
-#| label: apply_lm
+#| label: apply_lm_8
 
 columns <- c("CD", 
              "tissue",
@@ -103,7 +104,7 @@ data_analysis4 <- data_aug |>
 This section shows how many CD markers were significant (p \< 0.05) in each lineage.
 
 ```{r}
-#| label: count_sig_CDs
+#| label: count_sig_CDs_8
 
 cds_significant <- data_analysis4 |>
   filter(is_significant == "yes") |>      
@@ -117,7 +118,7 @@ cds_significant
 A column plot of the count of significant CDs for each lineage is created below.
 
 ```{r}
-#| label: plot_sig_CDs
+#| label: plot_sig_CDs_8
 
 sig_CD_count <- data_analysis4 |>
   group_by(lineage) |>
@@ -142,7 +143,7 @@ For the B cells, the analysis focuses on markers like CD11a, CD69, CD79b, and CD
 ## B cells
 
 ```{r}
-#| label: B_cells
+#| label: B_cells_8
 
 cds_interest_b <- c("CD11a", "CD69", "CD79b", "CD80")
 
@@ -159,7 +160,7 @@ p1
 ## T cells
 
 ```{r}
-#| label: CD4_T_cells
+#| label: CD4_T_cells_8
 
 cds_interest_cd4 <- c("CD10", "CD25", "CD4_MEM-241", "CD62L")
 
@@ -173,7 +174,7 @@ data_analysis4 |>
 **CD4 T cell markers:** CD10 (early maturation), CD25 (activation), CD4_MEM-241 (memory), CD62L (migration).
 
 ```{r}
-#| label: CD8_T_cells
+#| label: CD8_T_cells_8
 
 cds_interest_cd8 <- c("CD27", "CD38", "CD71", "CD95")
 
@@ -191,7 +192,7 @@ Overall, the goal is to get a clearer picture of how immune cells change as they
 ## Export plots
 
 ```{r}
-#| label: export_plots
+#| label: export_plots_8
 
 final_plot <- sig_CD_count / p1
 
