@@ -51,7 +51,7 @@ data_analysis4 <- data_aug |>
   cell_type_order() |>
   filter(hierarchy_level %in% c(3, 4),
          !cell_type %in% c("Tgd", "TCD4", "TCD8")) |>
-  select(-c("CVQb", "count", "PEpos")) |>
+  select(-c("CVQb", "PEpos")) |>
   drop_na(MedQb) |>
   group_by(tissue, CD, lineage) |>
   nest() |>
@@ -117,7 +117,7 @@ sig_CD_count <- data_analysis4 |>
              y = count_CD)) +
   geom_col(fill = "#fa2840") + 
   theme_bw(base_size = 13) +
-  labs(subtitle = "Count of significant CDs for each pair",
+  labs(subtitle = "Count of significant CDs per lineage",
        x = "Lineage",
        y = "Count")
 
@@ -150,15 +150,13 @@ p1
 ```{r}
 cds_interest_cd4 <- c("CD10", "CD25", "CD4_MEM-241", "CD62L")
 
-p2 <- plot_cd_expression(
+plot_cd_expression(
   data = data_analysis4,
   lineage_filter = c("thymocytes", "CD4 T cells"),
   cds = cds_interest_cd4,
   cell_type_exclude = "CD8",
   title = "Significant CDs during CD8 T cell maturation"
 )
-
-p2
 ```
 
 **CD4 T cell markers:** CD10 (early maturation), CD25 (activation), CD4_MEM-241 (memory), CD62L (migration).
@@ -166,15 +164,13 @@ p2
 ```{r}
 cds_interest_cd8 <- c("CD27", "CD38", "CD71", "CD95")
 
-p3 <- plot_cd_expression(
+plot_cd_expression(
   data = data_analysis4,
   lineage_filter = c("thymocytes", "CD8 T cells"),
   cds = cds_interest_cd8,
   cell_type_exclude = "CD4",
   title = "Significant CDs during CD8 T cell maturation"
 )
-
-p3
 ```
 
 **CD8 T cell markers:** CD27 (memory), CD38 (activation), CD71 (proliferation), CD95 (apoptosis).
@@ -185,15 +181,10 @@ Overall, the goal is to get a clearer picture of how immune cells change as they
 
 ```{r}
 
-final_plot <- p1 / p2
+final_plot <- sig_CD_count / p1
 
 save_plot(plot = final_plot, 
-          filename = "08_key_plot_1.png",
+          filename = "08_key_plot.png",
           width = 7,
           height = 8.5)
-
-save_plot(plot = sig_CD_count, 
-          filename = "08_key_plot_2.png",
-          height = 4)
-
 ```
