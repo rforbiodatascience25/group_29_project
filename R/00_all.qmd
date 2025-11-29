@@ -1,5 +1,10 @@
 ---
 title: "Master document"
-format: html
+format:
+  html:
+    embed-resources: true
+output-dir: ../results
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---

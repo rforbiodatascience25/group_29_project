@@ -1,9 +1,15 @@
 ---
 title: "Loading data"
-format: html
+format:
+  html:
+    embed-resources: true
+output-dir: ../results
 editor: visual
 editor_options: 
   chunk_output_type: console
+execute: 
+  warning: false
+  message: false
 ---
 
 # Loading packages
@@ -11,7 +17,6 @@ editor_options:
 ```{r}
 
 library("tidyverse")
-
 ```
 
 # Loading data files
@@ -23,7 +28,6 @@ blood <- read_csv(file = "data/_raw/blood.csv")
 tonsil <- read_csv(file = "data/_raw/tonsil.csv")
 
 thymus <- read_csv(file = "data/_raw/thymus.csv")
-
 ```
 
 # Writing data files
@@ -38,5 +42,4 @@ write_csv(x = tonsil,
 
 write_csv(x = thymus,
           file = "data/thymus_load.csv")
-
 ```

@@ -1,12 +1,18 @@
 ---
 title: "Adding new variables"
-format: html
+format:
+  html:
+    embed-resources: true
+output-dir: ../results
 editor: visual
 editor_options: 
   chunk_output_type: console
+execute: 
+  warning: false
+  message: false
 ---
 
-# Loading packages
+## Loading packages
 
 ```{r}
 
@@ -15,7 +21,7 @@ library("tidyverse")
 source(file = "R/99_proj_func.R")
 ```
 
-# Loading data files
+## Loading data files
 
 ```{r}
 
@@ -24,7 +30,7 @@ data_clean <- read_csv(file = "data/data_clean.csv")
 PCA_clean <- read_csv(file = "data/PCA_clean.csv")
 ```
 
-# Add variables
+## Add variables
 
 Here we enrich the dataset with two new variables:
 
@@ -53,17 +59,12 @@ level_3 <- c("Tgd",
              "PC")
 
 data_aug <- data_clean |>
-  mutate(hierarchy_level = case_when(cell_type == "Lymphs" ~ 1,
-                                     cell_type %in% c("T", "B") ~ 2,
-                                     cell_type %in% level_3 ~ 3,
-                                     .default = 4),
+  mutate(hierarchy = case_when(cell_type == "Lymphs" ~ 1,
+                               cell_type %in% c("T", "B") ~ 2,
+                               cell_type %in% level_3 ~ 3,
+                               .default = 4),
          .after = cell_type) |>
-  mutate(lineage = case_when(tissue == "thymus" ~ "thymocytes",
-                             str_detect(cell_type, "CD4") ~ "CD4 T cells",
-                             str_detect(cell_type, "CD8") ~ "CD8 T cells",
-                             str_starts(cell_type, "T") ~ "T cells",
-                             .default = "B cells"),
-         .before = cell_type)
+  add_lineage()
 ```
 
 The same lineage classification is applied to the PCA dataset so that both data_aug and PCA_aug share identical labels.
@@ -71,15 +72,10 @@ The same lineage classification is applied to the PCA dataset so that both data_
 ```{r}
 
 PCA_aug <- PCA_clean |>
-  mutate(lineage = case_when(tissue == "thymus" ~ "thymocytes",
-                             str_detect(cell_type, "CD4") ~ "CD4 T cells",
-                             str_detect(cell_type, "CD8") ~ "CD8 T cells",
-                             str_starts(cell_type, "T") ~ "T cells",
-                             .default = "B cells"),
-         .before = cell_type)
+  add_lineage()
 ```
 
-# Writing data files
+## Writing data files
 
 ```{r}
 

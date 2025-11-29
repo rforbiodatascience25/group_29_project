@@ -1,12 +1,18 @@
 ---
 title: "Analysis 2"
-format: html
+format:
+  html:
+    embed-resources: true
+output-dir: ../results
 editor: visual
 editor_options: 
   chunk_output_type: console
+execute: 
+  warning: false
+  message: false
 ---
 
-# Loading libraries
+## Loading packages
 
 ```{r}
 
@@ -15,27 +21,23 @@ library("tidyverse")
 source(file = "R/99_proj_func.R")
 ```
 
-# Loading data files
+## Loading data files
 
 ```{r}
 
 data_aug <- read_csv(file = "data/data_aug.csv")
-
 ```
 
-# Creating auxiliary data frame
+## Creating auxiliary data frame
 
 The **aim** of this visualization is to have a summarized, comprehensive view of all CD markers used in our data set. From it, the user can extract preliminary insight about constitutive, cohort- and tissue-associated markers, which will be further expanded in following analyses.
 
-A pre-processing step is taken to generate an auxiliary data frame for plotting an upper horizontal bar for identifying cell types by tissue, named **tube_bar**. This keeps only one distinct cell type entry per tissue, which is needed for non-redundant marker classification.
+A dummy variable `tube_bar` (with the value `"TubeBar"`) is added to enable plotting a horizontal bar above the plot for identifying `cell_type` by `tissue`.
 
 ```{r}
 
-tube_bar <- data_aug |>
-  distinct(cell_type, 
-           tissue) |>
-  mutate(y = "TubeBar")  
-
+data_aug <- data_aug |>
+  mutate(tube_bar = "TubeBar")  
 ```
 
 ## Making the heat dot plot
@@ -49,7 +51,7 @@ The plot shown below is generated using dplyr's **ggplot2**; as the same plot wi
 data_aug |>
   drop_na(MedQb, PEpos) |>
   cell_type_order() |>
-  heat_dot_plot(bar = tube_bar)
+  heat_dot_plot()
 ```
 
 This is a heat-dot plot that shows the relative fluorescence of every surface marker from CD1a to C100. For every cell type analysed, the size of the dot is proportional to the percentage of cells marked, while the color portrays the amount of fluorescence, represented as the log10 of the antibody binding capability (ABC). The cell types are also segmented by tissue (blood, tonsil and thymus).
@@ -64,16 +66,24 @@ data_aug |>
   mutate(CD_num = parse_number(CD)) |>
   filter(CD_num <= 50) |>
   drop_na(MedQb, PEpos) |>
-  heat_dot_plot(bar = tube_bar)
+  cell_type_order() |>
+  heat_dot_plot()
   
   
-data_aug |>
+final_plot <- data_aug |>
   mutate(CD_num = parse_number(CD)) |>
   filter(CD_num %in% CDs) |>
   drop_na(MedQb, PEpos) |>
   cell_type_order() |>
-  heat_dot_plot(bar = tube_bar) |>
-  save_plot(filename = "06_key_plot.png",
-            width = 17,
-            height = 8)
+  heat_dot_plot()
+```
+
+## Export plots
+
+```{r}
+
+save_plot(plot = final_plot,
+          filename = "06_key_plot.png",
+          width = 17,
+          height = 8)
 ```
