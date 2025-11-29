@@ -3,7 +3,8 @@ title: "Analysis 3"
 format:
   html:
     embed-resources: true
-output-dir: ../results
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -15,12 +16,13 @@ execute:
 ## Loading packages
 
 ```{r}
-#| label: load_packages
+#| label: load_packages_7
 
 library("tidyverse")
 library("scales")
 library("patchwork")
 library("broom")
+library("rlang")
 
 source(here::here("R", "99_proj_func.R"))
 ```
@@ -28,7 +30,7 @@ source(here::here("R", "99_proj_func.R"))
 ## Loading data files
 
 ```{r}
-#| label: load_data
+#| label: load_data_7
 
 data_aug <- read_csv(here::here("data", "data_aug.csv"))
 
@@ -43,7 +45,7 @@ The purpose of these plots is to examine and compare the fluorescence signals ac
 Firstly, boxplots of `MedQb`, `CVQb` and `PEpos` based on `CD` are created in ascending order of `MedQb` for `B cells` in the `blood`.
 
 ```{r}
-#| label: B_cells_blood
+#| label: B_cells_blood_7
 #| fig-height: 10
 #| fig-width: 9
 
@@ -75,7 +77,7 @@ From the plots, it looks like that there might be a correlation between the thre
 In the next part, the two correlations are assessed by creating a linear model of the two variables, `CVQb` and `PEpos`, against `MedQb`. Additionally, the correlation coefficients are calculated. The logarithmic values are used.
 
 ```{r}
-#| label: apply_lm
+#| label: apply_lm_7
 
 columns <- c("tissue",
              "lineage",
@@ -131,7 +133,7 @@ data_lm <- data_aug |>
 The correlation coefficient is now calculated and the two data frames are joined.
 
 ```{r}
-#| label: paramers
+#| label: paramers_7
 
 data_params <- data_aug |>
   filter(!is.na(MedQb), 
@@ -150,7 +152,8 @@ data_params <- data_aug |>
 In the last part, scatter plots with the linear model are created.
 
 ```{r}
-#| label: plots
+#| label: plots_7
+#| fig-height: 15
 
 p1 <- data_aug |>
   plot_scatter(params = data_params,
@@ -227,12 +230,14 @@ final_plot <- (p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
   plot_annotation(title = "Correlation of the intensity to variation and positivity",
                   caption = "cor: correlation coefficient") &
   theme(plot.caption = element_text(size = 11))
+
+final_plot
 ```
 
 ## Plot export
 
 ```{r}
-#| label: export_plots
+#| label: export_plots_7
 
 save_plot(plot = final_plot,
           filename = "07_key_plot.png",

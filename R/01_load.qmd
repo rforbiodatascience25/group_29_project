@@ -3,7 +3,8 @@ title: "Loading data"
 format:
   html:
     embed-resources: true
-output-dir: ../results
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -12,34 +13,37 @@ execute:
   message: false
 ---
 
-# Loading packages
+## Loading packages
 
 ```{r}
+#| label: load_packages_1
 
 library("tidyverse")
 ```
 
-# Loading data files
+## Loading data files
 
 ```{r}
+#| label: load_data_1
 
-blood <- read_csv(file = "data/_raw/blood.csv")
+blood <- read_csv(here::here(file = "data/_raw/blood.csv"))
 
-tonsil <- read_csv(file = "data/_raw/tonsil.csv")
+tonsil <- read_csv(here::here(file = "data/_raw/tonsil.csv"))
 
-thymus <- read_csv(file = "data/_raw/thymus.csv")
+thymus <- read_csv(here::here(file = "data/_raw/thymus.csv"))
 ```
 
-# Writing data files
+## Writing data files
 
 ```{r}
+#| label: write_data_1
 
 write_csv(x = blood,
-          file = "data/blood_load.csv")
+          file = here::here("data/blood_load.csv"))
 
 write_csv(x = tonsil,
-          file = "data/tonsil_load.csv")
+          file = here::here("data/tonsil_load.csv"))
 
 write_csv(x = thymus,
-          file = "data/thymus_load.csv")
+          file = here::here("data/thymus_load.csv"))
 ```

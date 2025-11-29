@@ -3,7 +3,8 @@ title: "Analysis 5"
 format:
   html:
     embed-resources: true
-output-dir: ../results
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -15,7 +16,7 @@ execute:
 ## Loading packages
 
 ```{r}
-#| label: load_packages
+#| label: load_packages_9
 
 library("tidyverse")
 library("broom")
@@ -27,7 +28,7 @@ source(here::here("R", "99_proj_func.R"))
 ## Loading data files
 
 ```{r}
-#| label: load_data
+#| label: load_data_9
 
 data_aug <- read_csv(file = here::here("data/data_aug.csv"))
 ```
@@ -41,7 +42,7 @@ In the data set, the `CD4 T cells` and `CD8 T cells` exist in two similar and pa
 To assess significant differences in CD marker expression between each pair, a linear model was applied using the `map()` function as described in analysis 4. In order to compare the CDs for a specific subset between `CD4` and `CD8`, the data must be grouped by the pair, hence why the variable `pair` was added. As the `CD4 T cells` are listed first in the function `cell_type_order`, their estimate corresponds the intercept, while the estimate of the `CD8 T cells` is the slope, corresponding to how much the CD expression differs from the `CD4 T cells`. Lastly, the full estimates were calculated by adding the intercept to the estimate of the `CD8 T cells`, and the variable `is_significant` and `any_significant` is added from the calculated p-value.
 
 ```{r}
-#| label: apply_lm
+#| label: apply_lm_9
 
 columns <- c("tissue", 
              "CD",
@@ -117,7 +118,7 @@ data_analysis5  <- data_aug |>
 Below are the number of significant CDs for each pair calculated and visualized.
 
 ```{r}
-#| label: count_sig_CDs
+#| label: count_sig_CDs_9
 
 sig_CD_count <- data_analysis5 |>
   group_by(pair) |>
@@ -139,7 +140,7 @@ sig_CD_count
 The significant CDs for each pair are visualized with an error bar plot of the estimate and the confidence intervals by using the function `plot_CD4vsCD8()`. The six figures are plotted together by using the package `patchwork`.
 
 ```{r}
-#| label: create_plots
+#| label: create_plots_9
 #| fig-height: 10
 #| fig-width: 8
 
@@ -181,12 +182,12 @@ p6 <- data_analysis5 |>
 
 The CD markers that generally show the biggest difference are as expected the lineage-specific markers `CD4` and `CD8`, which are significant for all the pairs.
 
-# Plot export and document rendering
+## Plot export
 
-As the figure above is too big for the presentation only the plot for the naive T cells are saved.
+As the figure above is too big for the presentation only the plot for the naive T cells is saved.
 
 ```{r}
-#| label: export_plots
+#| label: export_plots_9
 
 p3 <- data_analysis5 |>
   CD_order() |>

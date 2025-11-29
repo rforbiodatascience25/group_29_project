@@ -3,7 +3,8 @@ title: "Analysis 2"
 format:
   html:
     embed-resources: true
-output-dir: ../results
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -15,17 +16,19 @@ execute:
 ## Loading packages
 
 ```{r}
+#| label: load_packages_6
 
 library("tidyverse")
 
-source(file = "R/99_proj_func.R")
+source(file = here::here("R/99_proj_func.R"))
 ```
 
 ## Loading data files
 
 ```{r}
+#| label: load_data_6
 
-data_aug <- read_csv(file = "data/data_aug.csv")
+data_aug <- read_csv(file = here::here("data/data_aug.csv"))
 ```
 
 ## Creating auxiliary data frame
@@ -35,6 +38,7 @@ The **aim** of this visualization is to have a summarized, comprehensive view of
 A dummy variable `tube_bar` (with the value `"TubeBar"`) is added to enable plotting a horizontal bar above the plot for identifying `cell_type` by `tissue`.
 
 ```{r}
+#| label: create_tubebar_6
 
 data_aug <- data_aug |>
   mutate(tube_bar = "TubeBar")  
@@ -45,8 +49,9 @@ data_aug <- data_aug |>
 The plot shown below is generated using dplyr's **ggplot2**; as the same plot will be used many times, albeit with slight alterations, a function called `heat_dot_plot()` has been created separately and placed in `R/99_proj_func.R`. Our data set, `data_aug` was slightly modified for the analysis; new columns with labels for CD number and tissue were added to allow for correct alphabetical display of CD markers using the custom function `CD_order()`. Additionally, `tube_bar` is plotted over the upper x-axis. Discrete intervals for dot size are displayed in the legend for a comprehensive view of the plot, as well as a color gradient bar for fluorescence.
 
 ```{r}
-#| fig-height: 15
+#| label: create_plot1_6
 #| fig-width: 8
+#| fig-height: 20
 
 data_aug |>
   drop_na(MedQb, PEpos) |>
@@ -59,6 +64,9 @@ This is a heat-dot plot that shows the relative fluorescence of every surface ma
 As the plot figure is too large for the presentation, subsets of `data_aug` will be used for showing data points of interest.
 
 ```{r}
+#| label: create_plot2_6
+#| fig-width: 8
+#| fig-height: 10
 
 CDs <- c(1,2,3,4,5,6,7,8,9,10, 15, 16, 17, 18, 19, 45, 74, 81, 96, 99)
 
@@ -81,6 +89,7 @@ final_plot <- data_aug |>
 ## Export plots
 
 ```{r}
+#| label: export_plots_6
 
 save_plot(plot = final_plot,
           filename = "06_key_plot.png",
