@@ -12,28 +12,27 @@ execute:
   message: false
 ---
 
-# Loading packages
+## Loading packages
 
 ```{r}
+#| label: load_packages
 
 library("tidyverse")
 library("broom")
 library("patchwork")
-library("quarto")
 
 source(here::here("R", "99_proj_func.R"))
-
 ```
 
-# Loading data files
+## Loading data files
 
 ```{r}
+#| label: load_data
 
 data_aug <- read_csv(file = here::here("data/data_aug.csv"))
-
 ```
 
-# Differences in CD makers on CD4 and CD8 T cells
+## Differences in CD makers on CD4 and CD8 T cells
 
 In the data set, the `CD4 T cells` and `CD8 T cells` exist in two similar and parallel subsets in the `thymus`, `SP1ap` and `SP1am`, and four subsets in the `blood`, `naive`, `central memory` (CM) `effector memory` (EM) and `TEMRA`. It is therefore interesting to investigate differences in CD marker expression between `CD4` and `CD8` T cells for each pair of subset.
 
@@ -42,6 +41,7 @@ In the data set, the `CD4 T cells` and `CD8 T cells` exist in two similar and pa
 To assess significant differences in CD marker expression between each pair, a linear model was applied using the `map()` function as described in analysis 4. In order to compare the CDs for a specific subset between `CD4` and `CD8`, the data must be grouped by the pair, hence why the variable `pair` was added. As the `CD4 T cells` are listed first in the function `cell_type_order`, their estimate corresponds the intercept, while the estimate of the `CD8 T cells` is the slope, corresponding to how much the CD expression differs from the `CD4 T cells`. Lastly, the full estimates were calculated by adding the intercept to the estimate of the `CD8 T cells`, and the variable `is_significant` and `any_significant` is added from the calculated p-value.
 
 ```{r}
+#| label: apply_lm
 
 columns <- c("tissue", 
              "CD",
@@ -54,18 +54,22 @@ columns <- c("tissue",
              "is_significant",
              "any_significant")
 
-CD4_vs_CD8  <- data_aug |>
+data_analysis5  <- data_aug |>
   filter(str_detect(cell_type, "CD4") | str_detect(cell_type, "CD8"),
          cell_type != "CD4ISP",
          cell_type != "TCD8RAdim",
-         hierarchy_level == 4) |>
+         hierarchy == 4) |>
+  select(-c("CVQb", "PEpos")) |>
+  drop_na(MedQb) |>
   mutate(pair = case_when(str_detect(cell_type, "SP1ap") ~ "SP1ap",
                           str_detect(cell_type, "SP1am") ~ "SP1am",
                           str_ends(cell_type, "naive") ~ "naive",
                           str_ends(cell_type, "CM") ~ "CM",
                           str_ends(cell_type, "EM") ~ "EM",
-                          str_detect(cell_type, "TEMRA") ~ "TEMRA")) |>
+                          str_detect(cell_type, "TEMRA") ~ "TEMRA"),
+         .before = cell_type) |>
   group_by(tissue, CD, pair) |>
+  filter(n() > n_distinct(cell_type)) |>
   nest() |>
   mutate(model_object = map(.x = data,
                    .f = ~lm(formula = log(MedQb) ~ cell_type,
@@ -99,7 +103,7 @@ CD4_vs_CD8  <- data_aug |>
       term == "(Intercept)" & pair == "EM" ~ "TCD4EM", 
       term == "(Intercept)" & pair == "TEMRA" ~ "TCD4TEMRA",
       .default = str_remove(term, "cell_type"))) |>
-  select(columns) |>
+  select(all_of(columns)) |>
   ungroup() |>
   filter(any_significant == "yes") |>
   mutate(lineage = case_when(str_detect(cell_type, "CD4") ~ "CD4 T cells",
@@ -108,57 +112,14 @@ CD4_vs_CD8  <- data_aug |>
 
 ```
 
-## Visualization of significant CDs between each pair
-
-The significant CDs for each pair are visualized with an error bar plot of the estimate and the confidence intervals by using the function `plot_CD4vsCD8()`. The six figures are plotted together by using the package `patchwork`.
-
-```{r}
-#| fig-height: 10
-#| fig-width: 8
-
-p1 <- CD4_vs_CD8 |>
-  CD_order() |>
-  plot_CD4vsCD8(pair = "SP1ap",
-                legend_position = "none")
-
-p2 <- CD4_vs_CD8 |>
-  CD_order() |>
-  plot_CD4vsCD8(pair = "SP1am",
-                legend_position = "none")
-
-p3 <- CD4_vs_CD8 |>
-  CD_order() |>
-  plot_CD4vsCD8(pair = "naive",
-                legend_position = "none")
-
-p4 <- CD4_vs_CD8 |>
-  CD_order() |>
-  plot_CD4vsCD8(pair = "CM",
-                legend_position = "none")
-
-p5 <- CD4_vs_CD8 |>
-  CD_order() |>
-  plot_CD4vsCD8(pair = "EM",
-                legend_position = "none")
-
-p6 <- CD4_vs_CD8 |>
-  CD_order() |>
-  plot_CD4vsCD8(pair = "TEMRA",
-                legend_position = "bottom")
-
-(p1 + p2) / (p3 + p4) / (p5 + p6) +
-  plot_annotation(
-    title = "Significant CD Markers Differentiating CD4 and CD8 T Cell Subsets") &
-  theme(plot.title = element_text(size = 18))
-```
-
-The CD markers that generally show the biggest difference are as expected the lineage-specific markers `CD4` and `CD8`, which are significant for all the pairs.
+## Count of significant CDs
 
 Below are the number of significant CDs for each pair calculated and visualized.
 
 ```{r}
+#| label: count_sig_CDs
 
-sig_CD_count <- CD4_vs_CD8 |>
+sig_CD_count <- data_analysis5 |>
   group_by(pair) |>
   summarise(count_CD = n_distinct(CD)) |>
   mutate(pair = fct_rev(fct_reorder(pair, count_CD))) |>
@@ -173,13 +134,61 @@ sig_CD_count <- CD4_vs_CD8 |>
 sig_CD_count
 ```
 
+## Visualization of significant CDs between each pair
+
+The significant CDs for each pair are visualized with an error bar plot of the estimate and the confidence intervals by using the function `plot_CD4vsCD8()`. The six figures are plotted together by using the package `patchwork`.
+
+```{r}
+#| label: create_plots
+#| fig-height: 10
+#| fig-width: 8
+
+p1 <- data_analysis5 |>
+  CD_order() |>
+  plot_CD4vsCD8(pair = "SP1ap",
+                legend_position = "none")
+
+p2 <- data_analysis5 |>
+  CD_order() |>
+  plot_CD4vsCD8(pair = "SP1am",
+                legend_position = "none")
+
+p3 <- data_analysis5 |>
+  CD_order() |>
+  plot_CD4vsCD8(pair = "naive",
+                legend_position = "none")
+
+p4 <- data_analysis5 |>
+  CD_order() |>
+  plot_CD4vsCD8(pair = "CM",
+                legend_position = "none")
+
+p5 <- data_analysis5 |>
+  CD_order() |>
+  plot_CD4vsCD8(pair = "EM",
+                legend_position = "none")
+
+p6 <- data_analysis5 |>
+  CD_order() |>
+  plot_CD4vsCD8(pair = "TEMRA",
+                legend_position = "bottom")
+
+(p1 + p2) / (p3 + p4) / (p5 + p6) +
+  plot_annotation(
+    title = "Significant CD Markers Differentiating CD4 and CD8 T Cell Subsets") &
+  theme(plot.title = element_text(size = 18))
+```
+
+The CD markers that generally show the biggest difference are as expected the lineage-specific markers `CD4` and `CD8`, which are significant for all the pairs.
+
 # Plot export and document rendering
 
 As the figure above is too big for the presentation only the plot for the naive T cells are saved.
 
 ```{r}
+#| label: export_plots
 
-p3 <- CD4_vs_CD8 |>
+p3 <- data_analysis5 |>
   CD_order() |>
   plot_CD4vsCD8(pair = "naive",
                 legend_position = "bottom")

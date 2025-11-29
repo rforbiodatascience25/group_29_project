@@ -62,6 +62,16 @@ data_aug |>
 
 ## Analysis 1
 
+::::: columns
+::: {.column width="50%"}
+-   Skriv tekst her
+:::
+
+::: {.column width="50%"}
+![](images/05_key_plot.png)
+:::
+:::::
+
 ## Analysis 2
 
 ::: {.columns style="font-size:50%"}
@@ -110,7 +120,7 @@ data_aug |>
 :::
 
 ::: {.column width="50%"}
-![](images/08_key_plot-01.png)
+![](images/08_key_plot.png)
 :::
 :::::
 

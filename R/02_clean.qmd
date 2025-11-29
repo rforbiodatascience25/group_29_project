@@ -1,12 +1,18 @@
 ---
 title: "Cleaning data"
-format: html
+format:
+  html:
+    embed-resources: true
+output-dir: ../results
 editor: visual
 editor_options: 
   chunk_output_type: console
+execute: 
+  warning: false
+  message: false
 ---
 
-# Loading packages
+## Loading packages
 
 ```{r}
 
@@ -15,7 +21,7 @@ library("tidyverse")
 source(file = "R/99_proj_func.R")
 ```
 
-# Loading data files
+## Loading data files
 
 ```{r}
 
@@ -26,9 +32,9 @@ tonsil <- read_csv(file = "data/tonsil_load.csv")
 thymus <- read_csv(file = "data/thymus_load.csv")
 ```
 
-# Cleaning each data set
+## Cleaning each data set
 
-Each dataset is standardized using the function pivot_selected_variables(), which reshapes wide data into a tidy long format. It extracts only the selected variables (CVQb, MedQb, count, PEpos), splits the variable names into cell_type and measurement columns, and tags each observation with its tissue. This ensures that all datasets share the same column structure and can be merged later without conflicts.
+Each dataset is standardized using the function `pivot_selected_variables()`, which reshapes wide data into a tidy long format. It extracts only the selected variables (`CVQb`, `MedQb`, `PEpos`), splits the variable names into `cell_type` and measurement columns, and tags each observation with its `tissue`. This ensures that all datasets share the same column structure and can be merged later without conflicts.
 
 ```{r}
 
@@ -51,9 +57,9 @@ thymus_clean <- thymus |>
                            tissue = "thymus")
 ```
 
-# Merge the three cleaned data sets
+## Merge the three cleaned data sets
 
-Here the cleaned datasets from blood, tonsil, and thymus are combined into one large table (data_clean) using bind_rows(). Control samples labeled “FMO” are filtered out since they are used only for calibration. The result is a clean, uniform dataset containing all immune-cell measurements, ready for further analysis.
+Here the cleaned datasets from blood, tonsil, and thymus are combined into one large table (`data_clean`) using `bind_row()`. Control samples labeled `FMO` are filtered out since they are used only for calibration. The result is a clean, uniform dataset containing all immune-cell measurements, ready for further analysis.
 
 ```{r}
 
@@ -63,13 +69,12 @@ data_clean <- bind_rows(blood_clean,
   filter(CD != "FMO")
 ```
 
-# Preparing data set for PCA
+## Preparing data set for PCA
 
-### Populating all cells in dataset
-
-When you make a PCA plot you need all numeric rows and columns to be filled with data. So firstly we needed to fill the empty cells with data. These were empty due to the different cell types and CD's. Unpopulated cells was populated with the median for the column. We avoided using the mean due to outliers potentially skewing the data.
+The format for a PCA must be wide. As we want to analyse how the cell types cluster based on their CD expression, a variable `cell_type` must be kept. The other variables will then be `CD_measure`, where the measure is either `MedQb` or `PEpos`, which is the opposite of the original wide-format that had `celltype_measure` as variables. As the number of experiments for each CD differs, the mean of all experiments was summarised during the conversion to the wide-format to avoid missing values. However, there was still some missing values due to not all CDs being tested on all cell types. These missing values were assigned with the median for the column, corresponding to the median for that specific CD. We avoided using the mean due to outliers potentially skewing the data.
 
 ```{r}
+
 PCA_clean <- data_clean |>
   pivot_wider(id_cols = c("tissue", "cell_type"),
               names_from = "CD",
@@ -79,12 +84,12 @@ PCA_clean <- data_clean |>
     where(is.numeric),
     ~ if_else(is.na(.x), 
               median(.x, 
-                     na.rm = TRUE), .x)
-  ))
-  
+                     na.rm = TRUE), 
+              .x))
+    )
 ```
 
-# Writing data files
+## Writing data files
 
 ```{r}
 
