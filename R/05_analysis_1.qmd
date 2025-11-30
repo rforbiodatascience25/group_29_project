@@ -113,14 +113,12 @@ PCA_fit_MedQb |>
 ```{r}
 #| label: create_rotplot3_5
 
-MedQb_top10 <- PCA_fit_MedQb |>
+PCA_fit_MedQb |>
   PCA_rotation(prefix = "MedQb_",
                amount = 10,
                xlimits = c(-0.25, 0.25),
                ylimits = c(-0.25, 0.25),
                subtitle   = "MedQb")
-
-MedQb_top10
 ```
 
 **PEpos - all variables:**
@@ -134,7 +132,6 @@ PCA_fit_PEpos |>
                xlimits = c(-0.2, 0.2),
                ylimits = c(-0.2, 0.2),
                subtitle = "Rotation matrix for all PEpos variables")
-
 ```
 
 **PEpos - top 10 variables:**
@@ -142,14 +139,12 @@ PCA_fit_PEpos |>
 ```{r}
 #| label: create_rotplot5_5
 
-PEpos_top10 <- PCA_fit_PEpos |>
+PCA_fit_PEpos |>
   PCA_rotation(prefix = "PEpos_",
                amount = 10,
                xlimits = c(-0.2, 0.2),
                ylimits = c(-0.2, 0.2),
                subtitle = "PEpos")
-
-PEpos_top10
 ```
 
 ## Plot export
@@ -158,17 +153,9 @@ PEpos_top10
 #| label: export_plots_5
 
 scatter_plot_MedQb <- scatter_plot_MedQb +
-  labs(title = "PCA plot stratified on tissue and lineage") +
-  theme(legend.position = "none")
+    labs(title = "PCA plot stratified on tissue and lineage")
 
-scatter_plot <- scatter_plot_MedQb + scatter_plot_PEpos
-
-MedQb_top10 <- MedQb_top10 +
-    labs(title = "Rotation matrix for top 10 longest vectors")
-  
-rota_plot <- MedQb_top10 + PEpos_top10
-
-final_plot <- scatter_plot / rota_plot
+final_plot <- scatter_plot_MedQb / scatter_plot_PEpos
 
 save_plot(plot = final_plot,
           filename = "05_key_plot.png",

@@ -62,6 +62,7 @@ data_analysis4 <- data_aug |>
   select(-c("CVQb", "PEpos")) |>
   drop_na(MedQb) |>
   group_by(tissue, CD, lineage) |>
+  filter(n() > n_distinct(cell_type)) |>
   fit_linear_model(log(MedQb) ~ cell_type)|>
   mutate(is_significant = case_when(term == "(Intercept)" ~ "reference",
                                     p.value < 0.05 ~ "yes",
@@ -111,7 +112,9 @@ A column plot of the count of significant CDs for each lineage is created below.
 ```{r}
 #| label: plot_sig_CDs_8
 
-sig_CD_count <- plot_sig_CDs(data_analysis4, lineage, "#fa2840")
+sig_CD_count <- data_analysis4 |>
+  plot_sig_CDs(by_variable = lineage, 
+                 fill_color = "#fa2840")
 
 
 sig_CD_count
