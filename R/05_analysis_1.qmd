@@ -40,25 +40,28 @@ PCA_aug <- read_csv(file = here::here("data/PCA_aug.csv"))
 After all numeric cells were populated the function `prcomp` was used to make the the PCA.
 
 ```{r}
-PCA_fit <- PCA_aug |>
-  select(where(is.numeric))|>
-  prcomp(scale = TRUE)
 
-PCA_MedQb <- PCA_aug |>
-  select(tissue, cell_type, lineage, starts_with("MedQb"))
+data_MedQb <- PCA_aug |>
+  select(tissue, 
+         cell_type, 
+         lineage, 
+         starts_with("MedQb"))
 
-PCA_PEpos <- PCA_aug |>
-  select(tissue, cell_type, lineage, starts_with("PEpos"))
+data_PEpos <- PCA_aug |>
+  select(tissue, 
+         cell_type,
+         lineage, 
+         starts_with("PEpos"))
 ```
 
 ```{r}
 #| label: create_PCA_fit_5
 
-PCA_fit_PEpos <- PCA_PEpos |> 
+PCA_fit_MedQb <- data_MedQb |> 
   select(where(is.numeric)) |>
   prcomp(scale = TRUE)
 
-PCA_fit_MedQb <- PCA_MedQb |> 
+PCA_fit_PEpos <- data_PEpos |> 
   select(where(is.numeric)) |>
   prcomp(scale = TRUE)
 ```
@@ -68,32 +71,26 @@ PCA_fit_MedQb <- PCA_MedQb |>
 On the plot we have PC1 on the x-axis and PC2 on the y-axis. Usually most variation can be captured with the first two principal components. The points are stratified using tissue type (blood, tonsil, thymus) as the shapes and cell lineage as the color.'
 
 ```{r}
-scatter_plot_MedQB <- PCA_plot(PCA_fit_MedQb,PCA_aug, "PCA_MedQb")
+scatter_plot_MedQb <- PCA_fit_MedQb |>
+  PCA_plot(data = data_MedQb,
+           subtitle = "MedQb")
+
+scatter_plot_MedQb
 ```
 
+Then for PEpos:
+
 ```{r}
-scatter_plot_PEpos <- PCA_plot(PCA_fit_PEpos,PCA_aug, "PCA_PEpos")
+scatter_plot_PEpos <- PCA_fit_PEpos |>
+  PCA_plot(data = data_PEpos,
+           subtitle = "PEpos")
+
+scatter_plot_PEpos
 ```
 
 As we can see on the plot we have some nice clustering. We see all the cells from thymus clustered nicely and tonsil cells are also somewhat clustered. In the blood we see two different clusters, with one containing all blood B cells except for one, and the other one containing the rest of the cell lineages. We can also see that the B cell lineage from blood and thymus didn't vary much in PC1 but PC2 set them apart.
 
 ## Rotation matrices
-
-**Rotation matrix - all variables:**
-
-```{r}
-#| label: create_rotplot1_5
-
-PCA_fit |> 
-  PCA_rotation(prefix = ".*",
-               amount = Inf,
-               xlimits = c(-0.15, 0.15),
-               ylimits = c(-0.15, 0.15),
-               subtitle   = "Rotation matrix for all variables")
-
-```
-
-As the plot of the rotation matrix is very cluttered, the variables are separated into `MedQb` and `PRpos`.
 
 **MedQb - all variables:**
 
@@ -158,10 +155,16 @@ PEpos_top10
 ```{r}
 #| label: export_plots_5
 
+scatter_plot_MedQb <- scatter_plot_MedQb +
+  labs(title = "PCA plot stratified on tissue and lineage") +
+  theme(legend.position = "none")
+
+scatter_plot <- scatter_plot_MedQb + scatter_plot_PEpos
+
 MedQb_top10 <- MedQb_top10 +
     labs(title = "Rotation matrix for top 10 longest vectors")
   
-rota_plot <- (MedQb_top10 + PEpos_top10)
+rota_plot <- MedQb_top10 + PEpos_top10
 
 final_plot <- scatter_plot / rota_plot
 

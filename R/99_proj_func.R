@@ -94,9 +94,9 @@ save_plot <- function(plot, filename, width = 7, height = 5) {
 
 # Analysis 1 - plots
 #Scatter plots
-PCA_plot <- function(fit, data, title){
+PCA_plot <- function(fit, data, subtitle){
   
-  scatter_plot <- augment(fit, data = data) |>
+  augment(fit, data = data) |>
     ggplot(aes(
       .fittedPC1,
       .fittedPC2,
@@ -105,7 +105,7 @@ PCA_plot <- function(fit, data, title){
     )) +
     geom_point(size = 3, alpha = 0.8) +
     labs(
-      title = title,
+      subtitle = subtitle,
       x = "PC1",
       y = "PC2",
       color = "Lineage"
@@ -119,14 +119,7 @@ PCA_plot <- function(fit, data, title){
       legend.spacing.x = unit(0.2, "lines")
     )
   
-  return(scatter_plot)
-  print(scatter_plot)
 }
-
-
-
-
-
 
 #Rotation plots
 PCA_rotation <- function(data, prefix, amount, xlimits, ylimits, subtitle) {
@@ -140,7 +133,6 @@ PCA_rotation <- function(data, prefix, amount, xlimits, ylimits, subtitle) {
     pivot_wider(names_from = "PC", 
                 names_prefix = "PC", 
                 values_from  = "value") |>
-    filter(str_starts(column, prefix)) |>
     mutate(contrib = abs(PC1) + abs(PC2),
            arrow_length = sqrt(PC1^2 + PC2^2)) |>
     slice_max(contrib, n = amount) |>
