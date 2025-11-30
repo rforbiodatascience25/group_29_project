@@ -2,6 +2,7 @@
 title: "Group 29 Presentation"
 format: 
   revealjs:
+    theme: [serif, custom.scss]
     embed-resources: true
 editor: visual
 editor_options: 
