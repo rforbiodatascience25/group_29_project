@@ -93,6 +93,42 @@ save_plot <- function(plot, filename, width = 7, height = 5) {
 }
 
 # Analysis 1 - plots
+#Scatter plots
+PCA_plot <- function(fit, data, title){
+  
+  scatter_plot <- augment(fit, data = data) |>
+    ggplot(aes(
+      .fittedPC1,
+      .fittedPC2,
+      shape = tissue,
+      color = lineage
+    )) +
+    geom_point(size = 3, alpha = 0.8) +
+    labs(
+      title = title,
+      x = "PC1",
+      y = "PC2",
+      color = "Lineage"
+    ) +
+    scale_color_brewer(palette = "Dark2") +
+    theme_bw(base_size = 13) +
+    theme(
+      legend.key.size  = unit(0.4, "lines"),
+      legend.text      = element_text(size = 7),
+      legend.spacing.y = unit(0.1, "lines"),
+      legend.spacing.x = unit(0.2, "lines")
+    )
+  
+  return(scatter_plot)
+  print(scatter_plot)
+}
+
+
+
+
+
+
+#Rotation plots
 PCA_rotation <- function(data, prefix, amount, xlimits, ylimits, subtitle) {
   arrow_style <- arrow(angle  = 30, 
                        ends = "first", 

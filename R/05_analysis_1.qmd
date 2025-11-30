@@ -40,41 +40,39 @@ PCA_aug <- read_csv(file = here::here("data/PCA_aug.csv"))
 After all numeric cells were populated the function `prcomp` was used to make the the PCA.
 
 ```{r}
+PCA_fit <- PCA_aug |>
+  select(where(is.numeric))|>
+  prcomp(scale = TRUE)
+
+PCA_MedQb <- PCA_aug |>
+  select(tissue, cell_type, lineage, starts_with("MedQb"))
+
+PCA_PEpos <- PCA_aug |>
+  select(tissue, cell_type, lineage, starts_with("PEpos"))
+```
+
+```{r}
 #| label: create_PCA_fit_5
 
-PCA_fit <- PCA_aug |> 
+PCA_fit_PEpos <- PCA_PEpos |> 
   select(where(is.numeric)) |>
   prcomp(scale = TRUE)
 
+PCA_fit_MedQb <- PCA_MedQb |> 
+  select(where(is.numeric)) |>
+  prcomp(scale = TRUE)
 ```
 
 ## Make the plot
 
-On the plot we have PC1 on the x-axis and PC2 on the y-axis. Usually most variation can be captured with the first two principal components. The points are stratified using tissue type (blood, tonsil, thymus) as the shapes and cell lineage as the color.
+On the plot we have PC1 on the x-axis and PC2 on the y-axis. Usually most variation can be captured with the first two principal components. The points are stratified using tissue type (blood, tonsil, thymus) as the shapes and cell lineage as the color.'
 
 ```{r}
-#| label: create_scatterplot_5
+scatter_plot_MedQB <- PCA_plot(PCA_fit_MedQb,PCA_aug, "PCA_MedQb")
+```
 
-scatter_plot <- PCA_fit |> 
-  augment(data = PCA_aug) |>
-  ggplot(aes(.fittedPC1, 
-             .fittedPC2,
-             shape = tissue,
-             color = lineage)) +
-  geom_point(size = 3,
-             alpha = 0.8) +
-  labs(title = "PCA plot stratified on tissue and lineage",
-       x = "PC1",
-       y = "PC2",
-       color = "Lineage") +
-  scale_color_brewer(palette = "Set1") +
-  theme_bw(base_size = 13) +
-    theme(legend.key.size = unit(0.4, "lines"),
-          legend.text = element_text(size = 7),
-          legend.spacing.y = unit(0.1, "lines"),
-          legend.spacing.x = unit(0.2, "lines"))
- 
-scatter_plot
+```{r}
+scatter_plot_PEpos <- PCA_plot(PCA_fit_PEpos,PCA_aug, "PCA_PEpos")
 ```
 
 As we can see on the plot we have some nice clustering. We see all the cells from thymus clustered nicely and tonsil cells are also somewhat clustered. In the blood we see two different clusters, with one containing all blood B cells except for one, and the other one containing the rest of the cell lineages. We can also see that the B cell lineage from blood and thymus didn't vary much in PC1 but PC2 set them apart.
@@ -102,11 +100,11 @@ As the plot of the rotation matrix is very cluttered, the variables are separate
 ```{r}
 #| label: create_rotplot2_5
 
-PCA_fit |> 
+PCA_fit_MedQb |> 
   PCA_rotation(prefix = "MedQb_",
                amount = Inf,
-               xlimits = c(-0.15, 0.15),
-               ylimits = c(-0.15, 0.15),
+               xlimits = c(-0.25, 0.25),
+               ylimits = c(-0.25, 0.25),
                subtitle   = "Rotation matrix for all MedQb variables")
 
 ```
@@ -116,11 +114,11 @@ PCA_fit |>
 ```{r}
 #| label: create_rotplot3_5
 
-MedQb_top10 <- PCA_fit |>
+MedQb_top10 <- PCA_fit_MedQb |>
   PCA_rotation(prefix = "MedQb_",
                amount = 10,
-               xlimits = c(-0.15, 0.15),
-               ylimits = c(-0.15, 0.15),
+               xlimits = c(-0.25, 0.25),
+               ylimits = c(-0.25, 0.25),
                subtitle   = "MedQb")
 
 MedQb_top10
@@ -131,11 +129,11 @@ MedQb_top10
 ```{r}
 #| label: create_rotplot4_5
 
-PCA_fit |>
+PCA_fit_PEpos |>
   PCA_rotation(prefix = "PEpos_",
                amount = Inf,
-               xlimits = c(-0.15, 0.15),
-               ylimits = c(-0.15, 0.15),
+               xlimits = c(-0.2, 0.2),
+               ylimits = c(-0.2, 0.2),
                subtitle = "Rotation matrix for all PEpos variables")
 
 ```
@@ -145,11 +143,11 @@ PCA_fit |>
 ```{r}
 #| label: create_rotplot5_5
 
-PEpos_top10 <- PCA_fit |>
+PEpos_top10 <- PCA_fit_PEpos |>
   PCA_rotation(prefix = "PEpos_",
                amount = 10,
-               xlimits = c(-0.15, 0.15),
-               ylimits = c(-0.15, 0.15),
+               xlimits = c(-0.2, 0.2),
+               ylimits = c(-0.2, 0.2),
                subtitle = "PEpos")
 
 PEpos_top10
