@@ -33,6 +33,20 @@ data_clean <- read_csv(file = here::here("data/data_clean.csv"))
 PCA_clean <- read_csv(file = here::here("data/PCA_clean.csv"))
 ```
 
+## Quantifying dataset diversity
+
+```{r}
+summary_counts <- data_clean |>
+  summarise(
+    n_CDs = n_distinct(CD),
+    n_celltypes = n_distinct(cell_type)
+  )
+
+summary_counts
+```
+
+In this step, two summary variables are created to describe the structure of the dataset. Using the `summarise()` function, we count the number of unique CD markers and cell types present in the data. The result shows that the dataset includes 115 different CD markers and 38 distinct cell types, which highlights the biological diversity captured across tissues. This information provides a quick overview of how broad the dataset is and confirms that it contains enough variation to study immune cell development and activation patterns.
+
 ## Add variables
 
 Here we enrich the dataset with two new variables:
