@@ -353,3 +353,37 @@ plot_CD4vsCD8 <- function(data, pair, legend_position) {
          y = "log(MedQb)",
          color = "Lineage")
 }
+
+plot_sig_CDs <- function(data, group_selection, fill_color) {
+  
+  sig_CD_count <- data |>
+    filter(is_significant == "yes") |>
+    group_by({{ group_selection }}) |>
+    summarise(count_CD = n_distinct(CD), .groups = "drop") |>
+    mutate({{ group_selection }} := fct_rev(fct_reorder({{ group_selection }}, count_CD))) |>
+    ggplot(aes(x = {{ group_selection }}, y = count_CD)) +
+    geom_col(fill = fill_color) +
+    theme_bw(base_size = 13) +
+    labs(
+      subtitle = paste("Count of significant CDs per", as_label(enquo(group_selection))),
+      x = as_label(enquo(group_selection)),
+      y = "Count"
+    )
+}
+
+fit_linear_model <- function(data, formula) {
+  data |>
+    nest() |> 
+    mutate(
+      model_object = map(.x = data,
+                         .f = ~lm(formula = formula, data = .x))
+    ) |>
+    mutate(
+      model_object_tidy = map(.x = model_object,
+                              .f = ~tidy(.x,
+                                         conf.int = TRUE,
+                                         conf.level = 0.95))
+    ) |>
+    unnest(model_object_tidy)
+}
+
