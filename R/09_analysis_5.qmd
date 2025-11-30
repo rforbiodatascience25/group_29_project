@@ -112,7 +112,9 @@ Below are the number of significant CDs for each pair calculated and visualized.
 ```{r}
 #| label: count_sig_CDs_9
 
-sig_CD_count <- plot_sig_CDs(data_analysis5, pair, "hotpink")
+sig_CD_count <- data_analysis5 |>
+  plot_sig_CDs(by_variable = pair, 
+                 fill_color = "hotpink")
 
 
 sig_CD_count
