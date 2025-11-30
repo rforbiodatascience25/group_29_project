@@ -93,6 +93,6 @@ final_plot <- data_aug |>
 
 save_plot(plot = final_plot,
           filename = "06_key_plot.png",
-          width = 17,
-          height = 8)
+          width = 11,
+          height = 7)
 ```

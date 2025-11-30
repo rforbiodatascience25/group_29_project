@@ -152,7 +152,7 @@ data_aug |>
 :::
 
 ::: {.column width="50%"}
-![](images/09_analysis_5_plot.png)
+![](images/09_key_plot.png)
 :::
 :::::
 
