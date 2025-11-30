@@ -10,7 +10,7 @@ The project used data from the article:
 
 The data was downloaded from the corresponding shiny app:
 
-<http://bioinformin.cesnet.cz/CDmap>
+<http://bioinformin.cesnet.cz/CDmaps/>
 
 **The workflow for the data retrieval was as follows:**
 
