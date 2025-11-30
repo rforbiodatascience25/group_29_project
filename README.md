@@ -12,7 +12,7 @@ The data was downloaded from the corresponding shiny app:
 
 <http://bioinformin.cesnet.cz/CDmap>
 
-The workflow for the data retrieval was as follows:
+**The workflow for the data retrieval was as follows:**
 
 -   Go to the shiny app
 
@@ -28,7 +28,7 @@ The workflow for the data retrieval was as follows:
 
     -   `4. Tonsil: B-cell maturation`
 
--   As the name of downloaded files was automatically named after the current date, they were renamed to:
+-   As the names of downloaded files were automatically named after the current date, they were renamed to:
 
     -   `blood.csv`
 
