@@ -37,7 +37,7 @@ PCA_aug <- read_csv(file = here::here("data/PCA_aug.csv"))
 
 ## Make the PCA fit
 
-The data is split into two data sets, one for MedQb and for PEpos, so we can make a PCA for each.
+The data is split into two data sets, one for MedQb and for PEpos, so we can make a PCA for each..
 
 ```{r}
 
