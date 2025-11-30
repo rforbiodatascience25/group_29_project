@@ -35,12 +35,12 @@ data_clean <- read_csv(file = here::here("data/data_clean.csv"))
 
 ## Description of the clean data set
 
-The data consists of immunological measurements from blood, tonsil and thymus. The dataset consists of `r nrow(data_clean)` observations and `r ncol(data_clean)` variables containing CD markers for the cell types in the specific tissue. An overview of the quantitative markers is given below using a `table1` summary of `data_clean` . **The data is structured in long format,** meaning that each combination of `tissue`, `cell_type` and `CD` appears as one row. This structure makes the dataset suitable for analysis and visualization.
+The data consists of immunological measurements from blood, tonsil and thymus. The dataset consists of `r nrow(data_aug)` observations and `r ncol(data_aug)` variables containing CD markers for the cell types in the specific tissue. An overview of the quantitative markers is given below using a `table1` summary of `data_aug` . **The data is structured in long format,** meaning that each combination of `tissue`, `cell_type` and `CD` appears as one row. This structure makes the dataset suitable for analysis and visualization.
 
 ```{r}
 #| label: create_table1_4
 
-data_clean |>
+data_aug |>
   mutate(tissue = factor(tissue,
                          levels = c("thymus", "tonsil", "blood"),
                          labels = c("Thymus", "Tonsil", "Blood"))) |>
@@ -55,3 +55,14 @@ data_clean |>
 The dataset contains measurements from three tissue types: blood (N = 18,463), thymus (N = 4,482), and tonsil (N = 5,453). This distribution shows that the majority of observations originate from blood, while there are fewer measurements from thymus and tonsil.
 
 If you look at the cell types, they are distributed very differently between the tissues. Blood is dominated by mature B and T cell subtypes, thymus by early T cell development stages, while tonsils primarily contain B cell maturation stages and plasma cells.
+
+## Quantifying data set diversity
+
+```{r}
+
+data_aug |>   
+  summarise(n_CDs = n_distinct(CD),   
+            n_celltypes = n_distinct(cell_type))
+```
+
+In this step, two summary variables are created to describe the structure of the data set. Using the `summarise()` function, we count the number of unique CD markers and cell types present in the data. The result shows that the data set includes 115 different CD markers and 38 distinct cell types, which highlights the biological diversity captured across tissues. This information provides a quick overview of how broad the data set is and confirms that it contains enough variation to study immune cell development and activation patterns.

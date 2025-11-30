@@ -10,6 +10,19 @@ editor_options:
 
 ## Introduction
 
+```{r}
+#| include: false
+
+library("tidyverse")
+
+data_aug <- read_csv(here::here("data/data_aug.csv"))
+
+summary <- data_aug |>   
+  summarise(n_CDs = n_distinct(CD),   
+            n_celltypes = n_distinct(cell_type))
+
+```
+
 ::::: columns
 ::: {.column width="50%" style="font-size:50%"}
 -   CD molecules are membrane proteins with diverse functions and distributions across immune cell types.
@@ -36,21 +49,19 @@ editor_options:
 
 -   Can be downloaded from their shiny app: <http://bioinformin.cesnet.cz/CDmaps/>
 
-![](images/Method.png)
+-   The data set contains:
+
+    -   `r nrow(data_aug)` observations of `r ncol(data_aug)` variables
+
+    -   `r summary |> pluck("n_CDs")` unique CDs and `r summary |> pluck("n_celltypes")` unique cell types
+
+![](images/Method.png){width="602"}
 :::
 
 ::: {.column width="50%" style="font-size:50%"}
 ![](images/hierarchy.png){width="462"}
 
 **Sample of data_aug:**
-
-```{r}
-#| include: false
-
-library("tidyverse")
-
-data_aug <- read_csv(here::here("data/data_aug.csv"))
-```
 
 ```{r}
 
