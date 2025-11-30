@@ -71,15 +71,7 @@ data_analysis5  <- data_aug |>
          .before = cell_type) |>
   group_by(tissue, CD, pair) |>
   filter(n() > n_distinct(cell_type)) |>
-  nest() |>
-  mutate(model_object = map(.x = data,
-                   .f = ~lm(formula = log(MedQb) ~ cell_type,
-                            data = .x))) |>
-  mutate(model_object_tidy = map(.x = model_object,
-                                 .f = ~tidy(.x, 
-                                           conf.int = TRUE,
-                                           conf.level = 0.95))) |>
-  unnest(model_object_tidy) |>
+  fit_linear_model(log(MedQb) ~ cell_type)|>
   mutate(is_significant = case_when(term == "(Intercept)" ~ "reference",
                                     p.value < 0.05 ~ "yes",
                                     p.value >= 0.05 ~ "no"),
@@ -120,17 +112,8 @@ Below are the number of significant CDs for each pair calculated and visualized.
 ```{r}
 #| label: count_sig_CDs_9
 
-sig_CD_count <- data_analysis5 |>
-  group_by(pair) |>
-  summarise(count_CD = n_distinct(CD)) |>
-  mutate(pair = fct_rev(fct_reorder(pair, count_CD))) |>
-  ggplot(aes(x = pair,
-             y = count_CD)) +
-  geom_col(fill = "hotpink") + 
-  theme_bw(base_size = 13) +
-  labs(subtitle = "Count of significant CDs for each pair",
-       x = "Pair",
-       y = "Count")
+sig_CD_count <- plot_sig_CDs(data_analysis5, pair, "hotpink")
+
 
 sig_CD_count
 ```
