@@ -76,7 +76,12 @@ data_aug |>
 
 ::::: columns
 ::: {.column width="50%"}
--   Skriv tekst her
+-   MedQb: three clusters
+    -   Thymocytes cluster with T-cells from blood
+    -   B-cells form a tonsil cluster and a blood cluster
+-   PEpos
+    -   We get 4 distinct clusters
+    -   B-cells seperates in PC2, but very similar in PC1
 :::
 
 ::: {.column width="50%"}
