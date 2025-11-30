@@ -54,7 +54,7 @@ data_PEpos <- PCA_aug |>
          starts_with("PEpos"))
 ```
 
-After all numeric cells were populated the function `prcomp` was used to make the the PCA.
+After all numeric cells were populated the function `prcomp` was used to make the the PCA..
 
 ```{r}
 #| label: create_PCA_fit_5
