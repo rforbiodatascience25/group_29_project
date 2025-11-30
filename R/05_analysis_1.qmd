@@ -37,7 +37,7 @@ PCA_aug <- read_csv(file = here::here("data/PCA_aug.csv"))
 
 ## Make the PCA fit
 
-After all numeric cells were populated the function `prcomp` was used to make the the PCA.
+The data is split into two data sets, one for MedQb and for PEpos, so we can make a PCA for each.
 
 ```{r}
 
@@ -53,6 +53,8 @@ data_PEpos <- PCA_aug |>
          lineage, 
          starts_with("PEpos"))
 ```
+
+After all numeric cells were populated the function `prcomp` was used to make the the PCA.
 
 ```{r}
 #| label: create_PCA_fit_5
@@ -88,9 +90,9 @@ scatter_plot_PEpos <- PCA_fit_PEpos |>
 scatter_plot_PEpos
 ```
 
-As we can see on the plot we have some nice clustering. We see all the cells from thymus clustered nicely and tonsil cells are also somewhat clustered. In the blood we see two different clusters, with one containing all blood B cells except for one, and the other one containing the rest of the cell lineages. We can also see that the B cell lineage from blood and thymus didn't vary much in PC1 but PC2 set them apart.
-
 ## Rotation matrices
+
+These were made but ultimately it was a dead end.
 
 **MedQb - all variables:**
 
