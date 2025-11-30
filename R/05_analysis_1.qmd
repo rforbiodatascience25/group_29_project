@@ -1,146 +1,174 @@
 ---
-title: "Analysis 1"
-format: html
+title: "05_PCA"
+format:
+  html:
+    embed-resources: true
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
+execute: 
+  warning: false
+  message: false
 ---
 
-# Loading packages
+## Loading packages
 
 ```{r}
+#| label: load_packages_5
 
 library("tidyverse")
+library("broom")
+library("ggrepel")
+library("patchwork")
 
-source(file = "R/99_proj_func.R")
+source(file = here::here("R/99_proj_func.R"))
 ```
 
-# Loading data files
+## Loading data files
 
 ```{r}
+#| label: load_data_5
 
-data_clean <- read_csv(file = "data/data_clean.csv")
+PCA_aug <- read_csv(file = here::here("data/PCA_aug.csv"))
 
 ```
 
-# Plotting the data
+## Make the PCA fit
+
+After all numeric cells were populated the function `prcomp` was used to make the the PCA.
 
 ```{r}
+#| label: create_PCA_fit_5
 
-data_clean |>
-  filter(tissue == "blood") |>
-  ggplot(aes(x = PEpos,
-             y = MedQb,
+PCA_fit <- PCA_aug |> 
+  select(where(is.numeric)) |>
+  prcomp(scale = TRUE)
+
+```
+
+## Make the plot
+
+On the plot we have PC1 on the x-axis and PC2 on the y-axis. Usually most variation can be captured with the first two principal components. The points are stratified using tissue type (blood, tonsil, thymus) as the shapes and cell lineage as the color.
+
+```{r}
+#| label: create_scatterplot_5
+
+scatter_plot <- PCA_fit |> 
+  augment(data = PCA_aug) |>
+  ggplot(aes(.fittedPC1, 
+             .fittedPC2,
+             shape = tissue,
              color = lineage)) +
-  geom_point() +
-  scale_x_log10() +
-  scale_y_log10() 
-
+  geom_point(size = 3,
+             alpha = 0.8) +
+  labs(title = "PCA plot stratified on tissue and lineage",
+       x = "PC1",
+       y = "PC2",
+       color = "Lineage") +
+  scale_color_brewer(palette = "Set1") +
+  theme_bw(base_size = 13) +
+    theme(legend.key.size = unit(0.4, "lines"),
+          legend.text = element_text(size = 7),
+          legend.spacing.y = unit(0.1, "lines"),
+          legend.spacing.x = unit(0.2, "lines"))
+ 
+scatter_plot
 ```
+
+As we can see on the plot we have some nice clustering. We see all the cells from thymus clustered nicely and tonsil cells are also somewhat clustered. In the blood we see two different clusters, with one containing all blood B cells except for one, and the other one containing the rest of the cell lineages. We can also see that the B cell lineage from blood and thymus didn't vary much in PC1 but PC2 set them apart.
+
+## Rotation matrices
+
+**Rotation matrix - all variables:**
 
 ```{r}
+#| label: create_rotplot1_5
 
-data_clean |>
-  cell_type_order() |>
-  filter(lineage %in% c("CD8 T cells", "T cells"),
-         hierarchy_level == 4,
-         CD %in% c("CD10","CD1a"))|>
-  ggplot(aes(x = cell_type,
-             y = MedQb,
-             fill = tissue)) +
-  geom_boxplot() +
-  scale_y_log10() +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  facet_wrap(~ CD, ncol = 1)
+PCA_fit |> 
+  PCA_rotation(prefix = ".*",
+               amount = Inf,
+               xlimits = c(-0.15, 0.15),
+               ylimits = c(-0.15, 0.15),
+               subtitle   = "Rotation matrix for all variables")
 
 ```
+
+As the plot of the rotation matrix is very cluttered, the variables are separated into `MedQb` and `PRpos`.
+
+**MedQb - all variables:**
 
 ```{r}
+#| label: create_rotplot2_5
 
-data_clean |>
-  cell_type_order() |>
-  filter(lineage == "B cells",
-         hierarchy_level == 3,
-         CD %in% c("CD27","CD95"))|>
-  ggplot(aes(x = cell_type,
-             y = MedQb,
-             fill = tissue)) +
-  geom_boxplot() +
-  scale_y_log10() +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  facet_wrap(~ CD, ncol = 1)
+PCA_fit |> 
+  PCA_rotation(prefix = "MedQb_",
+               amount = Inf,
+               xlimits = c(-0.15, 0.15),
+               ylimits = c(-0.15, 0.15),
+               subtitle   = "Rotation matrix for all MedQb variables")
+
 ```
+
+**MedQb - top 10 variables:**
 
 ```{r}
+#| label: create_rotplot3_5
 
-data_clean |>
-  cell_type_order() |>
-  filter(lineage == "B cells",
-         hierarchy_level == 3,
-         tissue == "blood") |>
-  drop_na(MedQb) |>
-  group_by(CD) |>
-  mutate(MedQb_grp = median(MedQb)) |>
-  ungroup() |>
-  ggplot(aes(x = fct_reorder(CD, MedQb_grp),
-             y = MedQb,
-             fill = log10(MedQb_grp))) +
-  geom_boxplot() +
-  scale_y_log10(labels = trans_format("log10", 
-                                      math_format(10^.x))) +
-  scale_fill_gradient2(low = "lightblue", 
-                        mid = "orange", 
-                        high = "darkred", 
-                        midpoint = 3) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, 
-                                   vjust = 0.5, 
-                                   hjust = 1)) +
-  labs(x = "CD",
-       y = "Flourescence [Median ABC]",
-       fill = "log10(Median ABC)",
-       title = paste("Fluorescence of", lineage, "in", tissue))
+MedQb_top10 <- PCA_fit |>
+  PCA_rotation(prefix = "MedQb_",
+               amount = 10,
+               xlimits = c(-0.15, 0.15),
+               ylimits = c(-0.15, 0.15),
+               subtitle   = "MedQb")
 
-data_clean |>
-  asc_CDs_boxplot(lineage = "B cells",
-                  hierarchy_level = 4,
-                  tissue = "blood",
-                  measure = MedQb)
+MedQb_top10
 ```
 
-# Maybe to be deleted
+**PEpos - all variables:**
 
-```{r}  data_aug |>   filter(tissue == "blood",          lineage == "B cells",          !is.na(CVQb),          !is.na(MedQb)) |>   summarise(cor = cor(log(CVQb), log(MedQb)))}
+```{r}
+#| label: create_rotplot4_5
+
+PCA_fit |>
+  PCA_rotation(prefix = "PEpos_",
+               amount = Inf,
+               xlimits = c(-0.15, 0.15),
+               ylimits = c(-0.15, 0.15),
+               subtitle = "Rotation matrix for all PEpos variables")
+
 ```
 
-In boxplots for B cells in blood exhibit a more uniform and stable fluorescence pattern, which is also expected since blood primarily contains mature and less varied B cell populations.
+**PEpos - top 10 variables:**
 
-```{r} #| label: B_cells_tonsil #| message: false #| warning: false #| fig-height: 10 #| fig-width: 9  p1 <- data_aug |>   asc_CDs_boxplot(lineage = "B cells",                   hierarchy_level = 3,                   tissue = "tonsil",                   measure = MedQb)  p2 <- data_aug |>   asc_CDs_boxplot(lineage = "B cells",                   hierarchy_level = 3,                   tissue = "tonsil",                   measure = CVQb)  data_aug |>   filter(lineage == "B cells",          tissue == "tonsil") |>   ggplot(aes(x = log(CVQb),              y = log(MedQb))) +   geom_point(color = "hotpink",              alpha = 0.5) +   geom_smooth(method = "lm",               color = "navy",               se = FALSE) +   theme_bw()  p1 / p2 / p3}
+```{r}
+#| label: create_rotplot5_5
+
+PEpos_top10 <- PCA_fit |>
+  PCA_rotation(prefix = "PEpos_",
+               amount = 10,
+               xlimits = c(-0.15, 0.15),
+               ylimits = c(-0.15, 0.15),
+               subtitle = "PEpos")
+
+PEpos_top10
 ```
 
-```{r} data_aug |>   filter(tissue == "tonsil",          lineage == "B cells",          !is.na(CVQb),          !is.na(MedQb)) |>   summarise(cor = cor(log(CVQb), log(MedQb)))}
-```
+## Plot export
 
-Boxplots for B cells from the tonsil show both high and varying levels of fluorescence. This biologically makes sense as the tonsil contains many different maturation stages of B cells, which can be seen specifically in the plots as increased variation in MedQb and CVQb.
+```{r}
+#| label: export_plots_5
 
-# Flourescence of T cells
+MedQb_top10 <- MedQb_top10 +
+    labs(title = "Rotation matrix for top 10 longest vectors")
+  
+rota_plot <- (MedQb_top10 + PEpos_top10)
 
-```{r} #| label: CD4_T_cells #| message: false #| warning: false #| fig-height: 12 #| fig-width: 9  p1 <- data_aug |>   asc_CDs_boxplot(lineage = "CD4 T cells",                   hierarchy_level = 4,                   tissue = "blood",                   measure = MedQb)  p2 <- data_aug |>   asc_CDs_boxplot(lineage = "CD4 T cells",                   hierarchy_level = 4,                   tissue = "blood",                   measure = CVQb) p3 <-data_clean |>   filter(lineage == "CD4 T cells",          tissue == "blood") |>   ggplot(aes(x = CVQb,              y = MedQb)) +   geom_point(color = "hotpink",              alpha = 0.5) +   scale_x_log10() +   scale_y_log10()  p1 / p2 / p3}
-```
+final_plot <- scatter_plot / rota_plot
 
-CD4 T cells in the blood are predominantly mature, and therefore their fluorescence levels are close. They express a stable set of CD markers, which is reflected in predominantly high MedQb values ​​and low variation in CVQb. This is because the blood primarily contains mature, naive or memory CD4 cells.
-
-```{r} #| label: CD8_T_cells #| message: false #| warning: false #| fig-height: 10 #| fig-width: 9  p1 <- data_aug |>   asc_CDs_boxplot(lineage = "CD8 T cells",                   hierarchy_level = 4,                   tissue  = "blood",                   measure = MedQb)  p2 <- data_aug |>   asc_CDs_boxplot(lineage = "CD8 T cells",                   hierarchy_level = 4,                   tissue = "blood",                   measure = CVQb)  p3 <-data_clean |>   filter(lineage == "CD8 T cells",          tissue == "blood") |>   ggplot(aes(x = CVQb,              y = MedQb)) +   geom_point(color = "hotpink",              alpha = 0.5) +   scale_x_log10() +   scale_y_log10()  p1 / p2 / p3}
-```
-
-CD4 T cells show relatively homogeneous fluorescence with stable signal levels. However, a low level of variation is seen, consistent with the fact that CD4 cells in blood are typically mature and functionally show a more stable signal.
-
-```{r} #| label: Thymocytes #| message: false #| warning: false #| fig-height: 10 #| fig-width: 9  p1 <- data_aug |>   asc_CDs_boxplot(lineage = "thymocytes",                   hierarchy_level = 4,                   tissue = "thymus",                   measure = MedQb)  p2 <- data_aug |>   asc_CDs_boxplot(lineage = "thymocytes",                   hierarchy_level = 4,                   tissue = "thymus",                   measure = CVQb) p3 <-data_clean |>   filter(lineage == "thymocytes",          tissue == "thymus") |>   ggplot(aes(x = CVQb,              y = MedQb)) +   geom_point(color = "hotpink",              alpha = 0.5) +   scale_x_log10() +   scale_y_log10()  p1 / p2 / p3}
-```
-
-Thymocytes show more variable fluorescence signals across markers, which fits well with the biological heterogeneity in the thymus, where T cells are in many different stages of development.
-
-```{r}     pivot_wider(id_cols = c("tissue", "lineage"),               names_from = term,               values_from = c("estimate", "conf.low", "conf.high")) |>   rename(intercept = "estimate_intercept",          slope = "estimate_slope",          low_intercept = "conf.low_intercept",          low_slope = "conf.low_slope",          high_intercept = "conf.high_intercept",          high_slope = "conf.high_slope")    data_analysis3 <- data_aug |>   filter(lineage != "T cells",          !hierarchy_level %in% c(1, 2)) |>   left_join(y = data_lm,             by = c("tissue","lineage"),             relationship = "many-to-one") |>   mutate(pred = intercept + slope * log(CVQb),          pred_low = low_intercept + low_slope * log(CVQb),          pred_high = high_intercept + high_slope * log(CVQb))  data_analysis3 |>   filter(lineage == "B cells",          tissue == "blood") |>   ggplot(aes(x = log(CVQb),              y = log(MedQb))) +   geom_point(color = "grey",              alpha = 0.5) +   geom_line(aes(x = log(CVQb),                 y = pred),             color = "hotpink") +   geom_line(aes(x = log(CVQb),                 y = pred_low),             color = "navy") +   geom_line(aes(x = log(CVQb),                 y = pred_high),             color = "navy") +   theme_bw()}
+save_plot(plot = final_plot,
+          filename = "05_key_plot.png",
+          width = 8,
+          height = 9)
 ```

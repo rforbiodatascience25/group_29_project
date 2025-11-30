@@ -1,39 +1,48 @@
 ---
 title: "Analysis 4"
-format: html
+format:
+  html:
+    embed-resources: true
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
+execute: 
+  warning: false
+  message: false
 ---
 
-# Loading packages
+## Loading packages
 
 ```{r}
+#| label: load_packages_8
 
 library("tidyverse")
 library("broom")
+library("patchwork")
 
-source(file = "R/99_proj_func.R")
+source(here::here(file = "R/99_proj_func.R"))
 ```
 
-# Loading data files
+## Loading data files
 
 ```{r}
+#| label: load_data_8
 
-data_aug <- read_csv(file = "data/data_aug.csv")
+data_aug <- read_csv(here::here(file = "data/data_aug.csv"))
 ```
 
-# Maturation of immune cells
+## Maturation of immune cells
 
-This analysis explores how immune cells mature in different tissues (blood, tonsil, and thymus) using the dataset (data_aug). The idea is to see how the expression of several cell markers (CDs) changes depending on the type of cell and where it comes from. Instead of just looking at raw values, models and graphs are used to make it easier to compare how these markers behave in different conditions.
+This analysis explores how immune cells mature in different tissues (blood, tonsil, and thymus). The code groups and analyzes the data to investigate how the expression of several CDs changes depending on the type of cell and where it comes from.
 
-The data come from flow cytometry and include information about each cell’s type, lineage, and tissue of origin. The code groups and analyzes the data to find patterns that might show differences in how cells develop or activate. It’s basically a way to summarize how certain cell markers vary across different stages of immune cell maturation.
+To study these differences in a structured way, a linear model is applied to the log-transformed median fluorescence values (`log(MedQb)`). This model estimates how marker expression changes across cell types while accounting for variability between tissues and lineages. In this model, the naive cell population acts as the reference group, meaning that all other cell types are compared to it. This allows us to see how marker expression increases or decreases relative to naive cells as they progress through maturation or activation stages.
 
-To study these differences in a structured way, a linear model is applied to the log-transformed median fluorescence values (log(MedQb)). This model helps estimate how marker expression changes across cell types while accounting for variability between tissues and lineages. In this model, the naive cell population acts as the reference group, meaning that all other cell types are compared to it. This allows us to see how marker expression increases or decreases relative to naive (immature) cells as they progress through maturation or activation stages.
-
-Each model produces an estimate of the average expression for each cell type and its corresponding confidence interval. Positive estimates indicate higher expression compared to naive cells, while negative ones show lower expression. These comparisons reveal how specific CD markers evolve during the immune cell development process, showing, for example, which markers become more prominent as cells activate or differentiate.
+The data is first filtered based on `hierarchy` and `cell_type` as only the most specific cell subsets should be included in the analysis. Then the data is grouped and the data is filtered to ensure that there are more than one observation per `cell_type` in each group. Then the linear model applied. Each model produces an estimate of the average expression for each `cell_type` and its corresponding confidence interval. Lastly, the full estimates are calculated by retrieving and adding the `intercept` for each group. As the variable `cell_type` is lost during the transformation, it is recreated by using the variable `term`.
 
 ```{r}
+#| label: apply_lm_8
 
 columns <- c("CD", 
              "tissue",
@@ -48,11 +57,12 @@ columns <- c("CD",
 
 data_analysis4 <- data_aug |>
   cell_type_order() |>
-  filter(hierarchy_level %in% c(3, 4),
+  filter(hierarchy %in% c(3, 4),
          !cell_type %in% c("Tgd", "TCD4", "TCD8")) |>
-  select(-c("CVQb", "count", "PEpos")) |>
+  select(-c("CVQb", "PEpos")) |>
   drop_na(MedQb) |>
   group_by(tissue, CD, lineage) |>
+  filter(n() > n_distinct(cell_type)) |>
   nest() |>
   mutate(model_object = map(.x = data,
                    .f = ~lm(formula = log(MedQb) ~ cell_type,
@@ -85,8 +95,45 @@ data_analysis4 <- data_aug |>
       term == "(Intercept)" & lineage == "CD8 T cells" ~ "TCD8naive",
       term == "(Intercept)" & tissue == "thymus"  ~ "DN34p",
     .default = str_remove(term, "cell_type"))) |>
-  select(columns) |>
+  select(all_of(columns)) |>
   ungroup()
+```
+
+## Significant CDs
+
+This section shows how many CD markers were significant (p \< 0.05) in each lineage.
+
+```{r}
+#| label: count_sig_CDs_8
+
+cds_significant <- data_analysis4 |>
+  filter(is_significant == "yes") |>      
+  group_by(lineage) |>                    
+  summarise(n_significant_CDs = n_distinct(CD)) |>
+  arrange(desc(n_significant_CDs))        
+
+cds_significant
+```
+
+A column plot of the count of significant CDs for each lineage is created below.
+
+```{r}
+#| label: plot_sig_CDs_8
+
+sig_CD_count <- data_analysis4 |>
+  group_by(lineage) |>
+  filter(is_significant == "yes") |>
+  summarise(count_CD = n_distinct(CD)) |>
+  mutate(lineage = fct_rev(fct_reorder(lineage, count_CD))) |>
+  ggplot(aes(x = lineage,
+             y = count_CD)) +
+  geom_col(fill = "#fa2840") + 
+  theme_bw(base_size = 13) +
+  labs(subtitle = "Count of significant CDs per lineage",
+       x = "Lineage",
+       y = "Count")
+
+sig_CD_count
 ```
 
 The results are then combined into a single table called data_analysis4, which serves as the base for visualization and further interpretation. The function plot_cd_expression() is used to visualize these model results, plotting the estimated expression levels and their confidence intervals for each CD marker across tissues and cell types. The color indicates statistical significance, and the point shape represents the tissue of origin, allowing clear visual comparison between blood, tonsil, and thymus.
@@ -96,16 +143,16 @@ For the B cells, the analysis focuses on markers like CD11a, CD69, CD79b, and CD
 ## B cells
 
 ```{r}
+#| label: B_cells_8
+
 cds_interest_b <- c("CD11a", "CD69", "CD79b", "CD80")
 
-p_b <- plot_cd_expression(
-  data = data_analysis4,
-  lineage_filter = "B cells",
-  cds = cds_interest_b,
-  title = "Expression of Selected B-cell Markers"
-)
+p1 <- data_analysis4 |>
+  plot_cd_expression(lineage_filter = "B cells",
+                     cds = cds_interest_b,
+                     title = "Significant CDs during B cell maturation")
 
-save_plot(p_b, "08_key_plot_1.png")
+p1
 ```
 
 **B cell markers:** CD11a (cell adhesion), CD69 (early activation), CD79b (B cell receptor signaling), CD80 (co-stimulation).
@@ -113,35 +160,44 @@ save_plot(p_b, "08_key_plot_1.png")
 ## T cells
 
 ```{r}
+#| label: CD4_T_cells_8
+
 cds_interest_cd4 <- c("CD10", "CD25", "CD4_MEM-241", "CD62L")
 
-p_cd4 <- plot_cd_expression(
-  data = data_analysis4,
-  lineage_filter = c("thymocytes", "CD4 T cells"),
-  cds = cds_interest_cd4,
-  cell_type_exclude = "CD8",
-  title = "Expression of Selected CD4 T Cell and Thymocyte Markers"
-)
-
-save_plot(p_cd4, "08_key_plot_2.png")
+data_analysis4 |>
+  plot_cd_expression(lineage_filter = c("Thymocytes", "CD4 T cells"),
+                     cds = cds_interest_cd4,
+                     cell_type_exclude = "CD8",
+                     title = "Significant CDs during CD8 T cell maturation")
 ```
 
 **CD4 T cell markers:** CD10 (early maturation), CD25 (activation), CD4_MEM-241 (memory), CD62L (migration).
 
 ```{r}
+#| label: CD8_T_cells_8
+
 cds_interest_cd8 <- c("CD27", "CD38", "CD71", "CD95")
 
-p_cd8 <- plot_cd_expression(
-  data = data_analysis4,
-  lineage_filter = c("thymocytes", "CD8 T cells"),
-  cds = cds_interest_cd8,
-  cell_type_exclude = "CD4",
-  title = "Expression of Selected CD8 T Cell and Thymocyte Markers"
-)
-
-save_plot(p_cd8, "08_key_plot_3.png")
+data_analysis4 |>
+  plot_cd_expression(lineage_filter = c("Thymocytes", "CD8 T cells"),
+                     cds = cds_interest_cd8,
+                     cell_type_exclude = "CD4",
+                     title = "Significant CDs during CD8 T cell maturation")
 ```
 
 **CD8 T cell markers:** CD27 (memory), CD38 (activation), CD71 (proliferation), CD95 (apoptosis).
 
 Overall, the goal is to get a clearer picture of how immune cells change as they mature, how their protein expression shifts depending on the tissue, and how these differences relate to the naive reference cells. The comparison against naive populations makes it easier to see which markers increase or decrease as cells become more mature or activated. Using linear modeling together with visualization provides a clear and intuitive way to interpret these changes, helping to understand the development and activation of B and T cells across different tissues.
+
+## Export plots
+
+```{r}
+#| label: export_plots_8
+
+final_plot <- sig_CD_count / p1
+
+save_plot(plot = final_plot, 
+          filename = "08_key_plot.png",
+          width = 7,
+          height = 8.5)
+```

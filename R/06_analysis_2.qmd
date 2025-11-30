@@ -1,87 +1,98 @@
 ---
 title: "Analysis 2"
-format: html
+format:
+  html:
+    embed-resources: true
+project:
+  output-dir: results
 editor: visual
 editor_options: 
   chunk_output_type: console
+execute: 
+  warning: false
+  message: false
 ---
 
-# Loading libraries
+## Loading packages
 
 ```{r}
+#| label: load_packages_6
 
 library("tidyverse")
 
-source(file = "R/99_proj_func.R")
+source(file = here::here("R/99_proj_func.R"))
 ```
 
-# Loading data files
+## Loading data files
 
 ```{r}
+#| label: load_data_6
 
-data_aug <- read_csv(file = "data/data_aug.csv")
-
+data_aug <- read_csv(file = here::here("data/data_aug.csv"))
 ```
 
-# Creating auxiliary data frame
+## Creating auxiliary data frame
 
 The **aim** of this visualization is to have a summarized, comprehensive view of all CD markers used in our data set. From it, the user can extract preliminary insight about constitutive, cohort- and tissue-associated markers, which will be further expanded in following analyses.
 
-A pre-processing step is taken to generate an auxiliary data frame for plotting an upper horizontal bar for identifying cell types by tissue, named **tube_bar**. This keeps only one distinct cell type entry per tissue, which is needed for non-redundant marker classification.
+A dummy variable `tube_bar` (with the value `"TubeBar"`) is added to enable plotting a horizontal bar above the plot for identifying `cell_type` by `tissue`.
 
 ```{r}
+#| label: create_tubebar_6
 
-tube_bar <- data_aug |>
-  distinct(cell_type, 
-           tissue) |>
-  mutate(y = "TubeBar")  
-
+data_aug <- data_aug |>
+  mutate(tube_bar = "TubeBar")  
 ```
 
 ## Making the heat dot plot
 
-The plot shown below is generated using dplyr's **ggplot2**. Our data set, data_aug was slightly modified for the analysis; new columns with labels for CD number and tissue were added to allow for correct alphabetical display of CD markers using the custom function **CD_order()**. Additionally, tube_bar is plotted over the upper x-axis. Discrete intervals for dot size are displayed in the legend for a comprehensive view of the plot, as well as a color gradient bar for fluorescence.
+The plot shown below is generated using dplyr's **ggplot2**; as the same plot will be used many times, albeit with slight alterations, a function called `heat_dot_plot()` has been created separately and placed in `R/99_proj_func.R`. Our data set, `data_aug` was slightly modified for the analysis; new columns with labels for CD number and tissue were added to allow for correct alphabetical display of CD markers using the custom function `CD_order()`. Additionally, `tube_bar` is plotted over the upper x-axis. Discrete intervals for dot size are displayed in the legend for a comprehensive view of the plot, as well as a color gradient bar for fluorescence.
 
 ```{r}
-#| fig-height: 15
+#| label: create_plot1_6
 #| fig-width: 8
+#| fig-height: 20
 
 data_aug |>
-  CD_order(reverse = TRUE) |>
-  ggplot(aes(x = cell_type, 
-             y = CD)) +
-  geom_point(aes(size = PEpos, 
-                 color = log10(MedQb))) +
-  geom_tile(data = tube_bar, 
-            aes(x = cell_type, 
-                y = y, 
-                fill = tissue), 
-            height = 0.5) +
-  scale_size_continuous(breaks = c(5, 20, 60, 100), 
-                        range = c(1, 6)) +
-  scale_color_gradientn(colors = c("lightblue", "orange", "darkred"), 
-                        values = scales::rescale(c(2, 3, 4, 5))) +
-  scale_fill_manual(values = c("blood" = "#93aa9b", 
-                               "tonsil" = "#c8b145", 
-                               "thymus" = "#bb6e36")) +
-  scale_x_discrete(position = "top") +
-  coord_cartesian(clip = "off") +
-  theme_minimal(base_size = 8) +
-  theme(axis.text.x = element_text(angle = 90, 
-                                   vjust = 0.5, 
-                                   hjust = 0, 
-                                   size = 6),
-        axis.text.y = element_text(size = 7),
-        axis.title = element_text(size = 8), 
-        legend.position = "right",
-        plot.margin = margin(5, 5, 5, 5),
-        panel.grid = element_blank()) +
-  labs(x = "Cell Type",
-       y = "Marker",
-       size = "Frequency of Positive Cells (%)",
-       color = "Fluorescence [log10(Median ABC)]")
-
-ggsave("analysis2_plot.jpg", last_plot(), path = "data", width = 5000, height = 7000, units = "px", create.dir = FALSE)
+  drop_na(MedQb, PEpos) |>
+  cell_type_order() |>
+  heat_dot_plot()
 ```
 
 This is a heat-dot plot that shows the relative fluorescence of every surface marker from CD1a to C100. For every cell type analysed, the size of the dot is proportional to the percentage of cells marked, while the color portrays the amount of fluorescence, represented as the log10 of the antibody binding capability (ABC). The cell types are also segmented by tissue (blood, tonsil and thymus).
+
+As the plot figure is too large for the presentation, subsets of `data_aug` will be used for showing data points of interest.
+
+```{r}
+#| label: create_plot2_6
+#| fig-width: 8
+#| fig-height: 10
+
+CDs <- c(1,2,3,4,5,6,7,8,9,10, 15, 16, 17, 18, 19, 45, 74, 81, 96, 99)
+
+data_aug |>
+  mutate(CD_num = parse_number(CD)) |>
+  filter(CD_num <= 50) |>
+  drop_na(MedQb, PEpos) |>
+  cell_type_order() |>
+  heat_dot_plot()
+  
+  
+final_plot <- data_aug |>
+  mutate(CD_num = parse_number(CD)) |>
+  filter(CD_num %in% CDs) |>
+  drop_na(MedQb, PEpos) |>
+  cell_type_order() |>
+  heat_dot_plot()
+```
+
+## Export plots
+
+```{r}
+#| label: export_plots_6
+
+save_plot(plot = final_plot,
+          filename = "06_key_plot.png",
+          width = 17,
+          height = 8)
+```

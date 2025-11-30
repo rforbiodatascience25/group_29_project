@@ -3,15 +3,20 @@ title: "Analysis 3"
 format:
   html:
     embed-resources: true
+project:
+  output-dir: results
 editor: visual
+editor_options: 
+  chunk_output_type: console
+execute: 
+  warning: false
+  message: false
 ---
 
-# Loading packages
+## Loading packages
 
 ```{r}
-#| label: load_packages
-#| message: false
-#| warning: false
+#| label: load_packages_7
 
 library("tidyverse")
 library("scales")
@@ -22,47 +27,43 @@ library("rlang")
 source(here::here("R", "99_proj_func.R"))
 ```
 
-# Loading data files
+## Loading data files
 
 ```{r}
-#| label: load_data
-#| message: false
-#| warning: false
+#| label: load_data_7
 
 data_aug <- read_csv(here::here("data", "data_aug.csv"))
 
 ```
 
-# Analysis of Fluorescence Variation Across Immune Cell Types and Tissues
+## Correlation of MedQb to CVQb and PEpos
 
-The purpose of these plots is to examine and compare the fluorescence signals across key immune cell types and tissues. By displaying both the median fluorescence (MedQb) and the coefficient of variation (CVQb) for the selected cells, we can see both the signal strength and signal stability for the different CD markers.
+The purpose of these plots is to examine and compare the fluorescence signals across key immune cell types and tissues.
 
-We use the four cell types B cells from tonsil and blood, CD4 and CD8 T cells from blood, and thymocytes from the thymus for biologically different environments in the immune system. By visualizing, we can see how fluorescence levels vary between mature and immature cells, how signal variation depends on tissue type whether the expression of CD markers is stable or heterogeneous within a given location and which cell types show the most or least variation in the CD marker profiles.
+### Flourescence of B cells in blood
 
-# Flourescence of B cells
+Firstly, boxplots of `MedQb`, `CVQb` and `PEpos` based on `CD` are created in ascending order of `MedQb` for `B cells` in the `blood`.
 
 ```{r}
-#| label: B_cells_blood
-#| message: false
-#| warning: false
+#| label: B_cells_blood_7
 #| fig-height: 10
 #| fig-width: 9
 
 p1 <- data_aug |>
   asc_CDs_boxplot(lineage = "B cells",
-                  hierarchy_level = 3,
+                  hierarchy = 3,
                   tissue = "blood",
                   measure = MedQb)
 
 p2 <- data_aug |>
   asc_CDs_boxplot(lineage = "B cells",
-                  hierarchy_level = 3,
+                  hierarchy = 3,
                   tissue = "blood",
                   measure = CVQb)
 
 p3 <- data_aug |>
     asc_CDs_boxplot(lineage = "B cells",
-                  hierarchy_level = 3,
+                  hierarchy = 3,
                   tissue = "blood",
                   measure = PEpos)
 
@@ -71,11 +72,12 @@ p1 / p2 / p3
 
 From the plots, it looks like that there might be a correlation between the three variables. When the `MedQb` increases, the `CVQb` seems to decrease. For `PEpos` the correlation does not seem as strong, but it may increase, when `MedQb` increases.
 
-# Applying a linear model
+## Applying a linear model
 
-In the next part, this is assessed by creating a linear model of the two variables, `CVQb` and `PEpos`, against `MedQb`. Additionally, the correlation coefficients are calculated.
+In the next part, the two correlations are assessed by creating a linear model of the two variables, `CVQb` and `PEpos`, against `MedQb`. Additionally, the correlation coefficients are calculated. The logarithmic values are used.
 
 ```{r}
+#| label: apply_lm_7
 
 columns <- c("tissue",
              "lineage",
@@ -86,7 +88,7 @@ columns <- c("tissue",
 
 data_lm <- data_aug |>
   filter(lineage != "T cells",
-         !hierarchy_level %in% c(1, 2)) |>
+         !hierarchy %in% c(1, 2)) |>
   group_by(tissue, lineage) |>
   nest() |>
   mutate(model_object_CVQb = map(.x = data,
@@ -131,18 +133,17 @@ data_lm <- data_aug |>
 The correlation coefficient is now calculated and the two data frames are joined.
 
 ```{r}
+#| label: paramers_7
 
 data_params <- data_aug |>
   filter(!is.na(MedQb), 
          !is.na(CVQb), 
          !is.na(PEpos),
          lineage != "T cells",
-         !hierarchy_level %in% c(1, 2)) |>
+         !hierarchy %in% c(1, 2)) |>
   group_by(tissue, lineage) |>
-  summarise(CVQb_cor = cor(log(CVQb), 
-                           log(MedQb)),
-            PEpos_cor = cor(log(PEpos), 
-                            log(MedQb))) |>
+  summarise(CVQb_cor = cor(log(CVQb), log(MedQb)),
+            PEpos_cor = cor(log(PEpos), log(MedQb))) |>
   left_join(y = data_lm,
             by = c("tissue", "lineage"),
             relationship = "one-to-one")
@@ -151,6 +152,8 @@ data_params <- data_aug |>
 In the last part, scatter plots with the linear model are created.
 
 ```{r}
+#| label: plots_7
+#| fig-height: 15
 
 p1 <- data_aug |>
   plot_scatter(params = data_params,
@@ -212,18 +215,32 @@ p8 <- data_aug |>
 p9 <- data_aug |>
   plot_scatter(params = data_params,
                measure = CVQb,
-               lineage = "thymocytes",
+               lineage = "Thymocytes",
                tissue = "thymus",
                color = "blue")
 
 p10 <- data_aug |>
   plot_scatter(params = data_params,
                measure = PEpos,
-               lineage = "thymocytes",
+               lineage = "Thymocytes",
                tissue = "thymus",
                color = "hotpink")
 
-(p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
-  plot_annotation(caption = "cor: correlation coefficient") &
+final_plot <- (p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
+  plot_annotation(title = "Correlation of the intensity to variation and positivity",
+                  caption = "cor: correlation coefficient") &
   theme(plot.caption = element_text(size = 11))
+
+final_plot
+```
+
+## Plot export
+
+```{r}
+#| label: export_plots_7
+
+save_plot(plot = final_plot,
+          filename = "07_key_plot.png",
+          width = 7.5,
+          height = 9)
 ```

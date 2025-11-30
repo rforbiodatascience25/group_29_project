@@ -10,32 +10,133 @@ editor_options:
 
 ## Introduction
 
+::::: columns
+::: {.column width="50%" style="font-size:50%"}
+-   CD molecules are membrane proteins with diverse functions and distributions across immune cell types.
+
+-   Their expression patterns help distinguish cell lineages and reveal functional relationships
+
+**Aim:**
+
+-   How do the expression of CD markers on lymphocyte subsets change during maturation?
+
+-   How are fluorescence intensity, variability, and positivity (MedQb, CVQb, PEpos) related across CD markers in lymphocyte subsets?
+:::
+
+::: {.column width="50%" style="font-size:50%"}
+![DOI: 10.5772/intechopen.81568](images/CD_markers.png){width="409"}
+:::
+:::::
+
 ## Materials and Methods
+
+::::: columns
+::: {.column width="50%" style="font-size:50%"}
+-   **Data from:** *Frontiers in Immunology*, “B Cell Biology,” vol. 10, Oct. 23, 2019. doi: 10.3389/fimmu.2019.02434
+
+-   Can be downloaded from their shiny app: <http://bioinformin.cesnet.cz/CDmaps/>
+
+![](images/Method.png)
+:::
+
+::: {.column width="50%" style="font-size:50%"}
+![](images/hierarchy.png){width="462"}
+
+**Sample of data_aug:**
+
+```{r}
+#| include: false
+
+library("tidyverse")
+
+data_aug <- read_csv(here::here("data/data_aug.csv"))
+```
+
+```{r}
+
+data_aug |>
+  slice_sample(n = 5)
+```
+:::
+:::::
 
 ## Analysis 1
 
+::::: columns
+::: {.column width="50%"}
+-   Skriv tekst her
+:::
+
+::: {.column width="50%"}
+![](images/05_key_plot.png)
+:::
+:::::
+
 ## Analysis 2
+
+::: {.columns style="font-size:50%"}
+-   Wide variations in CD marker distribution
+
+-   **Tissue-related** clusters are common
+
+-   Some markers are universally expressed (e.g. CD45), with others are **lineage-specific**
+
+![](images/06_key_plot.png)
+:::
 
 ## Analysis 3
 
+::::: columns
+::: {.column width="50%" style="font-size:50%"}
+**CVQb:**
+
+-   Blue lines show a negative correlation → higher CVQb = lower MedQb
+
+-   Tonsil B cells: line is flat → almost no relationship
+
+**PEpos:**
+
+-   Pink lines show a positive correlation → higher PEpos = higher MedQb
+:::
+
+::: {.column width="50%"}
+![](images/07_key_plot.png)
+:::
+:::::
+
 ## Analysis 4
+
+::::: columns
+::: {.column width="50%" style="font-size:50%"}
+-   **Table:** B cells had the most significant markers, showing stronger activation changes.
+
+-   **B cells:** Tonsil B cells are more activated (CD69, CD80), while blood B cells mature gradually (CD11a, CD80).
+
+-   **CD4 T cells:** Mature from thymus to blood, losing CD10 and gaining CD25 and CD4_MEM-241.
+
+-   **CD8 T cells:** Move from active thymus cells to mature blood cells with higher CD27 and CD95.
+
+![](images/compare_Bnaive.png)
+:::
+
+::: {.column width="50%"}
+![](images/08_key_plot.png)
+:::
+:::::
 
 ## Analysis 5
 
 ::::: columns
-::: {.column width="50%" style="font-size:70%"}
--   Something something
+::: {.column width="50%" style="font-size:50%"}
+-   CD4 and CD8 T cells go through parallel stages
 
-| Pair  | Count |
-|-------|-------|
-| SP1ap | 24    |
-| SP1am | 15    |
-| Naive | 18    |
-| CM    | 23    |
-| EM    | 25    |
-| TEMRA | 22    |
+    ![](images/CD4vsCD8.png)
 
-: Count of significant CDs
+-   **How do the CD markers differ between CD4 and CD8 T cells for each stage?**
+
+    -   As expected CD4 and CD8 are significant different for all pairs
+    -   CD59 is significant for all stages except TEMRA with a higher log(MedQb) for CD8
+    -   SP1am and Naive have the lowest number of significant CDs → CD4 and CD8 more similar in these stages
 :::
 
 ::: {.column width="50%"}
@@ -44,3 +145,25 @@ editor_options:
 :::::
 
 ## Discussion
+
+::::: columns
+::: {.column width="50%" style="font-size:50%"}
+**Why did we choose the linear model to assess significant difference for CDs?**
+
+-   Simplicity
+
+-   A two-way ANOVA could for example also have been used, but it depends on what the aim is.
+
+![](images/lm_vs_ANOVA.png)
+:::
+
+::: {.column width="50%" style="font-size:50%"}
+**Problems with missing values in the wide-format data set for PCA**
+
+-   Number of experiments for each CD differed → summarized the experiments by the mean
+
+-   Not every CD marker was measured across all cell types → replaced the missing value with the median for that specific CD
+
+-   Limits the variation in the data set, but necessary to avoid dropping observations
+:::
+:::::
