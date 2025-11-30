@@ -75,11 +75,8 @@ data_aug |>
 ## Analysis 1
 
 ::::: columns
-<<<<<<< HEAD
 ::: {.column width="50%" style="font-size:50%"}
-=======
-::: {.column width="50%"}
->>>>>>> dab444ef7668bb5a92aba36457c89727ed736218
+
 -   MedQb: three clusters
     -   Thymocytes cluster with T-cells from blood
     -   B-cells form a tonsil cluster and a blood cluster
