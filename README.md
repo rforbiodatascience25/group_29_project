@@ -26,7 +26,7 @@ The workflow for the data retrieval was as follows:
 
     -   `5. Thymus`
 
-    -   `5. Tonsil: B-cell maturation`
+    -   `4. Tonsil: B-cell maturation`
 
 -   As the name of downloaded files was automatically named after the current date, they were renamed to:
 
@@ -36,4 +36,4 @@ The workflow for the data retrieval was as follows:
 
     -   `tonsil.csv`
 
--   The three files werethen uploaded to the folder `_raw` inside of the folder `data`
+-   The three files were then uploaded to the folder `_raw` inside of the folder `data`
