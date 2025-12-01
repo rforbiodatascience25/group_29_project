@@ -54,7 +54,7 @@ data_PEpos <- PCA_aug |>
          starts_with("PEpos"))
 ```
 
-After all numeric cells were populated the function `prcomp` was used to make the the PCA..
+After all set is split up we use the function `prcomp` was used to make the the PCA.
 
 ```{r}
 #| label: create_PCA_fit_5
@@ -70,7 +70,7 @@ PCA_fit_PEpos <- data_PEpos |>
 
 ## Make the plot
 
-On the plot we have PC1 on the x-axis and PC2 on the y-axis. Usually most variation can be captured with the first two principal components. The points are stratified using tissue type (blood, tonsil, thymus) as the shapes and cell lineage as the color.'
+On the plot we have PC1 on the x-axis and PC2 on the y-axis. Usually most variation can be captured with the first two principal components. The points are stratified using tissue type (blood, tonsil, thymus) as the shapes and cell lineage as the color.
 
 ```{r}
 scatter_plot_MedQb <- PCA_fit_MedQb |>
