@@ -38,8 +38,6 @@ data_aug <- read_csv(here::here("data", "data_aug.csv"))
 
 ## Correlation of MedQb to CVQb and PEpos
 
-The purpose of these plots is to examine and compare the fluorescence signals across key immune cell types and tissues.
-
 ### Flourescence of B cells in blood
 
 Firstly, boxplots of `MedQb`, `CVQb` and `PEpos` based on `CD` are created in ascending order of `MedQb` for `B cells` in the `blood`.
