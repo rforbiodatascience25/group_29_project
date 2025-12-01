@@ -152,7 +152,7 @@ data_aug |>
 ::: {.columns style="font-size:50%"}
 -   Tonsil B cells are more activated (CD69, CD80), while blood B cells mature gradually (CD11a, CD80)
 
--   CD4 and CD8 T cells follow a similar pattern
+-   CD4 and CD8 T cells follow a similar pattern. Develop in the thymus and become more specialized and mature in the blood. 
 
 ![](images/08_key_plot_2.png)
 :::
@@ -171,7 +171,6 @@ data_aug |>
 :::
 
 ::: {.column width="50%" style="font-size: 50%"}
-
 ![](images/09_key_plot_1.png)
 :::
 :::::
