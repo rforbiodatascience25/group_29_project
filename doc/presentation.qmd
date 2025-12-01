@@ -76,12 +76,14 @@ data_aug |>
 
 ::::: columns
 ::: {.column width="50%" style="font-size:50%"}
--   MedQb: three clusters
+-   **MedQb:**
+    -   Three distinct clusters
     -   Thymocytes cluster with T-cells from blood
     -   B-cells form a tonsil cluster and a blood cluster
--   PEpos
-    -   We get 4 distinct clusters
-    -   B-cells seperates in PC2, but very similar in PC1
+-   **PEpos:**
+    -   Four distinct clusters
+    -   Thymocytes and blood T cells are seperated in two clusters
+    -   B-cells from blood and tonsil seperate in PC2, but very similar in PC1
 :::
 
 ::: {.column width="50%"}
@@ -125,15 +127,21 @@ data_aug |>
 
 ::::: columns
 ::: {.column width="50%" style="font-size:50%"}
--   **Table:** B cells had the most significant markers, showing stronger activation changes.
+-   **How do CD marker expression change during maturation of each lineage?**
 
--   **B cells:** Tonsil B cells are more activated (CD69, CD80), while blood B cells mature gradually (CD11a, CD80).
+    -   Applying a linear model with naive cell as reference
 
--   **CD4 T cells:** Mature from thymus to blood, losing CD10 and gaining CD25 and CD4_MEM-241.
+![](images/compare_Bnaive.png){fig-align="center" width="456"}
 
--   **CD8 T cells:** Move from active thymus cells to mature blood cells with higher CD27 and CD95.
+-   **B cells:**
 
-![](images/compare_Bnaive.png)
+    -   Had the most significant markers, showing stronger activation changes
+
+    -   Tonsil B cells are more activated (CD69, CD80), while blood B cells mature gradually (CD11a, CD80)
+
+-   **CD4 and CD8 T cells:**
+
+    -   Follow a similar pattern
 :::
 
 ::: {.column width="50%"}
@@ -167,9 +175,9 @@ data_aug |>
 ::: {.column width="50%" style="font-size:50%"}
 **Why did we choose the linear model to assess significant difference for CDs?**
 
--   Simplicity
+-   Simple method to compare each subset to the naive cell
 
--   A two-way ANOVA could for example also have been used, but it depends on what the aim is.
+-   An ANOVA could for example also have been used for pairwise comparison
 
 ![](images/lm_vs_ANOVA.png)
 :::
