@@ -39,7 +39,7 @@ In the data set, the `CD4 T cells` and `CD8 T cells` exist in two similar and pa
 
 ## Applying a linear model
 
-To assess significant differences in CD marker expression between each pair, a linear model was applied using the `map()` function as described in analysis 4. In order to compare the CDs for a specific subset between `CD4` and `CD8`, the data must be grouped by the pair, hence why the variable `pair` was added. As the `CD4 T cells` are listed first in the function `cell_type_order`, their estimate corresponds the intercept, while the estimate of the `CD8 T cells` is the slope, corresponding to how much the CD expression differs from the `CD4 T cells`. Lastly, the full estimates were calculated by adding the intercept to the estimate of the `CD8 T cells`, and the variable `is_significant` and `any_significant` is added from the calculated p-value.
+To assess significant differences in CD marker expression between each pair, a linear model was applied using the `map()` function as described in analysis 4. In order to compare the CDs for a specific subset between `CD4` and `CD8`, the data must be grouped by the pair, hence why the variable `pair` was added. As the `CD4 T cells` are listed first in the function `cell_type_order`, their estimate corresponds the intercept, while the estimate of the `CD8 T cells` is the slope, corresponding to how much the CD expression differs from the `CD4 T cells`. Lastly, the full estimates were calculated by adding the intercept to the estimate of the `CD8 T cells`, and the variable `is_significant` and `any_significant` is added from the calculated p-value. The step `filter(n() > n_distinct(cell_type))` is added to ensure more than one observation for each `cell_type` in each `pair`.
 
 ```{r}
 #| label: apply_lm_9
@@ -164,8 +164,6 @@ p6 <- data_analysis5 |>
     title = "Significant CD Markers Differentiating CD4 and CD8 T Cell Subsets") &
   theme(plot.title = element_text(size = 18))
 ```
-
-The CD markers that generally show the biggest difference are as expected the lineage-specific markers `CD4` and `CD8`, which are significant for all the pairs.
 
 ## Plot export
 
