@@ -1,5 +1,4 @@
 ---
-title: "Describing data"
 format:
   html:
     embed-resources: true
@@ -12,6 +11,8 @@ execute:
   warning: false
   message: false
 ---
+
+# Describing data
 
 ## Loading packages
 
@@ -29,7 +30,7 @@ source(file = here::here("R/99_proj_func.R"))
 ```{r}
 #| label: load_data_4
 
-data_clean <- read_csv(file = here::here("data/data_clean.csv"))
+data_aug <- read_csv(file = here::here("data/data_aug.csv"))
 
 ```
 
@@ -52,17 +53,14 @@ data_aug |>
 
 ```
 
-The dataset contains measurements from three tissue types: blood (N = 18,463), thymus (N = 4,482), and tonsil (N = 5,453). This distribution shows that the majority of observations originate from blood, while there are fewer measurements from thymus and tonsil.
-
-If you look at the cell types, they are distributed very differently between the tissues. Blood is dominated by mature B and T cell subtypes, thymus by early T cell development stages, while tonsils primarily contain B cell maturation stages and plasma cells.
-
 ## Quantifying data set diversity
 
+Using the `summarise()` function, we count the number of unique CD markers and cell types present in the data
+
 ```{r}
+#| label: count_4
 
 data_aug |>   
   summarise(n_CDs = n_distinct(CD),   
             n_celltypes = n_distinct(cell_type))
 ```
-
-In this step, two summary variables are created to describe the structure of the data set. Using the `summarise()` function, we count the number of unique CD markers and cell types present in the data. The result shows that the data set includes 115 different CD markers and 38 distinct cell types, which highlights the biological diversity captured across tissues. This information provides a quick overview of how broad the data set is and confirms that it contains enough variation to study immune cell development and activation patterns.

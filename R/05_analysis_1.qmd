@@ -1,5 +1,4 @@
 ---
-title: "05_PCA"
 format:
   html:
     embed-resources: true
@@ -12,6 +11,8 @@ execute:
   warning: false
   message: false
 ---
+
+# Analysis 1
 
 ## Loading packages
 

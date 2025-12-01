@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Describing data</title>
+<title>describe</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -3087,25 +3087,11 @@ vertical-align: -.125em;
 
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Describing data</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
+<section id="describing-data" class="level1">
+<h1>Describing data</h1>
 <section id="loading-packages" class="level2">
 <h2 class="anchored" data-anchor-id="loading-packages">Loading packages</h2>
 <div class="cell">
@@ -3118,14 +3104,14 @@ vertical-align: -.125em;
 <section id="loading-data-files" class="level2">
 <h2 class="anchored" data-anchor-id="loading-data-files">Loading data files</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data/data_clean.csv&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data_aug <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data/data_aug.csv&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="description-of-the-clean-data-set" class="level2">
 <h2 class="anchored" data-anchor-id="description-of-the-clean-data-set">Description of the clean data set</h2>
-<p>The data consists of immunological measurements from blood, tonsil and thymus. The dataset consists of 28340 observations and 6 variables containing CD markers for the cell types in the specific tissue. An overview of the quantitative markers is given below using a <code>table1</code> summary of <code>data_clean</code> . <strong>The data is structured in long format,</strong> meaning that each combination of <code>tissue</code>, <code>cell_type</code> and <code>CD</code> appears as one row. This structure makes the dataset suitable for analysis and visualization.</p>
+<p>The data consists of immunological measurements from blood, tonsil and thymus. The dataset consists of 28340 observations and 8 variables containing CD markers for the cell types in the specific tissue. An overview of the quantitative markers is given below using a <code>table1</code> summary of <code>data_aug</code> . <strong>The data is structured in long format,</strong> meaning that each combination of <code>tissue</code>, <code>cell_type</code> and <code>CD</code> appears as one row. This structure makes the dataset suitable for analysis and visualization.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>data_clean <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>data_aug <span class="sc">|&gt;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tissue =</span> <span class="fu">factor</span>(tissue,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;thymus&quot;</span>, <span class="st">&quot;tonsil&quot;</span>, <span class="st">&quot;blood&quot;</span>),</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Thymus&quot;</span>, <span class="st">&quot;Tonsil&quot;</span>, <span class="st">&quot;Blood&quot;</span>))) <span class="sc">|&gt;</span></span>
@@ -3519,8 +3505,22 @@ vertical-align: -.125em;
 </div>
 </div>
 </div>
-<p>The dataset contains measurements from three tissue types: blood (N = 18,463), thymus (N = 4,482), and tonsil (N = 5,453). This distribution shows that the majority of observations originate from blood, while there are fewer measurements from thymus and tonsil.</p>
-<p>If you look at the cell types, they are distributed very differently between the tissues. Blood is dominated by mature B and T cell subtypes, thymus by early T cell development stages, while tonsils primarily contain B cell maturation stages and plasma cells.</p>
+</section>
+<section id="quantifying-data-set-diversity" class="level2">
+<h2 class="anchored" data-anchor-id="quantifying-data-set-diversity">Quantifying data set diversity</h2>
+<p>Using the <code>summarise()</code> function, we count the number of unique CD markers and cell types present in the data</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>data_aug <span class="sc">|&gt;</span>   </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_CDs =</span> <span class="fu">n_distinct</span>(CD),   </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">n_celltypes =</span> <span class="fu">n_distinct</span>(cell_type))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  n_CDs n_celltypes
+  &lt;int&gt;       &lt;int&gt;
+1   114          38</code></pre>
+</div>
+</div>
+</section>
 </section>
 
 </main>

@@ -1,5 +1,4 @@
 ---
-title: "Analysis 3"
 format:
   html:
     embed-resources: true
@@ -12,6 +11,8 @@ execute:
   warning: false
   message: false
 ---
+
+# Analysis 3
 
 ## Loading packages
 

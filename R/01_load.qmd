@@ -1,5 +1,4 @@
 ---
-title: "Loading data"
 format:
   html:
     embed-resources: true
@@ -12,6 +11,8 @@ execute:
   warning: false
   message: false
 ---
+
+# Loading data
 
 ## Loading packages
 
