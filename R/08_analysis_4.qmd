@@ -51,8 +51,7 @@ columns <- c("CD",
              "conf.low", 
              "conf.high",
              "p.value",
-             "is_significant",
-             "any_significant")
+             "is_significant")
 
 data_analysis4 <- data_aug |>
   cell_type_order() |>
@@ -65,9 +64,7 @@ data_analysis4 <- data_aug |>
   fit_linear_model(log(MedQb) ~ cell_type)|>
   mutate(is_significant = case_when(term == "(Intercept)" ~ "reference",
                                     p.value < 0.05 ~ "yes",
-                                    p.value >= 0.05 ~ "no"),
-          any_significant = case_when(any(is_significant == "yes") ~ "yes",
-                                     .default = "no")) |>
+                                    p.value >= 0.05 ~ "no")) |>
   mutate(
     intercept = estimate[term == "(Intercept)"],
     estimate = case_when(
