@@ -134,7 +134,7 @@ cds_interest_b <- c("CD11a", "CD69", "CD79b", "CD80")
 p1 <- data_analysis4 |>
   plot_cd_expression(lineage_filter = "B cells",
                      cds = cds_interest_b,
-                     title = "Significant CDs during B cell maturation")
+                     subtitle = "B cells")
 
 p1
 ```
@@ -148,11 +148,13 @@ p1
 
 cds_interest_cd4 <- c("CD10", "CD25", "CD4_MEM-241", "CD62L")
 
-data_analysis4 |>
+p2 <- data_analysis4 |>
   plot_cd_expression(lineage_filter = c("Thymocytes", "CD4 T cells"),
                      cds = cds_interest_cd4,
                      cell_type_exclude = "CD8",
-                     title = "Significant CDs during CD8 T cell maturation")
+                     subtitle = "CD4 T cells")
+
+p2
 ```
 
 **CD4 T cell markers:** CD10 (early maturation), CD25 (activation), CD4_MEM-241 (memory), CD62L (migration).
@@ -162,11 +164,13 @@ data_analysis4 |>
 
 cds_interest_cd8 <- c("CD27", "CD38", "CD71", "CD95")
 
-data_analysis4 |>
+p3 <- data_analysis4 |>
   plot_cd_expression(lineage_filter = c("Thymocytes", "CD8 T cells"),
                      cds = cds_interest_cd8,
                      cell_type_exclude = "CD4",
-                     title = "Significant CDs during CD8 T cell maturation")
+                     subtitle = "CD8 T cells")
+
+p3
 ```
 
 **CD8 T cell markers:** CD27 (memory), CD38 (activation), CD71 (proliferation), CD95 (apoptosis).
@@ -178,10 +182,16 @@ Overall, the goal is to get a clearer picture of how immune cells change as they
 ```{r}
 #| label: export_plots_8
 
-final_plot <- sig_CD_count / p1
+save_plot(plot = sig_CD_count, 
+          filename = "08_key_plot_1.png")
+
+p1 <- p1 + 
+  labs(title = "Selected significant CDs during maturation stratified on lineage")
+
+final_plot <- p1 + p2 + p3
 
 save_plot(plot = final_plot, 
-          filename = "08_key_plot.png",
-          width = 7,
-          height = 8.5)
+          filename = "08_key_plot_2.png",
+          width = 22,
+          height = 9)
 ```
