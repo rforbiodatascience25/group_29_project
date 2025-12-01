@@ -33,10 +33,9 @@ source(here::here("R", "99_proj_func.R"))
 #| label: load_data_7
 
 data_aug <- read_csv(here::here("data", "data_aug.csv"))
-
 ```
 
-## Correlation of MedQb to CVQb and PEpos
+## Relationship between MedQb, CVQb, and PEpos
 
 ### Flourescence of B cells in blood
 
