@@ -131,17 +131,17 @@ The significant CDs for each pair are visualized with an error bar plot of the e
 
 p1 <- data_analysis5 |>
   CD_order() |>
-  plot_CD4vsCD8(pair = "SP1ap",
+  plot_CD4vsCD8(pair_filter = "SP1ap",
                 legend_position = "none")
 
 p2 <- data_analysis5 |>
   CD_order() |>
-  plot_CD4vsCD8(pair = "SP1am",
+  plot_CD4vsCD8(pair_filter = "SP1am",
                 legend_position = "none")
 
 p3 <- data_analysis5 |>
   CD_order() |>
-  plot_CD4vsCD8(pair = "naive",
+  plot_CD4vsCD8(pair_filter = "naive",
                 legend_position = "none")
 
 p4 <- data_analysis5 |>
@@ -151,12 +151,12 @@ p4 <- data_analysis5 |>
 
 p5 <- data_analysis5 |>
   CD_order() |>
-  plot_CD4vsCD8(pair = "EM",
+  plot_CD4vsCD8(pair_filter = "EM",
                 legend_position = "none")
 
 p6 <- data_analysis5 |>
   CD_order() |>
-  plot_CD4vsCD8(pair = "TEMRA",
+  plot_CD4vsCD8(pair_filter = "TEMRA",
                 legend_position = "bottom")
 
 (p1 + p2) / (p3 + p4) / (p5 + p6) +
@@ -174,7 +174,7 @@ As the figure above is too big for the presentation only the plot for the naive 
 
 p3 <- data_analysis5 |>
   CD_order() |>
-  plot_CD4vsCD8(pair = "naive",
+  plot_CD4vsCD8(pair_filter = "naive",
                 legend_position = "bottom")
 
 final_plot <- sig_CD_count / p3

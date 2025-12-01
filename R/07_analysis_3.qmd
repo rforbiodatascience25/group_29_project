@@ -33,9 +33,12 @@ source(here::here("R", "99_proj_func.R"))
 #| label: load_data_7
 
 data_aug <- read_csv(here::here("data", "data_aug.csv"))
+
 ```
 
-## Relationship between MedQb, CVQb, and PEpos
+## Correlation of MedQb to CVQb and PEpos
+
+The purpose of these plots is to examine and compare the fluorescence signals across key immune cell types and tissues.
 
 ### Flourescence of B cells in blood
 
@@ -47,21 +50,21 @@ Firstly, boxplots of `MedQb`, `CVQb` and `PEpos` based on `CD` are created in as
 #| fig-width: 9
 
 p1 <- data_aug |>
-  asc_CDs_boxplot(lineage = "B cells",
-                  hierarchy = 3,
-                  tissue = "blood",
+  asc_CDs_boxplot(lineage_filter = "B cells",
+                  hierarchy_filter = 3,
+                  tissue_filter = "blood",
                   measure = MedQb)
 
 p2 <- data_aug |>
-  asc_CDs_boxplot(lineage = "B cells",
-                  hierarchy = 3,
-                  tissue = "blood",
+  asc_CDs_boxplot(lineage_filter = "B cells",
+                  hierarchy_filter = 3,
+                  tissue_filter = "blood",
                   measure = CVQb)
 
 p3 <- data_aug |>
-    asc_CDs_boxplot(lineage = "B cells",
-                  hierarchy = 3,
-                  tissue = "blood",
+  asc_CDs_boxplot(lineage_filter = "B cells",
+                  hierarchy_filter = 3,
+                  tissue_filter = "blood",
                   measure = PEpos)
 
 p1 / p2 / p3
@@ -155,77 +158,78 @@ In the last part, scatter plots with the linear model are created.
 p1 <- data_aug |>
   plot_scatter(params = data_params,
                measure = CVQb,
-               lineage = "B cells",
-               tissue = "blood",
+               lineage_filter = "B cells",
+               tissue_filter = "blood",
                color = "blue")
 
 
 p2 <- data_aug |>
   plot_scatter(params = data_params,
                measure = PEpos,
-               lineage = "B cells",
-               tissue = "blood",
+               lineage_filter = "B cells",
+               tissue_filter = "blood",
                color = "hotpink")
 
 p3 <- data_aug |>
   plot_scatter(params = data_params,
                measure = CVQb,
-               lineage = "B cells",
-               tissue = "tonsil",
+               lineage_filter = "B cells",
+               tissue_filter = "tonsil",
                color = "blue")
 
 p4 <- data_aug |>
   plot_scatter(params = data_params,
                measure = PEpos,
-               lineage = "B cells",
-               tissue = "tonsil",
+               lineage_filter = "B cells",
+               tissue_filter = "tonsil",
                color = "hotpink")
 
 p5 <- data_aug |>
   plot_scatter(params = data_params,
                measure = CVQb,
-               lineage = "CD4 T cells",
-               tissue = "blood",
+               lineage_filter = "CD4 T cells",
+               tissue_filter = "blood",
                color = "blue")
 
 p6 <- data_aug |>
   plot_scatter(params = data_params,
                measure = PEpos,
-               lineage = "CD4 T cells",
-               tissue = "blood",
+               lineage_filter = "CD4 T cells",
+               tissue_filter = "blood",
                color = "hotpink")
 
 p7 <- data_aug |>
   plot_scatter(params = data_params,
                measure = CVQb,
-               lineage = "CD8 T cells",
-               tissue = "blood",
+               lineage_filter = "CD8 T cells",
+               tissue_filter = "blood",
                color = "blue")
 
 p8 <- data_aug |>
   plot_scatter(params = data_params,
                measure = PEpos,
-               lineage = "CD8 T cells",
-               tissue = "blood",
+               lineage_filter = "CD8 T cells",
+               tissue_filter = "blood",
                color = "hotpink")
 
 p9 <- data_aug |>
   plot_scatter(params = data_params,
                measure = CVQb,
-               lineage = "Thymocytes",
-               tissue = "thymus",
+               lineage_filter = "Thymocytes",
+               tissue_filter = "thymus",
                color = "blue")
 
 p10 <- data_aug |>
   plot_scatter(params = data_params,
                measure = PEpos,
-               lineage = "Thymocytes",
-               tissue = "thymus",
+               lineage_filter = "Thymocytes",
+               tissue_filter = "thymus",
                color = "hotpink")
 
 final_plot <- (p1 + p2) / (p3 + p4) / (p5 + p6) / (p7 + p8) / (p9 + p10) +
-  plot_annotation(title = "Correlation of the intensity to variation and positivity",
-                  caption = "cor: correlation coefficient") &
+  plot_annotation(
+    title = "Correlation of the intensity to variation and positivity",
+    caption = "cor: correlation coefficient") &
   theme(plot.caption = element_text(size = 11))
 
 final_plot
