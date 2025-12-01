@@ -180,7 +180,7 @@ data_aug |>
 ::: {.columns style="font-size:50%"}
 -   As expected CD4 and CD8 are significant different for all pairs
 
--   CD59 is significant for all stages except TEMRA with a higher log(MedQb) for CD8 T cells
+-   CD59 is significant for all stages except TEMRA with a higher log(MedQb) for CD4 T cells
 
 ![](images/09_key_plot_2.png)
 :::
