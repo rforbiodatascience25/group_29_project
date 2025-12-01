@@ -283,7 +283,7 @@ plot_scatter <- function(data, params, measure, lineage_filter, tissue_filter, c
 
 # Analysis 4 - plots
 plot_cd_expression <- function(data, lineage_filter, cds, cell_type_exclude = NULL,
-                               title = "Expression of Selected Markers") {
+                               subtitle) {
   
   df <- data |>
     filter(lineage %in% lineage_filter,
@@ -318,17 +318,19 @@ plot_cd_expression <- function(data, lineage_filter, cds, cell_type_exclude = NU
       )
     ) +
     scale_shape_discrete(name = "Tissue") +
-    theme_minimal(base_size = 12) +
+    theme_minimal(base_size = 18) +
     theme(
       axis.text.x = element_text(angle = 90, 
                                  vjust = 0.5, 
                                  hjust = 1),
-      strip.text = element_text(size = 10, 
+      strip.text = element_text(size = 16, 
                                 face = "bold"),
-      axis.line = element_line(color = "black")
+      axis.line = element_line(color = "black"),
+      legend.position = "bottom",
+      legend.box = "vertical"
     ) +
     labs(
-      title = title,
+      subtitle = subtitle,
       x = "Cell Type",
       y = "log(MedQb)"
     )
@@ -366,7 +368,7 @@ plot_CD4vsCD8 <- function(data, pair_filter, legend_position) {
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
                   width = 0.4) +
-    theme_bw(base_size = 13) +
+    theme_bw(base_size = 16) +
     theme(axis.text.x = element_text(angle = 90, 
                                      vjust = 0.5, 
                                      hjust = 1),

@@ -1,5 +1,11 @@
 ---
 title: "Group 29 Presentation"
+authors: 's224965: Mille Grinder <br>
+          s224989: Amalie Frøsig <br>
+          s225059: Niels Elfenbein <br>
+          s250441: Tomás Raskovsky<br>
+          s251977: Frida De los Rios'
+slide-number: true
 format: 
   revealjs:
     theme: [serif, custom.scss]
@@ -132,22 +138,24 @@ data_aug |>
     -   Applying a linear model with naive cell as reference
 
 ![](images/compare_Bnaive.png){fig-align="center" width="456"}
-
--   **B cells:**
-
-    -   Had the most significant markers, showing stronger activation changes
-
-    -   Tonsil B cells are more activated (CD69, CD80), while blood B cells mature gradually (CD11a, CD80)
-
--   **CD4 and CD8 T cells:**
-
-    -   Follow a similar pattern
 :::
 
-::: {.column width="50%"}
-![](images/08_key_plot.png)
+::: {.column width="50%" style="font-size:50%"}
+-   B cells had the most significant markers, showing stronger activation changes
+
+![](images/08_key_plot_1.png)
 :::
 :::::
+
+## Analysis 4
+
+::: {.columns style="font-size:50%"}
+-   Tonsil B cells are more activated (CD69, CD80), while blood B cells mature gradually (CD11a, CD80)
+
+-   CD4 and CD8 T cells follow a similar pattern
+
+![](images/08_key_plot_2.png)
+:::
 
 ## Analysis 5
 
@@ -159,15 +167,24 @@ data_aug |>
 
 -   **How do the CD markers differ between CD4 and CD8 T cells for each stage?**
 
-    -   As expected CD4 and CD8 are significant different for all pairs
-    -   CD59 is significant for all stages except TEMRA with a higher log(MedQb) for CD8
-    -   SP1am and Naive have the lowest number of significant CDs → CD4 and CD8 more similar in these stages
+    -   SP1am and naive subsets have the lowest number of significant CDs → CD4 and CD8 more similar in CD expression in these stages
 :::
 
-::: {.column width="50%"}
-![](images/09_key_plot.png)
+::: {.column width="50%" style="font-size: 50%"}
+
+![](images/09_key_plot_1.png)
 :::
 :::::
+
+## Analysis 5
+
+::: {.columns style="font-size:50%"}
+-   As expected CD4 and CD8 are significant different for all pairs
+
+-   CD59 is significant for all stages except TEMRA with a higher log(MedQb) for CD8 T cells
+
+![](images/09_key_plot_2.png)
+:::
 
 ## Discussion
 
