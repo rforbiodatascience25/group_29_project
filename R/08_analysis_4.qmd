@@ -33,13 +33,12 @@ source(here::here(file = "R/99_proj_func.R"))
 data_aug <- read_csv(here::here(file = "data/data_aug.csv"))
 ```
 
+The aim of this analysis is to explore how different CD markers change across immune cell types and maturation stages in several tissues, using linear models and simple visualizations to highlight meaningful differences.
+
 ## Maturation of immune cells
 
-This analysis explores how immune cells mature in different tissues (blood, tonsil, and thymus). The code groups and analyzes the data to investigate how the expression of several CDs changes depending on the type of cell and where it comes from.
-
-To study these differences in a structured way, a linear model is applied to the log-transformed median fluorescence values (`log(MedQb)`). This model estimates how marker expression changes across cell types while accounting for variability between tissues and lineages. In this model, the naive cell population acts as the reference group, meaning that all other cell types are compared to it. This allows us to see how marker expression increases or decreases relative to naive cells as they progress through maturation or activation stages.
-
-The data is first filtered based on `hierarchy` and `cell_type` as only the most specific cell subsets should be included in the analysis. Then the data is grouped and the data is filtered to ensure that there are more than one observation per `cell_type` in each group. Then the linear model applied. Each model produces an estimate of the average expression for each `cell_type` and its corresponding confidence interval. Lastly, the full estimates are calculated by retrieving and adding the `intercept` for each group. As the variable `cell_type` is lost during the transformation, it is recreated by using the variable `term`.
+This part prepares the data and runs the linear models. We keep only the detailed cell-type levels we care about and remove some unwanted columns and populations. After cleaning, we group the data by tissue, CD marker, and lineage, and then fit a linear model (`log(MedQb) ~ cell_type`) for each group.\
+Once the models are fit, we classify whether each term is significant, rebuild the cell-type names, and adjust estimates by adding the intercept back in so everything stays on the same scale.
 
 ```{r}
 #| label: apply_lm_8
@@ -93,7 +92,8 @@ data_analysis4 <- data_aug |>
 
 ## Significant CDs
 
-This section shows how many CD markers were significant (p \< 0.05) in each lineage.
+Here we check which CD markers actually show significant differences between cell types.\
+We filter for terms with p \< 0.05, count how many CDs are significant within each lineage.
 
 ```{r}
 #| label: count_sig_CDs_8
@@ -120,7 +120,7 @@ sig_CD_count <- data_analysis4 |>
 sig_CD_count
 ```
 
-The results are then combined into a single table called data_analysis4, which serves as the base for visualization and further interpretation. The function plot_cd_expression() is used to visualize these model results, plotting the estimated expression levels and their confidence intervals for each CD marker across tissues and cell types. The color indicates statistical significance, and the point shape represents the tissue of origin, allowing clear visual comparison between blood, tonsil, and thymus.
+The results are then combined into a single table called data_analysis4, which serves as the base for visualization and further interpretation. The function `plot_cd_expression()` is used to visualize these model results, plotting the estimated expression levels and their confidence intervals for each CD marker across tissues and cell types. The color indicates statistical significance, and the point shape represents the tissue of origin, allowing clear visual comparison between blood, tonsil, and thymus.
 
 For the B cells, the analysis focuses on markers like CD11a, CD69, CD79b, and CD80, which are related to how these cells activate and differentiate. For T cells, the analysis is divided between CD4 and CD8 cells. The CD4 group includes markers like CD10, CD25, CD4_MEM-241, and CD62L, while the CD8 group includes CD27, CD38, CD71, and CD95. The plots compare expression levels across tissues, helping visualize how these cells evolve from early to more mature stages.
 
