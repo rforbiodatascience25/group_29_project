@@ -206,13 +206,13 @@ heat_dot_plot <- function(data){
 }
 
 # Analysis 3 - plots
-asc_CDs_boxplot <- function(data, lineage, hierarchy, tissue, measure){
+asc_CDs_boxplot <- function(data, lineage_filter, hierarchy_filter, tissue_filter, measure){
   measure <- enquo(measure)
   
   data|>
-    filter(lineage == !!lineage,
-           hierarchy == !!hierarchy,
-           tissue == !!tissue) |>
+    filter(lineage == lineage_filter,
+           hierarchy == hierarchy_filter,
+           tissue == tissue_filter) |>
     drop_na(!!measure) |>
     group_by(CD) |>
     mutate(MedQb_grp = median(MedQb),
@@ -238,31 +238,31 @@ asc_CDs_boxplot <- function(data, lineage, hierarchy, tissue, measure){
     labs(x = "CD",
          y = measure,
          fill = paste0("log10(", quo_name(measure), ")"),
-         title = paste("Fluorescence of", lineage, "from the", tissue))
+         title = paste("Fluorescence of", lineage_filter, "from the", tissue_filter))
 }
 
-plot_scatter <- function(data, params, measure, lineage, tissue, color){
+plot_scatter <- function(data, params, measure, lineage_filter, tissue_filter, color){
   measure <- enquo(measure)
   measure_str <- as_name(measure)
   
   measure_intercept <- params |> 
-    filter(lineage == !!lineage,
-           tissue == !!tissue) |>
+    filter(lineage == lineage_filter,
+           tissue == tissue_filter) |>
     pull(paste0(measure_str, "_intercept"))
   
   measure_slope <- params |> 
-    filter(lineage == !!lineage,
-           tissue == !!tissue) |>
+    filter(lineage == lineage_filter,
+           tissue == tissue_filter) |>
     pull(paste0(measure_str, "_slope"))
   
   measure_cor <- params |> 
-    filter(lineage == !!lineage,
-           tissue == !!tissue) |>
+    filter(lineage == lineage_filter,
+           tissue == tissue_filter) |>
     pull(paste0(measure_str, "_cor"))
   
   data |>
-    filter(lineage == !!lineage,
-           tissue == !!tissue,
+    filter(lineage == lineage_filter,
+           tissue == tissue_filter,
            !hierarchy %in% c(1, 2),
            lineage != "T cells") |>
     drop_na(MedQb, !!measure) |>
@@ -273,7 +273,7 @@ plot_scatter <- function(data, params, measure, lineage, tissue, color){
     geom_smooth(method = "lm",
                 color = color) +
     theme_bw() + 
-    labs(title = paste0(lineage, " from ", tissue),
+    labs(title = paste0(lineage_filter, " from ", tissue_filter),
          subtitle = paste0("y = ", round(measure_slope, 2), 
                            " * x + ", 
                            round(measure_intercept, 2), 
@@ -356,9 +356,9 @@ plot_sig_CDs <- function(data, by_variable, fill_color){
 
 
 # Analysis 5 - plots
-plot_CD4vsCD8 <- function(data, pair, legend_position) {
+plot_CD4vsCD8 <- function(data, pair_filter, legend_position) {
   data |>
-    filter(pair == !!pair) |>
+    filter(pair == pair_filter) |>
     ggplot(aes(x = CD,
                y = estimate,
                color = lineage)) +
@@ -374,7 +374,7 @@ plot_CD4vsCD8 <- function(data, pair, legend_position) {
     ylim(c(0, 13)) +
     scale_color_manual(values = c("CD4 T cells" = "navy",
                                   "CD8 T cells" = "hotpink")) +
-    labs(subtitle = paste0("CD4", pair, " vs CD8", pair),
+    labs(subtitle = paste0("CD4", pair_filter, " vs CD8", pair_filter),
          x = "Significant CDs",
          y = "log(MedQb)",
          color = "Lineage")
