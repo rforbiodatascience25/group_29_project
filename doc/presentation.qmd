@@ -174,12 +174,11 @@ data_aug |>
 :::
 
 ::: {.column width="50%" style="font-size: 50%"}
-
 ![](images/09_key_plot_1.png)
 :::
 :::::
 
-## How do the CD markers differ between CD4 and CD8 T cells?
+## How do CD markers differ between CD4 and CD8 T cells?
 
 ::: {.columns style="font-size:50%"}
 -   As expected CD4 and CD8 are significant different for all pairs
