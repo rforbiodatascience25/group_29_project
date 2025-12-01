@@ -1,5 +1,4 @@
 ---
-title: "Analysis 5"
 format:
   html:
     embed-resources: true
@@ -12,6 +11,8 @@ execute:
   warning: false
   message: false
 ---
+
+# Analysis 5
 
 ## Loading packages
 
@@ -164,6 +165,7 @@ p6 <- data_analysis5 |>
 ## Overview of CDs
 
 ```{r}
+#| label: CDs_overview_9
 
 final_plot <- data_analysis5 |>
   CD_order() |>

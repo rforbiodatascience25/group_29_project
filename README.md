@@ -1,5 +1,17 @@
 # group_29_project
 
+## Project Contributors
+
+-   s224965: Mille Grinder, GitHub name: MilleGrinder
+
+-   s224989: Amalie Frøsig, GitHub name: amal6306
+
+-   s225059: Niels Elfenbein, GitHub name: s225059
+
+-   s250441: Tomás Raskovsky, GitHub name: Tomás (tall-tom)
+
+-   s251977: Frida De los Rios, GitHub name: FridaEusebi
+
 ## Data source
 
 The project used data from the article:

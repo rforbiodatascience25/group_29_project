@@ -1,5 +1,4 @@
 ---
-title: "Adding new variables"
 format:
   html:
     embed-resources: true
@@ -12,6 +11,8 @@ execute:
   warning: false
   message: false
 ---
+
+# Augmenting data
 
 ## Loading packages
 

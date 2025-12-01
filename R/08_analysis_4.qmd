@@ -1,5 +1,4 @@
 ---
-title: "Analysis 4"
 format:
   html:
     embed-resources: true
@@ -12,6 +11,8 @@ execute:
   warning: false
   message: false
 ---
+
+# Analysis 4
 
 ## Loading packages
 
@@ -87,6 +88,8 @@ data_analysis4 <- data_aug |>
   ungroup()
 ```
 
+The results are then combined into a single table called data_analysis4, which serves as the base for visualization and further interpretation. The function `plot_cd_expression()` is used to visualize these model results, plotting the estimated expression levels and their confidence intervals for each CD marker across tissues and cell types.
+
 ## Significant CDs
 
 Here we check which CD markers actually show significant differences between cell types.\
@@ -117,14 +120,11 @@ sig_CD_count <- data_analysis4 |>
 sig_CD_count
 ```
 
-The results are then combined into a single table called data_analysis4, which serves as the base for visualization and further interpretation. The function `plot_cd_expression()` is used to visualize these model results, plotting the estimated expression levels and their confidence intervals for each CD marker across tissues and cell types. The color indicates statistical significance, and the point shape represents the tissue of origin, allowing clear visual comparison between blood, tonsil, and thymus.
-
-For the B cells, the analysis focuses on markers like CD11a, CD69, CD79b, and CD80, which are related to how these cells activate and differentiate. For T cells, the analysis is divided between CD4 and CD8 cells. The CD4 group includes markers like CD10, CD25, CD4_MEM-241, and CD62L, while the CD8 group includes CD27, CD38, CD71, and CD95. The plots compare expression levels across tissues, helping visualize how these cells evolve from early to more mature stages.
-
 ## B cells
 
 ```{r}
 #| label: B_cells_8
+#| fig-height: 8
 
 cds_interest_b <- c("CD11a", "CD69", "CD79b", "CD80")
 
@@ -142,6 +142,7 @@ p1
 
 ```{r}
 #| label: CD4_T_cells_8
+#| fig-height: 8
 
 cds_interest_cd4 <- c("CD10", "CD25", "CD4_MEM-241", "CD62L")
 
@@ -158,6 +159,7 @@ p2
 
 ```{r}
 #| label: CD8_T_cells_8
+#| fig-height: 8
 
 cds_interest_cd8 <- c("CD27", "CD38", "CD71", "CD95")
 
@@ -171,8 +173,6 @@ p3
 ```
 
 **CD8 T cell markers:** CD27 (memory), CD38 (activation), CD71 (proliferation), CD95 (apoptosis).
-
-Overall, the goal is to get a clearer picture of how immune cells change as they mature, how their protein expression shifts depending on the tissue, and how these differences relate to the naive reference cells. The comparison against naive populations makes it easier to see which markers increase or decrease as cells become more mature or activated. Using linear modeling together with visualization provides a clear and intuitive way to interpret these changes, helping to understand the development and activation of B and T cells across different tissues.
 
 ## Export plots
 

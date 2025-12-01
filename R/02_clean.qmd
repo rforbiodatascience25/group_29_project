@@ -1,5 +1,4 @@
 ---
-title: "Cleaning data"
 format:
   html:
     embed-resources: true
@@ -12,6 +11,8 @@ execute:
   warning: false
   message: false
 ---
+
+# Cleaning data
 
 ## Loading packages
 

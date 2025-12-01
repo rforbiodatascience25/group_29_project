@@ -237,8 +237,9 @@ asc_CDs_boxplot <- function(data, lineage_filter, hierarchy_filter, tissue_filte
           legend.position = "bottom") +
     labs(x = "CD",
          y = measure,
-         fill = paste0("log10(", quo_name(measure), ")"),
-         title = paste("Fluorescence of", lineage_filter, "from the", tissue_filter))
+         fill = str_c("log10(", quo_name(measure), ")"),
+         title = str_c("Fluorescence of", lineage_filter, "from the", tissue_filter,
+                       sep = " "))
 }
 
 plot_scatter <- function(data, params, measure, lineage_filter, tissue_filter, color){
@@ -248,17 +249,17 @@ plot_scatter <- function(data, params, measure, lineage_filter, tissue_filter, c
   measure_intercept <- params |> 
     filter(lineage == lineage_filter,
            tissue == tissue_filter) |>
-    pull(paste0(measure_str, "_intercept"))
+    pull(str_c(measure_str, "_intercept"))
   
   measure_slope <- params |> 
     filter(lineage == lineage_filter,
            tissue == tissue_filter) |>
-    pull(paste0(measure_str, "_slope"))
+    pull(str_c(measure_str, "_slope"))
   
   measure_cor <- params |> 
     filter(lineage == lineage_filter,
            tissue == tissue_filter) |>
-    pull(paste0(measure_str, "_cor"))
+    pull(str_c(measure_str, "_cor"))
   
   data |>
     filter(lineage == lineage_filter,
@@ -273,8 +274,9 @@ plot_scatter <- function(data, params, measure, lineage_filter, tissue_filter, c
     geom_smooth(method = "lm",
                 color = color) +
     theme_bw() + 
-    labs(title = paste0(lineage_filter, " from ", tissue_filter),
-         subtitle = paste0("y = ", round(measure_slope, 2), 
+    labs(title = str_c(lineage_filter, "from", tissue_filter,
+                       sep = " "),
+         subtitle = str_c("y = ", round(measure_slope, 2), 
                            " * x + ", 
                            round(measure_intercept, 2), 
                            ", cor = ", 
@@ -350,8 +352,9 @@ plot_sig_CDs <- function(data, by_variable, fill_color){
                y = count_CD)) +
     geom_col(fill = fill_color) + 
     theme_bw(base_size = 13) +
-    labs(title = paste("Count of significant CDs for each", 
-                          by_variable_label),
+    labs(title = str_c("Count of significant CDs for each", 
+                       by_variable_label,
+                       sep = " "),
          x = by_variable_label,
          y = "count")
 }
@@ -369,7 +372,7 @@ plot_CD4vsCD8 <- function(data, pair_filter, legend_position) {
     geom_errorbar(aes(ymin = conf.low,
                       ymax = conf.high),
                   width = 0.4) +
-    theme_bw(base_size = 16) +
+    theme_bw(base_size = 13) +
     theme(axis.text.x = element_text(angle = 90, 
                                      vjust = 0.5, 
                                      hjust = 1),
@@ -377,7 +380,7 @@ plot_CD4vsCD8 <- function(data, pair_filter, legend_position) {
     ylim(c(0, 13)) +
     scale_color_manual(values = c("CD4 T cells" = "navy",
                                   "CD8 T cells" = "hotpink")) +
-    labs(subtitle = paste0("CD4", pair_filter, " vs CD8", pair_filter),
+    labs(subtitle = str_c("CD4", pair_filter, " vs CD8", pair_filter),
          x = "Significant CDs",
          y = "log(MedQb)",
          color = "Lineage")
