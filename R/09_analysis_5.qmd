@@ -52,8 +52,7 @@ columns <- c("tissue",
              "conf.low", 
              "conf.high",
              "p.value",
-             "is_significant",
-             "any_significant")
+             "is_significant")
 
 data_analysis5  <- data_aug |>
   filter(str_detect(cell_type, "CD4") | str_detect(cell_type, "CD8"),
@@ -72,11 +71,9 @@ data_analysis5  <- data_aug |>
   group_by(tissue, CD, pair) |>
   filter(n() > n_distinct(cell_type)) |>
   fit_linear_model(log(MedQb) ~ cell_type)|>
-  mutate(is_significant = case_when(term == "(Intercept)" ~ "reference",
-                                    p.value < 0.05 ~ "yes",
-                                    p.value >= 0.05 ~ "no"),
-          any_significant = case_when(any(is_significant == "yes") ~ "yes",
-                                     .default = "no")) |>
+  mutate(is_significant = case_when(
+    p.value[term != "(Intercept)"] < 0.05 ~ "yes",
+    p.value[term != "(Intercept)"] >= 0.05 ~ "no")) |>
   mutate(
     intercept = estimate[term == "(Intercept)"],
     estimate = case_when(
@@ -98,7 +95,6 @@ data_analysis5  <- data_aug |>
       .default = str_remove(term, "cell_type"))) |>
   select(all_of(columns)) |>
   ungroup() |>
-  filter(any_significant == "yes") |>
   mutate(lineage = case_when(str_detect(cell_type, "CD4") ~ "CD4 T cells",
                              .default = "CD8 T cells"),
          .before = cell_type)
@@ -114,7 +110,7 @@ Below are the number of significant CDs for each pair calculated and visualized.
 
 sig_CD_count <- data_analysis5 |>
   plot_sig_CDs(by_variable = pair, 
-                 fill_color = "hotpink")
+                 fill_color = "#fa2840")
 
 
 sig_CD_count
@@ -165,23 +161,68 @@ p6 <- data_analysis5 |>
   theme(plot.title = element_text(size = 18))
 ```
 
-## Plot export
+## Overview of CDs
 
-The format of the figure above is adjusted to fit the presentation.
+```{r}
+
+final_plot <- data_analysis5 |>
+  CD_order() |>
+  group_by(CD)|>
+  filter(any(is_significant == "yes")) |>
+  ungroup() |>
+  group_by(CD, pair) |>
+  mutate(highest = if_else(
+    estimate[str_detect(cell_type, "CD8")] >
+    estimate[str_detect(cell_type, "CD4")], 
+    "CD8 T cells",
+    "CD4 T cells")) |>
+  mutate(pair = factor(x = pair, 
+                       levels = c("TEMRA",
+                                  "EM",
+                                  "CM",
+                                  "naive",
+                                  "SP1am",
+                                  "SP1ap"))) |>
+  ggplot(aes(x = CD,
+             y = pair)) +
+  geom_tile(aes(fill = is_significant),
+            alpha = 0.4,
+            color = "white") +
+  geom_point(aes(shape = highest,
+                 color = highest,),
+             size = 2) +
+  scale_fill_manual(values = c("no" = "#fa2840",
+                                "yes" = "#29cf8f")) +
+  scale_color_manual(values = c("CD4 T cells" = "black",
+                               "CD8 T cells" = "#FFD700")) +
+  scale_shape_manual(values = c("CD4 T cells" = 16, 
+                                "CD8 T cells" = 15)) +
+  theme_bw(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 90, 
+                                    vjust = 0.5, 
+                                    hjust = 1),
+        legend.position = "bottom",
+        legend.box = "vertical") +
+  labs(title = "Significant CDs for each pair",
+       fill = "Is significant",
+       shape = "Highest log(MedQb)",
+       color = "Highest log(MedQb)",
+       x = "CD",
+       y = "Pair")
+
+final_plot
+```
+
+## Plot export
 
 ```{r}
 #| label: export_plots_9
 
 save_plot(plot = sig_CD_count,
           filename = "09_key_plot_1.png")
-
-p1 <- p1 +
-  labs(title = "Significant CDs stratified on pair")
-
-final_plot <- (p1 + p2 + p3) / (p4 + p5 + p6)
   
 save_plot(plot = final_plot,
           filename = "09_key_plot_2.png",
-          width = 17,
-          height = 9)
+          width = 10,
+          height = 5)
 ```
