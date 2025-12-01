@@ -10,6 +10,7 @@ format:
   revealjs:
     theme: [serif, custom.scss]
     embed-resources: true
+    scss: custom.scss
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -41,6 +42,12 @@ summary <- data_aug |>
 -   How do the expression of CD markers on lymphocyte subsets change during maturation?
 
 -   How are fluorescence intensity, variability, and positivity (MedQb, CVQb, PEpos) related across CD markers in lymphocyte subsets?
+
+**Data from:**
+
+-   Frontiers in Immunology, “B Cell Biology,” vol. 10, Oct. 23, 2019. doi: 10.3389/fimmu.2019.02434
+
+-   Can be downloaded from their shiny app: <http://bioinformin.cesnet.cz/CDmaps/>
 :::
 
 ::: {.column width="50%" style="font-size:50%"}
@@ -52,15 +59,15 @@ summary <- data_aug |>
 
 ::::: columns
 ::: {.column width="50%" style="font-size:50%"}
--   **Data from:** *Frontiers in Immunology*, “B Cell Biology,” vol. 10, Oct. 23, 2019. doi: 10.3389/fimmu.2019.02434
-
--   Can be downloaded from their shiny app: <http://bioinformin.cesnet.cz/CDmaps/>
-
--   The data set contains:
+-   **The data set contains:**
 
     -   `r nrow(data_aug)` observations of `r ncol(data_aug)` variables
 
     -   `r summary |> pluck("n_CDs")` unique CDs and `r summary |> pluck("n_celltypes")` unique cell types
+
+-   **Selected variables:**
+
+    -   CVQB, MedQb and PEpos
 
 ![](images/Method.png){width="602"}
 :::
@@ -78,7 +85,7 @@ data_aug |>
 :::
 :::::
 
-## Analysis 1
+## PCA of MedQb and PEpos
 
 ::::: columns
 ::: {.column width="50%" style="font-size:50%"}
@@ -97,7 +104,7 @@ data_aug |>
 :::
 :::::
 
-## Analysis 2
+## Overview of CD markers
 
 ::: {.columns style="font-size:50%"}
 -   Wide variations in CD marker distribution
@@ -109,7 +116,7 @@ data_aug |>
 ![](images/06_key_plot.png)
 :::
 
-## Analysis 3
+## How does MedQb correlate with CVQb and PEpos?
 
 ::::: columns
 ::: {.column width="50%" style="font-size:50%"}
@@ -129,13 +136,11 @@ data_aug |>
 :::
 :::::
 
-## Analysis 4
+## How does CD expression change during maturation?
 
 ::::: columns
 ::: {.column width="50%" style="font-size:50%"}
--   **How do CD marker expression change during maturation of each lineage?**
-
-    -   Applying a linear model with naive cell as reference
+-   For each tissue and lineage, a linear model was applied with the naive cell as the reference
 
 ![](images/compare_Bnaive.png){fig-align="center" width="456"}
 :::
@@ -147,7 +152,7 @@ data_aug |>
 :::
 :::::
 
-## Analysis 4
+## How does CD expression change during maturation?
 
 ::: {.columns style="font-size:50%"}
 -   Tonsil B cells are more activated (CD69, CD80), while blood B cells mature gradually (CD11a, CD80)
@@ -157,7 +162,7 @@ data_aug |>
 ![](images/08_key_plot_2.png)
 :::
 
-## Analysis 5
+## How do CD markers differ between CD4 and CD8 T cells?
 
 ::::: columns
 ::: {.column width="50%" style="font-size:50%"}
@@ -165,17 +170,16 @@ data_aug |>
 
     ![](images/CD4vsCD8.png)
 
--   **How do the CD markers differ between CD4 and CD8 T cells for each stage?**
-
-    -   SP1am and naive subsets have the lowest number of significant CDs → CD4 and CD8 more similar in CD expression in these stages
+-   SP1am and naive subsets have the lowest number of significant CDs → CD4 and CD8 more similar in CD expression in these stages
 :::
 
 ::: {.column width="50%" style="font-size: 50%"}
+
 ![](images/09_key_plot_1.png)
 :::
 :::::
 
-## Analysis 5
+## How do the CD markers differ between CD4 and CD8 T cells?
 
 ::: {.columns style="font-size:50%"}
 -   As expected CD4 and CD8 are significant different for all pairs

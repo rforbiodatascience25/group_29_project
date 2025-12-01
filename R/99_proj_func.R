@@ -350,7 +350,7 @@ plot_sig_CDs <- function(data, by_variable, fill_color){
                y = count_CD)) +
     geom_col(fill = fill_color) + 
     theme_bw(base_size = 13) +
-    labs(subtitle = paste("Count of significant CDs for each", 
+    labs(title = paste("Count of significant CDs for each", 
                           by_variable_label),
          x = by_variable_label,
          y = "count")
@@ -360,7 +360,8 @@ plot_sig_CDs <- function(data, by_variable, fill_color){
 # Analysis 5 - plots
 plot_CD4vsCD8 <- function(data, pair_filter, legend_position) {
   data |>
-    filter(pair == pair_filter) |>
+    filter(pair == pair_filter,
+           is_significant == "yes") |>
     ggplot(aes(x = CD,
                y = estimate,
                color = lineage)) +
